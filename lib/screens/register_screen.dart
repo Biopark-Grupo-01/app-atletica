@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_atletica/widgets/custom_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -120,12 +121,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(height: 20),
               isLoading
                   ? CircularProgressIndicator(color: Theme.of(context).colorScheme.secondary)
-                  : ElevatedButton(
+                  : CustomButton(
+                      text: 'Registrar-se',
                       onPressed: _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                      ),
-                      child: Text('Registrar-se'),
                     ),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/'),
