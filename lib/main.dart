@@ -1,3 +1,4 @@
+import 'package:app_atletica/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
+        '/register': (context) => RegisterScreen(),
       },
     );
   }
