@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:app_atletica/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -17,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         isLoading = true;
       });
-      
+
       // Simulação de delay para login (substituir com lógica de API real)
       Future.delayed(Duration(seconds: 2), () {
         setState(() {
@@ -35,96 +37,140 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'AAABE TIGRE BRANCO',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+      body: Stack(
+        children: [
+          Opacity(
+            opacity: 0.5,
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/brasao.png'),
+                  fit: BoxFit.contain,
                 ),
               ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  hintText: 'Email',
-                  prefixIcon: Icon(Icons.email, color: Colors.white),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira seu email';
-                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Insira um email válido';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Senha',
-                  prefixIcon: Icon(Icons.lock, color: Colors.white),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira sua senha';
-                  } else if (value.length < 6) {
-                    return 'A senha deve ter pelo menos 6 caracteres';
-                  }
-                  return null;
-                },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: isChecked,
-                        onChanged: (bool? newValue) {
-                          setState(() {
-                            isChecked = newValue!;
-                          });
-                        },
-                      ),
-                      Text('Lembre-se', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, '/password_recovery'),
-                    child: Text(
-                      'Esqueceu a senha?',
-                      style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              isLoading
-                  ? CircularProgressIndicator(color: Theme.of(context).colorScheme.secondary)
-                  : ElevatedButton(
-                      onPressed: _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                      ),
-                      child: Text('Login'),
-                    ),
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/register'),
-                child: Text('Registrar-se', style: TextStyle(color: Colors.white)),
-              ),
-            ],
+            ),
+            
           ),
-        ),
+          Container(
+            color: const Color.fromARGB(178, 1, 28, 58)
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/aaabe.png',
+                      scale: 0.8,
+                    ),
+                    SizedBox(height: 60),
+                    Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 24,
+                      ),
+                    ),
+                    SizedBox(height: 60),
+                    TextFormField(
+                      controller: emailController, // Controlador do campo de email
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.email, color: Colors.white),
+                        border: UnderlineInputBorder(), // Apenas a linha inferior
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white), // Cor da linha inferior
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.amber, width: 2), // Linha em foco
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.white), // Cor do texto
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, insira seu email';
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          return 'Insira um email válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 50),
+                    TextFormField(
+                      controller: passwordController, // Controlador do campo de senha
+                      obscureText: true, // Oculta o texto
+                      decoration: InputDecoration(
+                        labelText: 'Senha',
+                        prefixIcon: Icon(Icons.lock, color: Colors.white),
+                        border: UnderlineInputBorder(), // Apenas a linha inferior
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white), // Cor da linha inferior
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.amber, width: 2), // Linha em foco
+                        ),
+                      ),
+                      style: TextStyle(color: Colors.white), // Cor do texto
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, insira sua senha';
+                        } else if (value.length < 6) {
+                          return 'A senha deve ter pelo menos 6 caracteres';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 45),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: isChecked,
+                              onChanged: (bool? newValue) {
+                                setState(() {
+                                  isChecked = newValue!;
+                                });
+                              },
+                            ),
+                            Text('Lembre-me'),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/password_recovery'),
+                          child: Text(
+                            'Esqueceu a senha?',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 180),
+                    isLoading
+                        ? CircularProgressIndicator(
+                            color: Theme.of(context).colorScheme.secondary,
+                          )
+                        : CustomButton(
+                          text: 'Login',
+                          onPressed: _login,
+                        ),
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/register'),
+                      child: Text('Registrar-se'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
