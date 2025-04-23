@@ -1,16 +1,36 @@
-# app_atletica
+# App Tigre Oficial
 
-A new Flutter project.
+## 📌 Sobre o Projeto
 
-## Getting Started
+O **App Tigre Oficial** é um aplicativo mobile desenvolvido para a **Atlética Tigre Branco** com o objetivo de centralizar a comunicação, eventos, treinos, notícias e a loja oficial da atlética. A plataforma permite o gerenciamento de conteúdos por administradores e melhora a interação entre os membros.
 
-This project is a starting point for a Flutter application.
+## 🎯 Funcionalidades
 
-A few resources to get you started if this is your first Flutter project:
+- Cadastro e login de usuários
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Exibição de eventos, treinos e notificações
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Loja virtual da atlética
+
+- Perfil personalizado para os usuários
+
+- Cadastro e gerenciamento de conteúdo por administradores
+
+- Canal de suporte via WhatsApp
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Frontend:** Flutter
+- **Backend:** Node.js
+- **Banco de Dados:** Mock Data
+- **Gerenciamento de Código:** Git
+
+## 🚀 Como Executar o Projeto
+
+### 🔹 Frontend (Flutter)
+
+```sh
+cd mobile
+flutter pub get
+flutter run
+```
