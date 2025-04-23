@@ -1,3 +1,4 @@
+import 'package:app_atletica/screens/password_recovery_screen.dart';
 import 'package:app_atletica/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
+        '/password_recovery': (context) => PasswordRecoveryScreen(),
       },
     );
   }
