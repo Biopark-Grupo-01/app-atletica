@@ -11,6 +11,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _obscureText = true;
   bool isLoading = false;
   bool isChecked = false;
 
@@ -99,20 +100,31 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 50),
                     TextFormField(
-                      controller: passwordController, // Controlador do campo de senha
-                      obscureText: true, // Oculta o texto
+                      controller: passwordController,
+                      obscureText: _obscureText, // Controla se o texto está oculto ou visível
                       decoration: InputDecoration(
                         labelText: 'Senha',
                         prefixIcon: Icon(Icons.lock, color: Colors.white),
-                        border: UnderlineInputBorder(), // Apenas a linha inferior
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText ? Icons.visibility_off : Icons.visibility, 
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText; // Alterna entre mostrar e ocultar
+                            });
+                          },
+                        ),
+                        border: UnderlineInputBorder(),
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white), // Cor da linha inferior
+                          borderSide: BorderSide(color: Colors.white),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.amber, width: 2), // Linha em foco
+                          borderSide: BorderSide(color: Colors.amber, width: 2),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white), // Cor do texto
+                      style: TextStyle(color: Colors.white),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira sua senha';
