@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+class CustomBottomNavBar extends StatelessWidget{
+  const CustomBottomNavBar({
+    super.key, 
+    required this.currentIndex, 
+    required this.onTap
+  });
+  final int currentIndex; // Índice do item atualmente selecionado
+  final Function(int) onTap; // Função chamada quando um item é tocado
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconSize = screenWidth * 0.06;
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      selectedItemColor: const Color.fromARGB(255, 234, 194, 49),
+      unselectedItemColor: const Color.fromARGB(255, 189, 189, 189),
+      backgroundColor: const Color.fromARGB(255, 16, 16, 16),
+      type: BottomNavigationBarType.fixed, // garante que os itens não se ajustem dinamicamente
+      showSelectedLabels: false, // remove o texto do item selecionado
+      showUnselectedLabels: false, // remove o texto dos itens não selecionados
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.house, size: iconSize),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.personRunning, size: iconSize),
+          label: 'Treinos e Amistosos',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.tag, size: iconSize),
+          label: 'Loja',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.calendarDay, size: iconSize),
+          label: 'Eventos e Notícias',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(FontAwesomeIcons.solidCircleUser, size: iconSize),
+          label: 'Perfil',
+        ),
+      ],
+    );
+  }
+}
