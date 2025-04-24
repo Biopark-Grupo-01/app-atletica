@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_atletica/widgets/custom_button.dart';
 
 class PasswordRecoveryScreen extends StatefulWidget {
   @override
@@ -78,12 +79,9 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
               SizedBox(height: 20),
               isLoading
                   ? CircularProgressIndicator(color: Theme.of(context).colorScheme.secondary)
-                  : ElevatedButton(
+                  : CustomButton(
+                      text: 'Recuperar Senha',
                       onPressed: _recoverPassword,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                      ),
-                      child: Text('Recuperar Senha'),
                     ),
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/'),
