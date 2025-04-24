@@ -12,11 +12,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  String? nameError;
+  String? emailError;
+  String? passwordError;
+  String? confirmPasswordError;
   bool isLoading = false;
 
+  void _validateFields() {
+    setState(() {
+      nameError = nameController.text.isEmpty ? 'Por favor, insira seu nome' : null;
+      emailError = emailController.text.isEmpty
+          ? 'Por favor, insira seu email'
+          : (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(emailController.text)
+              ? 'Insira um email válido'
+              : null);
+      passwordError = passwordController.text.isEmpty
+          ? 'Por favor, insira sua senha'
+          : (passwordController.text.length < 6
+              ? 'A senha deve ter pelo menos 6 caracteres'
+              : null);
+      confirmPasswordError = confirmPasswordController.text.isEmpty
+          ? 'Por favor, confirme sua senha'
+          : (confirmPasswordController.text != passwordController.text
+              ? 'As senhas não correspondem'
+              : null);
+    });
+  }
+
   void _register() {
-    if (_formKey.currentState!.validate()) {
+    _validateFields();
+    if ([nameError, emailError, passwordError, confirmPasswordError].every((error) => error == null)) {
       setState(() {
         isLoading = true;
       });
@@ -57,125 +82,104 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/aaabe.png',
-                      scale: 0.8,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/aaabe.png',
+                    scale: 0.8,
+                  ),
+                  SizedBox(height: 60),
+                  Text(
+                    'Registrar-se',
+                    style: TextStyle(
+                      fontSize: 24,
                     ),
-                    SizedBox(height: 60),
-                    Text(
-                      'Registrar-se',
-                      style: TextStyle(
-                        fontSize: 24,
+                  ),
+                  SizedBox(height: 60),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nome Completo',
+                      prefixIcon: Icon(Icons.person, color: Colors.white),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
                       ),
-                    ),
-                    SizedBox(height: 60),
-                    TextFormField(
-                      controller: nameController,
-                      decoration: InputDecoration(
-                        labelText: 'Nome Completo',
-                        prefixIcon: Icon(Icons.person, color: Colors.white),
-                        border: UnderlineInputBorder(),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.amber, width: 2),
-                        ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber, width: 2),
                       ),
-                      style: TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira seu nome';
-                        }
-                        return null;
-                      },
+                      errorText: nameError,
                     ),
-                    SizedBox(height: 50),
-                    TextFormField(
-                      controller: emailController,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email, color: Colors.white),
-                        border: UnderlineInputBorder(),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.amber, width: 2),
-                        ),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  SizedBox(height: 50),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email, color: Colors.white),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
                       ),
-                      style: TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira seu email';
-                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                          return 'Insira um email válido';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 50),
-                    TextFormField(
-                      controller: passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Senha',
-                        prefixIcon: Icon(Icons.lock, color: Colors.white),
-                        border: UnderlineInputBorder(),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.amber, width: 2),
-                        ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber, width: 2),
                       ),
-                      style: TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira sua senha';
-                        } else if (value.length < 6) {
-                          return 'A senha deve ter pelo menos 6 caracteres';
-                        }
-                        return null;
-                      },
+                      errorText: emailError,
                     ),
-                    SizedBox(height: 50),
-                    TextFormField(
-                      controller: confirmPasswordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Confirme sua senha',
-                        prefixIcon: Icon(Icons.lock, color: Colors.white),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  SizedBox(height: 50),
+                  TextFormField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Senha',
+                      prefixIcon: Icon(Icons.lock, color: Colors.white),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, confirme sua senha';
-                        } else if (value != passwordController.text) {
-                          return 'As senhas não correspondem';
-                        }
-                        return null;
-                      },
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber, width: 2),
+                      ),
+                      errorText: passwordError,
                     ),
-                    SizedBox(height: 60),
-                    isLoading
-                        ? CircularProgressIndicator(
-                            color: Theme.of(context).colorScheme.secondary,
-                          )
-                        : CustomButton(
-                            text: 'Registrar-se',
-                            onPressed: _register,
-                          ),
-                    TextButton(
-                      onPressed: () => Navigator.pushNamed(context, '/'),
-                      child: Text('Já tem uma conta? Login'),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  SizedBox(height: 50),
+                  TextFormField(
+                    controller: confirmPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: 'Confirme sua senha',
+                      prefixIcon: Icon(Icons.lock, color: Colors.white),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.amber, width: 2),
+                      ),
+                      errorText: confirmPasswordError,
                     ),
-                  ],
-                ),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  SizedBox(height: 60),
+                  isLoading
+                      ? CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.secondary,
+                        )
+                      : CustomButton(
+                          text: 'Registrar-se',
+                          onPressed: _register,
+                        ),
+                  TextButton(
+                    onPressed: () => Navigator.pushNamed(context, '/'),
+                    child: Text('Já tem uma conta? Login'),
+                  ),
+                ],
               ),
             ),
           ),
