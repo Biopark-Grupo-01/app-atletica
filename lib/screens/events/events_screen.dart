@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
-import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 

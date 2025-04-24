@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import 'package:app_atletica/screens/home/home_screen.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,6 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
         // Exemplo: Mostrar um snackbar ao concluir o login
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login realizado com sucesso!')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       });
     }

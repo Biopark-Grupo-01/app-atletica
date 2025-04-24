@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:app_atletica/widgets/custom_button.dart';
 
 class RegisterScreen extends StatefulWidget {

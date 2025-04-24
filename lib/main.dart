@@ -1,8 +1,9 @@
-import 'package:app_atletica/screens/events/events_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:app_atletica/screens/login/login_screen.dart';
 import 'package:app_atletica/screens/login/password_recovery_screen.dart';
 import 'package:app_atletica/screens/login/register_screen.dart';
-import 'package:flutter/material.dart';
-import 'screens/login/login_screen.dart';
+import 'package:app_atletica/screens/home/home_screen.dart';
+import 'package:app_atletica/screens/events/events_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/password_recovery': (context) => PasswordRecoveryScreen(),
+        '/home': (context) => HomeScreen(),
         '/events': (context) => EventsScreen(),
       },
     );
