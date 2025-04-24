@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:app_atletica/screens/home/home_screen.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -28,9 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
         });
 
         // Exemplo: Mostrar um snackbar ao concluir o login
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login realizado com sucesso!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Login realizado com sucesso!')));
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -54,11 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            
           ),
-          Container(
-            color: const Color.fromARGB(178, 1, 28, 58)
-          ),
+          Container(color: AppColors.blue),
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -67,36 +66,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'assets/images/aaabe.png',
-                      scale: 0.8,
-                    ),
+                    Image.asset('assets/images/aaabe.png', scale: 0.8),
                     SizedBox(height: 60),
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 24,
-                      ),
-                    ),
+                    Text('Login', style: TextStyle(fontSize: 24)),
                     SizedBox(height: 60),
                     TextFormField(
-                      controller: emailController, // Controlador do campo de email
+                      controller:
+                          emailController, // Controlador do campo de email
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        prefixIcon: Icon(Icons.email, color: Colors.white),
-                        border: UnderlineInputBorder(), // Apenas a linha inferior
+                        prefixIcon: Icon(Icons.email, color: AppColors.white),
+                        border:
+                            UnderlineInputBorder(), // Apenas a linha inferior
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white), // Cor da linha inferior
+                          borderSide: BorderSide(
+                            color: AppColors.white,
+                          ), // Cor da linha inferior
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.amber, width: 2), // Linha em foco
+                          borderSide: BorderSide(
+                            color: AppColors.yellow,
+                            width: 2,
+                          ), // Linha em foco
                         ),
                       ),
-                      style: TextStyle(color: Colors.white), // Cor do texto
+                      style: TextStyle(color: AppColors.white), // Cor do texto
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira seu email';
-                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        } else if (!RegExp(
+                          r'^[^@]+@[^@]+\.[^@]+',
+                        ).hasMatch(value)) {
                           return 'Insira um email válido';
                         }
                         return null;
@@ -105,30 +105,37 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: 50),
                     TextFormField(
                       controller: passwordController,
-                      obscureText: _obscureText, // Controla se o texto está oculto ou visível
+                      obscureText:
+                          _obscureText, // Controla se o texto está oculto ou visível
                       decoration: InputDecoration(
                         labelText: 'Senha',
-                        prefixIcon: Icon(Icons.lock, color: Colors.white),
+                        prefixIcon: Icon(Icons.lock, color: AppColors.white),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureText ? Icons.visibility_off : Icons.visibility, 
-                            color: Colors.white,
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: AppColors.white,
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureText = !_obscureText; // Alterna entre mostrar e ocultar
+                              _obscureText =
+                                  !_obscureText; // Alterna entre mostrar e ocultar
                             });
                           },
                         ),
                         border: UnderlineInputBorder(),
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: AppColors.white),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.amber, width: 2),
+                          borderSide: BorderSide(
+                            color: AppColors.yellow,
+                            width: 2,
+                          ),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.white),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira sua senha';
@@ -156,8 +163,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                         GestureDetector(
-                          onTap: () =>
-                              Navigator.pushNamed(context, '/password_recovery'),
+                          onTap:
+                              () => Navigator.pushNamed(
+                                context,
+                                '/password_recovery',
+                              ),
                           child: Text(
                             'Esqueceu a senha?',
                             style: TextStyle(
@@ -170,15 +180,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: 180),
                     isLoading
                         ? CircularProgressIndicator(
-                            color: Theme.of(context).colorScheme.secondary,
-                          )
-                        : CustomButton(
-                          text: 'Login',
-                          onPressed: _login,
-                        ),
+                          color: Theme.of(context).colorScheme.secondary,
+                        )
+                        : CustomButton(text: 'Login', onPressed: _login),
                     TextButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/register'),
+                      onPressed:
+                          () => Navigator.pushNamed(context, '/register'),
                       child: Text('Registrar-se'),
                     ),
                   ],
