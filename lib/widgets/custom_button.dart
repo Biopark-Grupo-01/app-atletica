@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text; // Texto no botão
@@ -17,21 +18,18 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isDisabled ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(280, 50), // Tamanho do botão
-        backgroundColor: isDisabled
-            ? Colors.grey // Cor do botão desabilitado
-            : const Color.fromARGB(255, 234, 194, 49), // Cor padrão
-        foregroundColor: const Color.fromARGB(255, 8, 8, 8), // Cor do texto
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5), // Bordas arredondadas
-        ),
+        minimumSize: Size(280, 50),
+        backgroundColor:
+            isDisabled
+                ? AppColors
+                    .lightGrey // Cor do botão desabilitado
+                : AppColors.yellow,
+        foregroundColor: AppColors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontWeight: FontWeight.bold, // Estilo do texto
-          fontSize: 16,
-        ),
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
     );
   }

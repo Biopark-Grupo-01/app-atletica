@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 
 class EventItem extends StatelessWidget {
   final String imageUrl;
@@ -24,7 +25,7 @@ class EventItem extends StatelessWidget {
         // Retângulo com imagem
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(8),
           ),
           clipBehavior: Clip.antiAlias,
@@ -36,7 +37,7 @@ class EventItem extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
-                  color: Color.fromARGB(255, 189, 189, 189),
+                  color: AppColors.lightGrey,
                   child: const Center(
                     child: Icon(Icons.image_not_supported, size: 50),
                   ),
@@ -45,7 +46,7 @@ class EventItem extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Informações de texto abaixo do retângulo
         Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 0),
@@ -57,17 +58,21 @@ class EventItem extends StatelessWidget {
                   Text(
                     date,
                     style: const TextStyle(
-                      color: Color.fromARGB(255, 248, 246, 245),
+                      color: AppColors.white,
                       fontSize: 16,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.location_on, size: 16, color: Color.fromARGB(255, 189, 189, 189)),
+                  const Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: AppColors.lightGrey,
+                  ),
                   const SizedBox(width: 2),
                   Text(
                     location,
                     style: const TextStyle(
-                      color: Color.fromARGB(255, 189, 189, 189),
+                      color: AppColors.lightGrey,
                       fontSize: 16,
                     ),
                   ),
@@ -77,7 +82,7 @@ class EventItem extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  color: Color.fromARGB(255, 234, 194, 49),
+                  color: AppColors.yellow,
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
@@ -85,10 +90,7 @@ class EventItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 description,
-                style: const TextStyle(
-                  color: Color.fromARGB(255, 248, 246, 245),
-                  fontSize: 16,
-                ),
+                style: const TextStyle(color: AppColors.white, fontSize: 16),
               ),
             ],
           ),

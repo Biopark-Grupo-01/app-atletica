@@ -4,6 +4,7 @@ import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 1, 28, 58),
+      backgroundColor: AppColors.blue,
       appBar: CustomAppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -24,17 +25,14 @@ class HomeScreen extends StatelessWidget {
                 const Center(
                   child: SizedBox(
                     width: 214,
-                    child: Divider(
-                      color: Color.fromARGB(255, 234, 194, 49),
-                      thickness: 1,
-                    ),
+                    child: Divider(color: AppColors.yellow, thickness: 1),
                   ),
                 ),
                 const Center(
                   child: Text(
                     'EVENTOS',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -43,10 +41,7 @@ class HomeScreen extends StatelessWidget {
                 const Center(
                   child: SizedBox(
                     width: 214,
-                    child: Divider(
-                      color: Color.fromARGB(255, 234, 194, 49),
-                      thickness: 1,
-                    ),
+                    child: Divider(color: AppColors.yellow, thickness: 1),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -85,17 +80,14 @@ class HomeScreen extends StatelessWidget {
                 const Center(
                   child: SizedBox(
                     width: 214,
-                    child: Divider(
-                      color: Color.fromARGB(255, 234, 194, 49),
-                      thickness: 1,
-                    ),
+                    child: Divider(color: AppColors.yellow, thickness: 1),
                   ),
                 ),
                 const Center(
                   child: Text(
                     'NOTÍCIAS',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -104,10 +96,7 @@ class HomeScreen extends StatelessWidget {
                 const Center(
                   child: SizedBox(
                     width: 214,
-                    child: Divider(
-                      color: Color.fromARGB(255, 234, 194, 49),
-                      thickness: 1,
-                    ),
+                    child: Divider(color: AppColors.yellow, thickness: 1),
                   ),
                 ),
                 const SizedBox(height: 30),

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 
-class CustomBottomNavBar extends StatelessWidget{
+class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
-    super.key, 
-    required this.currentIndex, 
-    required this.onTap
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
   });
   final int currentIndex; // Índice do item atualmente selecionado
   final Function(int) onTap; // Função chamada quando um item é tocado
@@ -17,10 +18,12 @@ class CustomBottomNavBar extends StatelessWidget{
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
-      selectedItemColor: const Color.fromARGB(255, 234, 194, 49),
-      unselectedItemColor: const Color.fromARGB(255, 189, 189, 189),
-      backgroundColor: const Color.fromARGB(255, 16, 16, 16),
-      type: BottomNavigationBarType.fixed, // garante que os itens não se ajustem dinamicamente
+      selectedItemColor: AppColors.yellow,
+      unselectedItemColor: AppColors.lightGrey,
+      backgroundColor: AppColors.darkGrey,
+      type:
+          BottomNavigationBarType
+              .fixed, // garante que os itens não se ajustem dinamicamente
       showSelectedLabels: false, // remove o texto do item selecionado
       showUnselectedLabels: false, // remove o texto dos itens não selecionados
       items: [

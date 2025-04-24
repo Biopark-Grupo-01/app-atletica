@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -19,28 +20,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _validateFields() {
     setState(() {
-      nameError = nameController.text.isEmpty ? 'Por favor, insira seu nome' : null;
-      emailError = emailController.text.isEmpty
-          ? 'Por favor, insira seu email'
-          : (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(emailController.text)
-              ? 'Insira um email válido'
-              : null);
-      passwordError = passwordController.text.isEmpty
-          ? 'Por favor, insira sua senha'
-          : (passwordController.text.length < 6
-              ? 'A senha deve ter pelo menos 6 caracteres'
-              : null);
-      confirmPasswordError = confirmPasswordController.text.isEmpty
-          ? 'Por favor, confirme sua senha'
-          : (confirmPasswordController.text != passwordController.text
-              ? 'As senhas não correspondem'
-              : null);
+      nameError =
+          nameController.text.isEmpty ? 'Por favor, insira seu nome' : null;
+      emailError =
+          emailController.text.isEmpty
+              ? 'Por favor, insira seu email'
+              : (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(emailController.text)
+                  ? 'Insira um email válido'
+                  : null);
+      passwordError =
+          passwordController.text.isEmpty
+              ? 'Por favor, insira sua senha'
+              : (passwordController.text.length < 6
+                  ? 'A senha deve ter pelo menos 6 caracteres'
+                  : null);
+      confirmPasswordError =
+          confirmPasswordController.text.isEmpty
+              ? 'Por favor, confirme sua senha'
+              : (confirmPasswordController.text != passwordController.text
+                  ? 'As senhas não correspondem'
+                  : null);
     });
   }
 
   void _register() {
     _validateFields();
-    if ([nameError, emailError, passwordError, confirmPasswordError].every((error) => error == null)) {
+    if ([
+      nameError,
+      emailError,
+      passwordError,
+      confirmPasswordError,
+    ].every((error) => error == null)) {
       setState(() {
         isLoading = true;
       });
@@ -75,59 +85,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
-          Container(
-            color: const Color.fromARGB(178, 1, 28, 58),
-          ),
+          Container(color: AppColors.blue),
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/aaabe.png',
-                    scale: 0.8,
-                  ),
+                  Image.asset('assets/images/aaabe.png', scale: 0.8),
                   SizedBox(height: 60),
-                  Text(
-                    'Registrar-se',
-                    style: TextStyle(
-                      fontSize: 24,
-                    ),
-                  ),
+                  Text('Registrar-se', style: TextStyle(fontSize: 24)),
                   SizedBox(height: 60),
                   TextFormField(
                     controller: nameController,
                     decoration: InputDecoration(
                       labelText: 'Nome Completo',
-                      prefixIcon: Icon(Icons.person, color: Colors.white),
+                      prefixIcon: Icon(Icons.person, color: AppColors.white),
                       border: UnderlineInputBorder(),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: AppColors.white),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.amber, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.yellow,
+                          width: 2,
+                        ),
                       ),
                       errorText: nameError,
                     ),
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppColors.white),
                   ),
                   SizedBox(height: 50),
                   TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      prefixIcon: Icon(Icons.email, color: Colors.white),
+                      prefixIcon: Icon(Icons.email, color: AppColors.white),
                       border: UnderlineInputBorder(),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: AppColors.white),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.amber, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.yellow,
+                          width: 2,
+                        ),
                       ),
                       errorText: emailError,
                     ),
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppColors.white),
                   ),
                   SizedBox(height: 50),
                   TextFormField(
@@ -135,17 +141,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Senha',
-                      prefixIcon: Icon(Icons.lock, color: Colors.white),
+                      prefixIcon: Icon(Icons.lock, color: AppColors.white),
                       border: UnderlineInputBorder(),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: AppColors.white),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.amber, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.yellow,
+                          width: 2,
+                        ),
                       ),
                       errorText: passwordError,
                     ),
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppColors.white),
                   ),
                   SizedBox(height: 50),
                   TextFormField(
@@ -153,27 +162,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: 'Confirme sua senha',
-                      prefixIcon: Icon(Icons.lock, color: Colors.white),
+                      prefixIcon: Icon(Icons.lock, color: AppColors.white),
                       border: UnderlineInputBorder(),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: AppColors.white),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.amber, width: 2),
+                        borderSide: BorderSide(
+                          color: AppColors.yellow,
+                          width: 2,
+                        ),
                       ),
                       errorText: confirmPasswordError,
                     ),
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppColors.white),
                   ),
                   SizedBox(height: 60),
                   isLoading
                       ? CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.secondary,
-                        )
+                        color: Theme.of(context).colorScheme.secondary,
+                      )
                       : CustomButton(
-                          text: 'Registrar-se',
-                          onPressed: _register,
-                        ),
+                        text: 'Registrar-se',
+                        onPressed: _register,
+                      ),
                   TextButton(
                     onPressed: () => Navigator.pushNamed(context, '/'),
                     child: Text('Já tem uma conta? Login'),
