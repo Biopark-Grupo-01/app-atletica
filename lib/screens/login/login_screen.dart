@@ -46,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
+          Container(color: const Color.fromARGB(255, 30, 30, 30)),
           Opacity(
             opacity: 0.5,
             child: Container(
@@ -57,40 +58,36 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Container(color: AppColors.blue),
+          Container(color: const Color.fromARGB(178, 1, 28, 58)),
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(40.0),
               child: Form(
                 key: _formKey,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Image.asset('assets/images/aaabe.png', scale: 0.8),
-                    SizedBox(height: 60),
+                    SizedBox(height: 30), // Espaço padronizado
                     Text('Login', style: TextStyle(fontSize: 24)),
-                    SizedBox(height: 60),
+                    SizedBox(height: 55), // Espaço padronizado
                     TextFormField(
-                      controller:
-                          emailController, // Controlador do campo de email
+                      controller: emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
                         prefixIcon: Icon(Icons.email, color: AppColors.white),
-                        border:
-                            UnderlineInputBorder(), // Apenas a linha inferior
+                        border: UnderlineInputBorder(),
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: AppColors.white,
-                          ), // Cor da linha inferior
+                          borderSide: BorderSide(color: AppColors.white),
                         ),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: AppColors.yellow,
                             width: 2,
-                          ), // Linha em foco
+                          ),
                         ),
                       ),
-                      style: TextStyle(color: AppColors.white), // Cor do texto
+                      style: TextStyle(color: AppColors.white),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira seu email';
@@ -102,11 +99,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 50),
+                    SizedBox(height: 30),
                     TextFormField(
                       controller: passwordController,
-                      obscureText:
-                          _obscureText, // Controla se o texto está oculto ou visível
+                      obscureText: _obscureText,
                       decoration: InputDecoration(
                         labelText: 'Senha',
                         prefixIcon: Icon(Icons.lock, color: AppColors.white),
@@ -119,8 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureText =
-                                  !_obscureText; // Alterna entre mostrar e ocultar
+                              _obscureText = !_obscureText;
                             });
                           },
                         ),
@@ -145,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 45),
+                    SizedBox(height: 25),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -177,16 +172,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 180),
+                    Spacer(), // Empurra os elementos restantes para baixo
                     isLoading
                         ? CircularProgressIndicator(
                           color: Theme.of(context).colorScheme.secondary,
                         )
                         : CustomButton(text: 'Login', onPressed: _login),
+                    SizedBox(height: 20), // Espaço padronizado
                     TextButton(
                       onPressed:
                           () => Navigator.pushNamed(context, '/register'),
-                      child: Text('Registrar-se'),
+                      child: Text(
+                        'Registrar-se',
+                        style: TextStyle(color: AppColors.white),
+                      ),
                     ),
                   ],
                 ),
