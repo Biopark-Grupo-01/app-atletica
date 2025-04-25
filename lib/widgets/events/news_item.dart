@@ -31,7 +31,7 @@ class NewsItem extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: SizedBox(
             width: double.infinity,
-            height: 270,
+            height: 250,
             child: Image.network(
               imageUrl,
               fit: BoxFit.cover,
