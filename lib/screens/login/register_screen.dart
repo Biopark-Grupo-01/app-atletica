@@ -85,17 +85,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
-          Container(color: AppColors.blue),
+          Container(color: const Color.fromARGB(178, 1, 28, 58)),
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(40.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Image.asset('assets/images/aaabe.png', scale: 0.8),
-                  SizedBox(height: 60),
+                  SizedBox(height: 30), // Espaço padronizado
                   Text('Registrar-se', style: TextStyle(fontSize: 24)),
-                  SizedBox(height: 60),
+                  SizedBox(height: 55), // Espaço padronizado
                   TextFormField(
                     controller: nameController,
                     decoration: InputDecoration(
@@ -115,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     style: TextStyle(color: AppColors.white),
                   ),
-                  SizedBox(height: 50),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: emailController,
                     decoration: InputDecoration(
@@ -135,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     style: TextStyle(color: AppColors.white),
                   ),
-                  SizedBox(height: 50),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: passwordController,
                     obscureText: true,
@@ -156,12 +156,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     style: TextStyle(color: AppColors.white),
                   ),
-                  SizedBox(height: 50),
+                  SizedBox(height: 20),
                   TextFormField(
                     controller: confirmPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                      hintText: 'Confirme sua senha',
+                      labelText: 'Confirme sua senha',
                       prefixIcon: Icon(Icons.lock, color: AppColors.white),
                       border: UnderlineInputBorder(),
                       enabledBorder: UnderlineInputBorder(
@@ -177,7 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     style: TextStyle(color: AppColors.white),
                   ),
-                  SizedBox(height: 60),
+                  Spacer(), // Empurra os elementos restantes para baixo
                   isLoading
                       ? CircularProgressIndicator(
                         color: Theme.of(context).colorScheme.secondary,
@@ -186,9 +186,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         text: 'Registrar-se',
                         onPressed: _register,
                       ),
+                  SizedBox(height: 20), // Espaço padronizado
                   TextButton(
-                    onPressed: () => Navigator.pushNamed(context, '/'),
-                    child: Text('Já tem uma conta? Login'),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Já tem uma conta? Login',
+                      style: TextStyle(color: AppColors.white),
+                    ),
                   ),
                 ],
               ),
