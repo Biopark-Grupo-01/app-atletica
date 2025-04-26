@@ -7,11 +7,11 @@ class CustomButton extends StatelessWidget {
   final bool isDisabled; // Controla se o botão está habilitado ou desabilitado
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isDisabled = false, // Por padrão o botão está habilitado
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

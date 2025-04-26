@@ -1,11 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:app_atletica/utils/utils.dart';
+import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/services/events_news_service.dart';
+import 'package:app_atletica/widgets/custom_app_bar.dart';
+import 'package:app_atletica/widgets/custom_title.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
-import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:app_atletica/theme/app_colors.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -29,48 +29,19 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() {
-      news = [
-        {
-          'imageUrl': 'https://picsum.photos/350/150',
-          'date': '22/04/2025',
-          'location': 'São Paulo',
-          'title': 'Notícia do Backend',
-          'description': 'Essa notícia veio da API.',
-        },
-      ];
-
-      events = [
-        {
-          'imageUrl': 'https://picsum.photos/350/150',
-          'date': '30/04/2025',
-          'location': 'Rio de Janeiro',
-          'title': 'Evento da API',
-          'description': 'Evento vindo do back-end.',
-        },
-      ];
-
-      isLoading = false;
-    });
-    // try {
-    //   final newsResponse = await makeHttpRequest(context, "/news");
-    //   final eventsResponse = await makeHttpRequest(context, "/events");
-
-    //   if (newsResponse.statusCode == 200 && eventsResponse.statusCode == 200) {
-    //     setState(() {
-    //       news = json.decode(newsResponse.body);
-    //       events = json.decode(eventsResponse.body);
-    //       isLoading = false;
-    //     });
-    //   } else {
-    //     throw Exception("Erro ao carregar dados do servidor");
-    //   }
-    // } catch (e) {
-    //   setState(() {
-    //     error = e.toString();
-    //     isLoading = false;
-    //   });
-    // }
+    try {
+      final data = await EventsNewsService.loadData(context);
+      setState(() {
+        news = data['news'] ?? [];
+        events = data['events'] ?? [];
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -98,36 +69,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const Center(
-                          child: SizedBox(
-                            width: 214,
-                            child: Divider(
-                              color: AppColors.yellow,
-                              thickness: 1,
-                            ),
-                          ),
-                        ),
-                        const Center(
-                          child: Text(
-                            'EVENTOS E NOTÍCIAS',
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const Center(
-                          child: SizedBox(
-                            width: 214,
-                            child: Divider(
-                              color: AppColors.yellow,
-                              thickness: 1,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-
+                        CustomTitle(title: 'EVENTOS E NOTÍCIAS'),
                         ...news.map(
                           (item) => Column(
                             children: [
@@ -142,7 +84,6 @@ class _EventsScreenState extends State<EventsScreen> {
                             ],
                           ),
                         ),
-
                         ...events.map(
                           (item) => Column(
                             children: [
