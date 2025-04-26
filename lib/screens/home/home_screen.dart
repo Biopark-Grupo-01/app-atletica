@@ -1,13 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:app_atletica/services/events_news_service.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
-import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/widgets/custom_title.dart';
+import 'package:app_atletica/widgets/home/carousel_item.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
-import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Map<String, String>> news = [];
+  List<Map<String, String>> events = [];
+
+  bool isLoading = true;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final data = await EventsNewsService.loadData(context);
+      setState(() {
+        news = data['news'] ?? [];
+        events = data['events'] ?? [];
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,119 +57,32 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Center(
-                  child: SizedBox(
-                    width: 214,
-                    child: Divider(color: AppColors.yellow, thickness: 1),
-                  ),
+                CustomTitle(title: 'EVENTOS'),
+                CarouselItem(
+                  items: events,
+                  useCarousel: true,
+                  itemBuilder:
+                      (item) => EventItem(
+                        imageUrl: item['imageUrl'] ?? '',
+                        date: item['date'] ?? '',
+                        location: item['location'] ?? '',
+                        title: item['title'] ?? '',
+                        description: item['description'] ?? '',
+                      ),
                 ),
-                const Center(
-                  child: Text(
-                    'EVENTOS',
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                CustomTitle(title: 'NOTÍCIAS'),
+                CarouselItem(
+                  items: news,
+                  useCarousel: true,
+                  itemBuilder:
+                      (item) => NewsItem(
+                        imageUrl: item['imageUrl'] ?? '',
+                        date: item['date'] ?? '',
+                        location: item['location'] ?? '',
+                        title: item['title'] ?? '',
+                        description: item['description'] ?? '',
+                      ),
                 ),
-                const Center(
-                  child: SizedBox(
-                    width: 214,
-                    child: Divider(color: AppColors.yellow, thickness: 1),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: 460,
-                    enlargeCenterPage: true,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 5),
-                    autoPlayAnimationDuration: const Duration(
-                      milliseconds: 800,
-                    ),
-                    pauseAutoPlayOnTouch: true,
-                    viewportFraction: 1.0,
-                  ),
-                  items: [
-                    // Notícia exemplo
-                    NewsItem(
-                      imageUrl: 'https://via.placeholder.com/350x150',
-                      date: '22/04/2025',
-                      location: 'São Paulo',
-                      title: 'TÍTULO NOTÍCIA',
-                      description:
-                          'Descrição da notícia com detalhes importantes sobre o acontecimento.',
-                    ),
-                    NewsItem(
-                      imageUrl: 'https://via.placeholder.com/350x150',
-                      date: '22/04/2025',
-                      location: 'Curitiba',
-                      title: 'TÍTULO NOTÍCIA',
-                      description:
-                          'Descrição da notícia com detalhes importantes sobre o acontecimento.',
-                    ),
-                  ],
-                ),
-                const Center(
-                  child: SizedBox(
-                    width: 214,
-                    child: Divider(color: AppColors.yellow, thickness: 1),
-                  ),
-                ),
-                const Center(
-                  child: Text(
-                    'NOTÍCIAS',
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Center(
-                  child: SizedBox(
-                    width: 214,
-                    child: Divider(color: AppColors.yellow, thickness: 1),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                CarouselSlider(
-                  options: CarouselOptions(
-                    height: 460,
-                    enlargeCenterPage: true,
-                    autoPlay: true,
-                    autoPlayInterval: const Duration(seconds: 5),
-                    autoPlayAnimationDuration: const Duration(
-                      milliseconds: 800,
-                    ),
-                    pauseAutoPlayOnTouch: true,
-                    viewportFraction: 1.0,
-                  ),
-                  items: [
-                    // Evento exemplo
-                    EventItem(
-                      imageUrl: 'https://via.placeholder.com/350x150',
-                      date: '30/04/2025',
-                      location: 'Belo Horizonte',
-                      title: 'TÍTULO EVENTO',
-                      description:
-                          'Descrição do evento com informações sobre horário e programação.',
-                    ),
-                    EventItem(
-                      imageUrl: 'https://via.placeholder.com/350x150',
-                      date: '30/04/2025',
-                      location: 'Rio de Janeiro',
-                      title: 'TÍTULO EVENTO',
-                      description:
-                          'Descrição do evento com informações sobre horário e programação.',
-                    ),
-
-                    // Adicione mais itens conforme necessário
-                  ],
-                ),
-                const SizedBox(height: 40),
               ],
             ),
           ),
