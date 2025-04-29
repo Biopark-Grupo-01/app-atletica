@@ -1,3 +1,4 @@
+import 'package:app_atletica/widgets/custom_square_button.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/services/events_news_service.dart';
 import 'package:app_atletica/theme/app_colors.dart';
@@ -7,6 +8,7 @@ import 'package:app_atletica/widgets/home/carousel_item.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,9 +56,49 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomSquareButton(
+                      icon: FontAwesomeIcons.ticket,
+                      offsetXFactor: -0.033,
+                      offsetYFactor: 0.0015,
+                      color: AppColors.white,
+                      label: 'Ingressos',
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/home');
+                      },
+                    ),
+                    CustomSquareButton(
+                      icon: FontAwesomeIcons.idCard,
+                      offsetXFactor: -0.033,
+                      offsetYFactor: 0.0015,
+                      label: 'Carteirinha',
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/home');
+                      },
+                    ),
+                    CustomSquareButton(
+                      icon: FontAwesomeIcons.newspaper,
+                      label: 'Notícias',
+                      color: AppColors.white,
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/events');
+                      },
+                    ),
+                    CustomSquareButton(
+                      icon: FontAwesomeIcons.calendarDay,
+                      label: 'Eventos',
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/events');
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
                 CustomTitle(title: 'EVENTOS'),
                 CarouselItem(
                   items: events,
