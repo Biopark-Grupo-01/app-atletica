@@ -7,14 +7,14 @@ class EventsNewsService {
     // Mock data for now
     final news = [
       {
-        'imageUrl': 'https://picsum.photos/350/150',
+        'imageUrl': 'https://picsum.photos/300/150',
         'date': '23/04/2025',
         'location': 'Porto Alegre',
         'title': 'Título Notícia',
         'description': 'Descrição da notícia',
       },
       {
-        'imageUrl': 'https://picsum.photos/350/150',
+        'imageUrl': 'https://picsum.photos/301/150',
         'date': '22/04/2025',
         'location': 'São Paulo',
         'title': 'Notícia do Backend',
@@ -24,14 +24,14 @@ class EventsNewsService {
 
     final events = [
       {
-        'imageUrl': 'https://picsum.photos/350/150',
+        'imageUrl': 'https://picsum.photos/302/150',
         'date': '31/04/2025',
         'location': 'Curitiba',
         'title': 'Título Evento',
         'description': 'Descrição do evento',
       },
       {
-        'imageUrl': 'https://picsum.photos/350/150',
+        'imageUrl': 'https://picsum.photos/303/150',
         'date': '30/04/2025',
         'location': 'Rio de Janeiro',
         'title': 'Evento da API',
