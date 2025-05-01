@@ -1,3 +1,6 @@
+import 'package:app_atletica/screens/account/account_settings_screen.dart';
+import 'package:app_atletica/screens/store/store_screen.dart';
+import 'package:app_atletica/screens/trainings/trainings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/screens/login/login_screen.dart';
 import 'package:app_atletica/screens/login/password_recovery_screen.dart';
@@ -18,13 +21,16 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.blue,
         primaryColor: AppColors.yellow,
       ),
-      initialRoute: '/',
+      initialRoute: '/home',
       routes: {
         '/': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/password_recovery': (context) => PasswordRecoveryScreen(),
         '/home': (context) => HomeScreen(),
         '/events': (context) => EventsScreen(),
+        '/trainings': (context) => TrainingsScreen(),
+        '/store': (context) => StoreScreen(),
+        '/profile': (context) => AccountSettingsScreen(),
       },
     );
   }
