@@ -104,34 +104,19 @@ final List<Map<String, String>> _allEvents = [
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.black,
-              child: const Center(
-                child: Text(
-                  'A.A.A.B.E',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            
+            // Sports list horizontal
             Padding(
               padding: const EdgeInsets.only(top: 16, bottom: 16),
               child: SizedBox(
-                height: 100, 
+                height: 100,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.only(left: 16), 
+                  padding: const EdgeInsets.only(left: 16),
                   itemCount: sports.length,
                   separatorBuilder: (context, index) => const SizedBox(width: 20),
-
                   itemBuilder: (context, index) {
                     final sport = sports[index];
                     final isLast = index == sports.length - 1;
@@ -140,16 +125,16 @@ final List<Map<String, String>> _allEvents = [
                     return Padding(
                       padding: EdgeInsets.only(right: isLast ? 16 : 0),
                       child: Material(
-                        color: Colors.transparent, 
+                        color: Colors.transparent,
                         child: InkWell(
-                          borderRadius: BorderRadius.circular(12), 
+                          borderRadius: BorderRadius.circular(12),
                           onTap: () {
                             setState(() {
                               final category = sport['category'];
                               if (_selectedCategories.contains(category)) {
-                                _selectedCategories.remove(category); 
+                                _selectedCategories.remove(category);
                               } else {
-                                _selectedCategories.add(category); 
+                                _selectedCategories.add(category);
                               }
                             });
                           },
@@ -166,26 +151,27 @@ final List<Map<String, String>> _allEvents = [
               ),
             ),
 
+            // Tabs
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Expanded(
-                    child: _buildTab('AMISTOSOS', 0)
-                  ),
+                  Expanded(child: _buildTab('AMISTOSOS', 0)),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildTab('TREINOS', 1),
-                  ),
+                  Expanded(child: _buildTab('TREINOS', 1)),
                 ],
               ),
             ),
 
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: filteredEvents.isEmpty
-                  ? Center(
+            const SizedBox(height: 16),
+
+            // Event list
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: filteredEvents.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
                       child: Text(
                         'Nenhum valor encontrado.',
                         style: const TextStyle(
@@ -194,20 +180,29 @@ final List<Map<String, String>> _allEvents = [
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    )
-                  : ListView.separated(
-                  itemCount: filteredEvents.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final event = filteredEvents[index];
-                    return _buildEventCard(event['title']!, event['description']!, event['date']!, event['location']!, event['category']!);
-                  },
-                ),
-              ),
+                    ),
+                  )
+                : Column(
+                    children: filteredEvents.map((event) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _buildEventCard(
+                          event['title']!,
+                          event['description']!,
+                          event['date']!,
+                          event['location']!,
+                          event['category']!,
+                        ),
+                      );
+                    }).toList(),
+                  ),
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
+
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 1,
         onTap: (index) {
@@ -240,13 +235,19 @@ final List<Map<String, String>> _allEvents = [
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFD700) : Colors.white,
+            gradient: LinearGradient(
+              colors: isSelected
+                ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
+                : [const Color.fromARGB(255, 0, 0, 0), const Color.fromARGB(255, 0, 34, 68)],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             icon,
             size: 30,
-            color: Colors.black,
+            color: isSelected ? Colors.black : Colors.white,
           ),
         ),
         const SizedBox(height: 8),
