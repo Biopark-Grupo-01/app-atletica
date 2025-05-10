@@ -186,13 +186,18 @@ final List<Map<String, String>> _allEvents = [
                     children: filteredEvents.map((event) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: _buildEventCard(
-                          event['title']!,
-                          event['description']!,
-                          event['date']!,
-                          event['location']!,
-                          event['category']!,
-                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/trainingDetail', arguments: 'productId');
+                          },
+                          child: _buildEventCard(
+                            event['title']!,
+                            event['description']!,
+                            event['date']!,
+                            event['location']!,
+                            event['category']!,
+                          ),
+                        )
                       );
                     }).toList(),
                   ),
