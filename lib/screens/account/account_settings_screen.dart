@@ -5,7 +5,6 @@ import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/account/register/register_home.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/screens/account/user_model.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import './edit_profile_screen.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
@@ -15,11 +14,8 @@ class AccountSettingsScreen extends StatefulWidget {
   State<AccountSettingsScreen> createState() => _AccountSettingsScreenState();
 }
 
-
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  // final userRepo = MockUserRepository(); // ← esse é nosso fake DB
   UserModel? user;
-
 
   @override
   void initState() {
@@ -28,157 +24,161 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   }
 
   Future<void> loadUser() async {
-    // final fetchedUser = await userRepo.getUser();
     final fetchedUser = UserModel(
       id: "123",
       email: "teste@gmail.com",
-      name: "Lucas",
+      name: "Lucas Dreveck",
       cpf: "123.456.789-00",
       avatarUrl: "https://example.com/avatar.png",
     );
-    // print("User fetched: ${fetchedUser.name} - ${fetchedUser.cpf}");
     setState(() {
       user = fetchedUser;
     });
   }
 
-
+  @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFF091B40),
-      body: Column(
-        children: [
-          // Header com avatar, nome e editar perfil
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: MediaQuery.of(context).size.height * 0.05),
-            width: double.infinity,
-            color: Colors.yellow,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Avatar
-                CircleAvatar(
-                  radius: 35,
-                  // backgroundImage: AssetImage("assets/images/avatar_exemplo.png"),
-                  backgroundImage: user?.avatarUrl != null
-                      ? NetworkImage(user!.avatarUrl)
-                      : const AssetImage("assets/images/logo_tigre.png")
-                          as ImageProvider,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: screenHeight * 0.3,
+              pinned: true,
+              backgroundColor: Colors.transparent,
+              flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xff21396a),
+                      Color(0xFF091B40),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: 16),
-                // Nome e CPF
-                Expanded(
-                  child: user == null
+                child: FlexibleSpaceBar(
+                  titlePadding: const EdgeInsets.only(left: 16, bottom: 16, right: 16),
+                  title: user == null
                       ? const CircularProgressIndicator()
-                      : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user!.name,
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            user!.cpf ?? 'CPF não disponível',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: MediaQuery.of(context).size.width * 0.13,
+                              backgroundImage: user?.avatarUrl == null
+                                  ? NetworkImage(user!.avatarUrl)
+                                  : const AssetImage("assets/images/emblema.png") as ImageProvider,
+                            ),
+
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user!.name,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    user!.cpf ?? 'CPF não disponível',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
-                // Editar perfil
-                // IconButton(
-                //   icon: const Icon(Icons.edit),
-                //   onPressed: () {
-                //     // TODO: Navegar para tela de edição de perfil
-                //   },
-                // ),
-                // Logout
+              ),
+              actions: [
                 IconButton(
                   icon: const Icon(Icons.logout),
-                    onPressed: () async {
-                      // await FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacementNamed(context, '/login');
+                  color: Colors.white,
+                  onPressed: () async {
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                ),
+              ],
+            ),
+
+
+
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  buildOptionTile(
+                    icon: Icons.confirmation_num,
+                    title: "Ingressos",
+                    subtitle: "Ingressos comprados",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TicketsScreen()),
+                      );
                     },
-                ),
-              ],
-            ),
-          ),
+                  ),
 
-          const SizedBox(height: 16),
-
-          // Opções da conta
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                buildOptionTile(
-                  icon: Icons.confirmation_num,
-                  title: "Ingressos",
-                  subtitle: "Ingressos comprados",
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => const TicketsScreen(),
-                      ),
-                    );
-                  },
-                ),
-                buildOptionTile(
-                  icon: Icons.badge,
-                  title: "Carteirinha",
-                  subtitle: "Sua carteirinha de associação",
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => const MembershipCardScreen(),
-                      ),
-                    );
-                  },
-                ),
-                buildOptionTile(
-                  icon: Icons.support_agent,
-                  title: "Suporte",
-                  subtitle: "Fale com a atlética",
-                  onTap: () {},
-                ),
-                buildOptionTile(
-                  icon: Icons.person,
-                  title: "Editar Perfil",
-                  subtitle: "Edite seu Perfil",
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => const EditProfileScreen(),
-                      ),
-                    );
-                  },
-                ),
-                buildOptionTile(
+                  buildOptionTile(
+                    icon: Icons.badge,
+                    title: "Carteirinha",
+                    subtitle: "Sua carteirinha de associação",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MembershipCardScreen()),
+                      );
+                    },
+                  ),
+                  buildOptionTile(
+                    icon: Icons.support_agent,
+                    title: "Suporte",
+                    subtitle: "Fale com a atlética",
+                    onTap: () {},
+                  ),
+                  buildOptionTile(
+                    icon: Icons.person,
+                    title: "Editar Perfil",
+                    subtitle: "Edite seu perfil",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                      );
+                    },
+                  ),
+                  buildOptionTile(
                     icon: Icons.add_circle,
-                  title: "Cadastros",
-                  subtitle: "Cadastrar Atividades",
-                  onTap: () {
-                    // Navigator.pushNamed(context, '/register_home');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => const RegisterAccountScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                    title: "Cadastros",
+                    subtitle: "Cadastrar atividades",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RegisterAccountScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 4,
         onTap: (index) {
-          // Handle bottom navigation tap
           switch (index) {
             case 0:
               Navigator.pushNamed(context, '/home');
@@ -207,20 +207,25 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    return Card(
-      color: const Color(0xFF10285C),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Colors.yellow),
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: Icon(icon, color: Colors.yellow),
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.white70)),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-        onTap: onTap,
+    return Container(
+      margin: const EdgeInsets.only(top: 5, bottom: 5, left: 8, right: 1), 
+      child: Card(
+        color: const Color.fromARGB(128, 52, 90, 167),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          child: ListTile(
+            leading: Icon(icon, color: Colors.yellow),
+            title: Text(title, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(subtitle, style: const TextStyle(color: Colors.white70)),
+            trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white),
+            onTap: onTap,
+          ),
+        ),
       ),
     );
   }
+
 }
