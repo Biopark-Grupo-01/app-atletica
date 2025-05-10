@@ -238,7 +238,7 @@ final List<Map<String, String>> _allEvents = [
             gradient: LinearGradient(
               colors: isSelected
                 ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
-                : [const Color.fromARGB(255, 0, 0, 0), const Color.fromARGB(255, 0, 34, 68)],
+                : [const Color.fromARGB(128, 52, 90, 167), const Color.fromARGB(128, 52, 90, 167)],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
             ),
