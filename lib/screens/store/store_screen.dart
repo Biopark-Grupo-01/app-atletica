@@ -131,15 +131,20 @@ class _StoreScreenState extends State<StoreScreen> {
               ...filteredProducts.map((product) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 15),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return _buildHorizontalProductCard(
-                        product['name']!,
-                        product['price']!,
-                        product['image']!,
-                        constraints.maxWidth,
-                      );
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/productDetail', arguments: product);
                     },
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        return _buildHorizontalProductCard(
+                          product['name']!,
+                          product['price']!,
+                          product['image']!,
+                          constraints.maxWidth,
+                        );
+                      },
+                    ),
                   ),
                 );
               }).toList(),
