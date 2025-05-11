@@ -9,6 +9,9 @@ android {
     namespace = "com.example.app_atletica"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"  // exemplo
+
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

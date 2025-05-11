@@ -5,10 +5,13 @@ import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_title.dart';
 import 'package:app_atletica/widgets/home/carousel_item.dart';
-import 'package:app_atletica/widgets/events/event_item.dart';
-import 'package:app_atletica/widgets/events/news_item.dart';
+import 'package:app_atletica/screens/events/event_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../news/news_item.dart';
+import '../trainings/training_item.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
+  List<Map<String, String>> trainings = []; // Lista para Treinos e Amistosos
 
   bool isLoading = true;
   String? error;
@@ -32,10 +36,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     try {
+      // Carregando dados de notícias e eventos
       final data = await EventsNewsService.loadData(context);
       setState(() {
         news = data['news'] ?? [];
         events = data['events'] ?? [];
+        trainings = data['trainings'] ?? []; // Carregando Treinos e Amistosos
         isLoading = false;
       });
     } catch (e) {
@@ -58,72 +64,49 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.ticket,
-                      offsetXFactor: -0.033,
-                      offsetYFactor: 0.0015,
-                      color: AppColors.white,
-                      label: 'Ingressos',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/home');
-                      },
-                    ),
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.idCard,
-                      offsetXFactor: -0.033,
-                      offsetYFactor: 0.0015,
-                      label: 'Carteirinha',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/home');
-                      },
-                    ),
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.newspaper,
-                      label: 'Notícias',
-                      color: AppColors.white,
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/events');
-                      },
-                    ),
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.calendarDay,
-                      label: 'Eventos',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/events');
-                      },
-                    ),
-                  ],
-                ),
+
                 const SizedBox(height: 30),
+
+                // Exibindo os eventos
                 CustomTitle(title: 'EVENTOS'),
                 CarouselItem(
                   items: events,
                   useCarousel: true,
-                  itemBuilder:
-                      (item) => EventItem(
-                        imageUrl: item['imageUrl'] ?? '',
-                        date: item['date'] ?? '',
-                        location: item['location'] ?? '',
-                        title: item['title'] ?? '',
-                        description: item['description'] ?? '',
-                      ),
+                  itemBuilder: (item) => EventItem(
+                    imageUrl: item['imageUrl'] ?? '',
+                    date: item['date'] ?? '',
+                    location: item['location'] ?? '',
+                    title: item['title'] ?? '',
+                    description: item['description'] ?? '',
+                  ),
                 ),
+
+                // Exibindo as notícias
                 CustomTitle(title: 'NOTÍCIAS'),
                 CarouselItem(
                   items: news,
                   useCarousel: true,
-                  itemBuilder:
-                      (item) => NewsItem(
-                        imageUrl: item['imageUrl'] ?? '',
-                        date: item['date'] ?? '',
-                        location: item['location'] ?? '',
-                        title: item['title'] ?? '',
-                        description: item['description'] ?? '',
-                      ),
+                  itemBuilder: (item) => NewsItem(
+                    imageUrl: item['imageUrl'] ?? '',
+                    date: item['date'] ?? '',
+                    location: item['location'] ?? '',
+                    title: item['title'] ?? '',
+                    description: item['description'] ?? '',
+                  ),
+                ),
+
+                // Exibindo os treinos e amistosos
+                CustomTitle(title: 'TREINOS E AMISTOSOS'),
+                CarouselItem(
+                  items: trainings,
+                  useCarousel: true,
+                  itemBuilder: (item) => TrainingMatchItem(
+                    imageUrl: item['imageUrl'] ?? '',
+                    date: item['date'] ?? '',
+                    location: item['location'] ?? '',
+                    title: item['title'] ?? '',
+                    description: item['description'] ?? '',
+                  ),
                 ),
               ],
             ),
@@ -156,3 +139,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

@@ -3,8 +3,8 @@ import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/services/events_news_service.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_title.dart';
-import 'package:app_atletica/widgets/events/event_item.dart';
-import 'package:app_atletica/widgets/events/news_item.dart';
+import 'package:app_atletica/screens/events/event_item.dart';
+import 'package:app_atletica/screens/news/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:intl/intl.dart';
 

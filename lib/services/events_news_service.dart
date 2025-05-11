@@ -4,7 +4,7 @@ import 'package:app_atletica/utils/utils.dart';
 
 class EventsNewsService {
   static Future<Map<String, List<Map<String, String>>>> loadData(BuildContext context) async {
-    // Mock data for now
+    // Mock data for nowm
     final news = [
       {
         'imageUrl': 'https://picsum.photos/300/150',
@@ -17,8 +17,8 @@ class EventsNewsService {
         'imageUrl': 'https://picsum.photos/301/150',
         'date': '22/04/2025',
         'location': 'São Paulo',
-        'title': 'Notícia do Backend',
-        'description': 'Essa notícia veio da API.',
+        'title': 'Título Notícia',
+        'description': 'Descrição da notícia.',
       },
     ];
 
@@ -34,8 +34,25 @@ class EventsNewsService {
         'imageUrl': 'https://picsum.photos/303/150',
         'date': '30/04/2025',
         'location': 'Rio de Janeiro',
-        'title': 'Evento da API',
-        'description': 'Evento vindo do back-end.',
+        'title': 'Título Evento',
+        'description': 'Descrição do evento',
+      },
+    ];
+
+    final trainings = [
+      {
+        'imageUrl': 'https://picsum.photos/302/150',
+        'date': '31/04/2025',
+        'location': 'Toledo',
+        'title': 'Título Amistoso ou Treino',
+        'description': 'Descrição do Amistoso ou Treino',
+      },
+      {
+        'imageUrl': 'https://picsum.photos/303/150',
+        'date': '30/04/2025',
+        'location': 'Rio de Janeiro',
+        'title': 'Título Amistoso ou Treino',
+        'description': 'Descrição do Amistoso ou Treino.',
       },
     ];
 
@@ -60,6 +77,7 @@ class EventsNewsService {
     return {
       'news': news,
       'events': events,
+      'trainings': trainings,
     };
   }
 }
