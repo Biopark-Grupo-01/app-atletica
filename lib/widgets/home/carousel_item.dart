@@ -21,13 +21,13 @@ class CarouselItem extends StatelessWidget {
         if (useCarousel)
           CarouselSlider(
             options: CarouselOptions(
-              height: 410,
+              height: 430,
               enlargeCenterPage: true,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 5),
               autoPlayAnimationDuration: const Duration(milliseconds: 800),
               pauseAutoPlayOnTouch: true,
-              viewportFraction: 1.0,
+              viewportFraction: 1,
             ),
             items: items.map((item) => itemBuilder(item)).toList(),
           )

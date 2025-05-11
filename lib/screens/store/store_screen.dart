@@ -1,6 +1,8 @@
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/custom_app_bar.dart';
+
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
 
@@ -40,6 +42,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
+      appBar: CustomAppBar(),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -72,50 +75,42 @@ class _StoreScreenState extends State<StoreScreen> {
 
             const SizedBox(height: 16),
 
-            // Categories horizontal list
-            SizedBox(
-              height: 100,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 0),
-                itemCount: storeCategories.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 20),
-                itemBuilder: (context, index) {
-                  final category = storeCategories[index];
-                  final isLast = index == storeCategories.length - 1;
+            // Categorias centralizadas sem rolagem
+            Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 16,
+                alignment: WrapAlignment.center,
+                children: storeCategories.map((category) {
                   final isSelected = _selectedCategories.contains(category['category']);
-
-                  return Padding(
-                    padding: EdgeInsets.only(right: isLast ? 16 : 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          setState(() {
-                            final cat = category['category'];
-                            if (_selectedCategories.contains(cat)) {
-                              _selectedCategories.remove(cat);
-                            } else {
-                              _selectedCategories.add(cat);
-                            }
-                          });
-                        },
-                        child: _buildCategoryIcon(
-                          category['label'],
-                          category['icon'],
-                          isSelected: isSelected,
-                        ),
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        setState(() {
+                          final cat = category['category'];
+                          if (_selectedCategories.contains(cat)) {
+                            _selectedCategories.remove(cat);
+                          } else {
+                            _selectedCategories.add(cat);
+                          }
+                        });
+                      },
+                      child: _buildCategoryIcon(
+                        category['label'],
+                        category['icon'],
+                        isSelected: isSelected,
                       ),
                     ),
                   );
-                },
+                }).toList(),
               ),
             ),
 
             const SizedBox(height: 16),
 
-            // Product list or message
+            // Produtos filtrados
             if (filteredProducts.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
@@ -165,7 +160,7 @@ class _StoreScreenState extends State<StoreScreen> {
               Navigator.pushNamed(context, '/store');
               break;
             case 3:
-              Navigator.pushNamed(context, '/events');
+              Navigator.pushNamed(context, '/eventsandnews');
               break;
             case 4:
               Navigator.pushNamed(context, '/profile');
@@ -185,8 +180,8 @@ class _StoreScreenState extends State<StoreScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isSelected
-                ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
-                : [const Color.fromARGB(128, 52, 90, 167), const Color.fromARGB(128, 52, 90, 167)],
+                  ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
+                  : [const Color.fromARGB(128, 52, 90, 167), const Color.fromARGB(128, 52, 90, 167)],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
             ),
@@ -219,7 +214,7 @@ class _StoreScreenState extends State<StoreScreen> {
       height: 110,
       child: Row(
         children: [
-          // Image - 30%
+          // Imagem do produto
           Expanded(
             flex: 3,
             child: ClipRRect(
@@ -233,7 +228,7 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
           const SizedBox(width: 12),
 
-          // Name - 40%
+          // Nome do produto
           Expanded(
             flex: 4,
             child: Container(
@@ -253,7 +248,7 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
           const SizedBox(width: 12),
 
-          // Price - 30%
+          // Preço do produto
           Expanded(
             flex: 3,
             child: Container(

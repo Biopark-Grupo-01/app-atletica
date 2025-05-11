@@ -223,7 +223,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               Navigator.pushNamed(context, '/store');
               break;
             case 3:
-              Navigator.pushNamed(context, '/events');
+              Navigator.pushNamed(context, '/eventsandnews');
               break;
             case 4:
               Navigator.pushNamed(context, '/profile');

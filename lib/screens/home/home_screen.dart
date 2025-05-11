@@ -5,13 +5,11 @@ import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_title.dart';
 import 'package:app_atletica/widgets/home/carousel_item.dart';
-import 'package:app_atletica/screens/events/event_item.dart';
+import 'package:app_atletica/screens/eventsandnews/event_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../news/news_item.dart';
+import '../eventsandnews/news_item.dart';
 import '../trainings/training_item.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,9 +19,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, String>> news = [];
-  List<Map<String, String>> events = [];
-  List<Map<String, String>> trainings = []; // Lista para Treinos e Amistosos
+  List<Map<String, String>> eventsAndNews = [];
+  List<Map<String, String>> trainings = [];
 
   bool isLoading = true;
   String? error;
@@ -36,12 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     try {
-      // Carregando dados de notícias e eventos
       final data = await EventsNewsService.loadData(context);
+      final events = data['events'] ?? [];
+      final news = data['news'] ?? [];
+      final combined = [...events, ...news];
+
       setState(() {
-        news = data['news'] ?? [];
-        events = data['events'] ?? [];
-        trainings = data['trainings'] ?? []; // Carregando Treinos e Amistosos
+        eventsAndNews = combined;
+        trainings = data['trainings'] ?? [];
         isLoading = false;
       });
     } catch (e) {
@@ -58,55 +57,116 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.blue,
       appBar: CustomAppBar(),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? Center(child: Text('Erro: $error'))
+            : SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(height: 5),
+
+                // Mensagem de boas-vindas estilizada
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Atlética Tigre Branco!\n',
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(218, 255, 204, 0), // Amarelo mais fraco
+                        ),
+                      ),
+                      TextSpan(
+                        text:
+                        'Fique por dentro dos eventos, notícias e conquistas da nossa atlética!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+
+                const SizedBox(height: 25),
+
+                // Eventos e Notícias
+                CustomTitle(title: 'EVENTOS E NOTÍCIAS'),
+                CarouselItem(
+                  items: eventsAndNews,
+                  useCarousel: true,
+                  itemBuilder: (item) {
+                    if (item['type'] == 'evento') {
+                      return EventItem(
+                        imageUrl: item['imageUrl'] ?? '',
+                        title: item['title'] ?? '',
+                        description: item['description'] ?? '',
+                        date: item['date'] ?? '',
+                        location: item['location'] ?? '',
+                      );
+                    } else {
+                      return NewsItem(
+                        imageUrl: item['imageUrl'] ?? '',
+                        title: item['title'] ?? '',
+                        description: item['description'] ?? '',
+                        date: item['date'] ?? '',
+                        location: item['location'] ?? '',
+                      );
+                    }
+                  },
+                ),
 
                 const SizedBox(height: 30),
 
-                // Exibindo os eventos
-                CustomTitle(title: 'EVENTOS'),
-                CarouselItem(
-                  items: events,
-                  useCarousel: true,
-                  itemBuilder: (item) => EventItem(
-                    imageUrl: item['imageUrl'] ?? '',
-                    date: item['date'] ?? '',
-                    location: item['location'] ?? '',
-                    title: item['title'] ?? '',
-                    description: item['description'] ?? '',
-                  ),
-                ),
 
-                // Exibindo as notícias
-                CustomTitle(title: 'NOTÍCIAS'),
-                CarouselItem(
-                  items: news,
-                  useCarousel: true,
-                  itemBuilder: (item) => NewsItem(
-                    imageUrl: item['imageUrl'] ?? '',
-                    date: item['date'] ?? '',
-                    location: item['location'] ?? '',
-                    title: item['title'] ?? '',
-                    description: item['description'] ?? '',
-                  ),
-                ),
-
-                // Exibindo os treinos e amistosos
                 CustomTitle(title: 'TREINOS E AMISTOSOS'),
                 CarouselItem(
                   items: trainings,
                   useCarousel: true,
-                  itemBuilder: (item) => TrainingMatchItem(
-                    imageUrl: item['imageUrl'] ?? '',
-                    date: item['date'] ?? '',
-                    location: item['location'] ?? '',
-                    title: item['title'] ?? '',
-                    description: item['description'] ?? '',
-                  ),
+                  itemBuilder: (item) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Exibir o Treino
+                        TrainingMatchItem(
+                          title: item['title'] ?? '',
+                          description: item['description'] ?? '',
+                          date: item['date'] ?? '',
+                          location: item['location'] ?? '',
+                          category: item['category'] ?? '',
+                          type: 'TREINOS',  // Tipo como Treino
+                        ),
+                        const SizedBox(height: 14),
+                        // Exibir o Amistoso
+                        TrainingMatchItem(
+                          title: item['title'] ?? '',
+                          description: item['description'] ?? '',
+                          date: item['date'] ?? '',
+                          location: item['location'] ?? '',
+                          category: item['category'] ?? '',
+                          type: 'AMISTOSOS',  // Tipo como Amistoso
+                        ),
+                        const SizedBox(height: 14),
+                        // Exibir um terceiro item
+                        TrainingMatchItem(
+                          title: item['title'] ?? '',
+                          description: item['description'] ?? '',
+                          date: item['date'] ?? '',
+                          location: item['location'] ?? '',
+                          category: item['category'] ?? '',
+                          type: 'AMISTOSOS',  // Tipo como Amistoso (poderia ser outro tipo, se necessário)
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -116,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 0,
         onTap: (index) {
-          // Handle bottom navigation tap
           switch (index) {
             case 0:
               Navigator.pushNamed(context, '/home');
@@ -128,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pushNamed(context, '/store');
               break;
             case 3:
-              Navigator.pushNamed(context, '/events');
+              Navigator.pushNamed(context, '/eventsandnews');
               break;
             case 4:
               Navigator.pushNamed(context, '/profile');
@@ -139,4 +198,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

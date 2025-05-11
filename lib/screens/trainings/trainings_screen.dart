@@ -4,6 +4,8 @@ import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../widgets/custom_app_bar.dart';
+
 class TrainingsScreen extends StatefulWidget {
   const TrainingsScreen({super.key});
 
@@ -103,6 +105,7 @@ final List<Map<String, String>> _allEvents = [
 
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
+      appBar: CustomAppBar(),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -222,7 +225,7 @@ final List<Map<String, String>> _allEvents = [
               Navigator.pushNamed(context, '/store');
               break;
             case 3:
-              Navigator.pushNamed(context, '/events');
+              Navigator.pushNamed(context, '/eventsandnews');
               break;
             case 4:
               Navigator.pushNamed(context, '/profile');

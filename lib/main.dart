@@ -1,4 +1,5 @@
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
+import 'package:app_atletica/screens/eventsandnews/events_news_screen.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
 import 'package:app_atletica/screens/trainings/training-details_screen.dart';
@@ -8,7 +9,6 @@ import 'package:app_atletica/screens/login/login_screen.dart';
 import 'package:app_atletica/screens/login/password_recovery_screen.dart';
 import 'package:app_atletica/screens/login/register_screen.dart';
 import 'package:app_atletica/screens/home/home_screen.dart';
-import 'package:app_atletica/screens/events/events_screen.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 
 void main() {
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/password_recovery': (context) => PasswordRecoveryScreen(),
         '/home': (context) => HomeScreen(),
-        '/events': (context) => EventsScreen(),
+        '/eventsandnews': (context) => EventsNewsScreen(),
         '/trainings': (context) => TrainingsScreen(),
         '/trainingDetail': (context) => TreinoDetalhesScreen(),
         '/store': (context) => StoreScreen(),

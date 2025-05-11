@@ -16,8 +16,8 @@ class CustomTitle extends StatelessWidget {
       children: [
         const Center(
           child: SizedBox(
-            width: 214,
-            child: Divider(color: AppColors.yellow, thickness: 1),
+            width: 230,
+            child: Divider(color: AppColors.yellow, thickness: 1.5),
           ),
         ),
         Center(
@@ -32,11 +32,11 @@ class CustomTitle extends StatelessWidget {
         ),
         const Center(
           child: SizedBox(
-            width: 214,
-            child: Divider(color: AppColors.yellow, thickness: 1),
+            width: 230,
+            child: Divider(color: AppColors.yellow, thickness: 1.5),
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 15),
       ],
     );
   }

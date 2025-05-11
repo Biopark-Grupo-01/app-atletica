@@ -4,79 +4,98 @@ import 'package:app_atletica/utils/utils.dart';
 
 class EventsNewsService {
   static Future<Map<String, List<Map<String, String>>>> loadData(BuildContext context) async {
-    // Mock data for nowm
-    final news = [
+    final allItems = [
       {
-        'imageUrl': 'https://picsum.photos/300/150',
-        'date': '23/04/2025',
-        'location': 'Porto Alegre',
-        'title': 'Título Notícia',
-        'description': 'Descrição da notícia',
-      },
-      {
-        'imageUrl': 'https://picsum.photos/301/150',
-        'date': '22/04/2025',
-        'location': 'São Paulo',
-        'title': 'Título Notícia',
-        'description': 'Descrição da notícia.',
-      },
-    ];
-
-    final events = [
-      {
-        'imageUrl': 'https://picsum.photos/302/150',
+        'imageUrl': 'assets/images/evento01.png',
         'date': '31/04/2025',
-        'location': 'Curitiba',
-        'title': 'Título Evento',
-        'description': 'Descrição do evento',
+        'location': 'Toledo',
+        'title': 'Minigames',
+        'description': 'Venha Participar de vários jogos da atlética!! Teremos bebidas e muita festa e diversao.',
+        'type': 'evento',
       },
       {
-        'imageUrl': 'https://picsum.photos/303/150',
-        'date': '30/04/2025',
-        'location': 'Rio de Janeiro',
-        'title': 'Título Evento',
-        'description': 'Descrição do evento',
+        'imageUrl': 'assets/images/evento02.png',
+        'date': '31/04/2025',
+        'location': 'Toledo',
+        'title': 'Estuda Que Passa',
+        'description': 'Evento Open Gummy, muita festa e interacao entre os socios da atletica',
+        'type': 'evento',
+      },
+      {
+        'imageUrl': 'assets/images/noticia01.png',
+        'date': '31/04/2025',
+        'location': 'Toledo',
+        'title': 'Inscricoes Tigre Branco',
+        'description': 'Seja sócio do Tigrao, inscricoes abertas para participar da atletica tigre branco',
+        'type': 'noticia',
+      },
+      {
+        'imageUrl': 'assets/images/noticia02.png',
+        'date': '31/04/2025',
+        'location': 'Toledo',
+        'title': 'Estágio Atletica Tigre Branco',
+        'description': 'Seja mais que sócio, seja estagiario e nos ajude a organizar os melhores eventos.',
+        'type': 'noticia',
       },
     ];
 
     final trainings = [
       {
-        'imageUrl': 'https://picsum.photos/302/150',
+        'type': 'TREINOS',
+        'category': 'Futebol',
         'date': '31/04/2025',
         'location': 'Toledo',
-        'title': 'Título Amistoso ou Treino',
-        'description': 'Descrição do Amistoso ou Treino',
+        'title': 'Treino',
+        'description': 'Treino Contra Raposa',
       },
       {
-        'imageUrl': 'https://picsum.photos/303/150',
-        'date': '30/04/2025',
-        'location': 'Rio de Janeiro',
-        'title': 'Título Amistoso ou Treino',
-        'description': 'Descrição do Amistoso ou Treino.',
+        'type': 'TREINOS',
+        'category': 'Futebol',
+        'date': '01/05/2025',
+        'location': 'Toledo',
+        'title': 'Treino Técnico',
+        'description': 'Treino entre sócios.',
+      },
+      {
+        'type': 'TREINOS',
+        'category': 'Basquete',
+        'date': '03/05/2025',
+        'location': 'Ginásio Central',
+        'title': 'Treino de Arremesso',
+        'description': 'Foco em fundamentos e agilidade.',
+      },
+      {
+        'type': 'AMISTOSOS',
+        'category': 'Futebol',
+        'date': '05/05/2025',
+        'location': 'Estádio Tigre',
+        'title': 'Amistoso com Raposa',
+        'description': 'Jogo preparatório para o torneio.',
+      },
+      {
+        'type': 'AMISTOSOS',
+        'category': 'Handebol',
+        'date': '06/05/2025',
+        'location': 'Quadra Poliesportiva',
+        'title': 'Amistoso Interatléticas',
+        'description': 'Confronto entre Tigre e Leões.',
+      },
+      {
+        'type': 'AMISTOSOS',
+        'category': 'Vôlei',
+        'date': '08/05/2025',
+        'location': 'Ginásio do Biopark',
+        'title': 'Amistoso da Amizade',
+        'description': 'Jogo especial com convidados.',
       },
     ];
 
-    // Uncomment this when you're ready to use the real API
-    // try {
-    //   final newsResponse = await makeHttpRequest(context, "/news");
-    //   final eventsResponse = await makeHttpRequest(context, "/events");
-    //
-    //   if (newsResponse.statusCode == 200 && eventsResponse.statusCode == 200) {
-    //     return {
-    //       'news': json.decode(newsResponse.body),
-    //       'events': json.decode(eventsResponse.body),
-    //     };
-    //   } else {
-    //     throw Exception("Erro ao carregar dados do servidor");
-    //   }
-    // } catch (e) {
-    //   throw e;
-    // }
+    final onlyEvents = allItems.where((item) => item['type'] == 'evento').toList();
+    final onlyNews = allItems.where((item) => item['type'] == 'noticia').toList();
 
-    // Return mock data for now
     return {
-      'news': news,
-      'events': events,
+      'events': onlyEvents,
+      'news': onlyNews,
       'trainings': trainings,
     };
   }
