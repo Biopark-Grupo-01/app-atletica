@@ -120,21 +120,30 @@ class _EventsScreenState extends State<EventsScreen> {
                           (item) => Column(
                             children: [
                               // Verificar o tipo do item e exibir o widget adequado
-                              item['type'] == 'news'
-                                ? NewsItem(
-                                    imageUrl: item['imageUrl'] ?? '',
-                                    date: item['date'] ?? '',
-                                    location: item['location'] ?? '',
-                                    title: item['title'] ?? '',
-                                    description: item['description'] ?? '',
-                                  )
-                                : EventItem(
-                                    imageUrl: item['imageUrl'] ?? '',
-                                    date: item['date'] ?? '',
-                                    location: item['location'] ?? '',
-                                    title: item['title'] ?? '',
-                                    description: item['description'] ?? '',
-                                  ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/trainingDetail', // ou a rota da tela que quiser abrir
+                                    arguments: item, // se quiser passar o conteúdo do card
+                                  );
+                                },
+                                child: item['type'] == 'news'
+                                  ? NewsItem(
+                                      imageUrl: item['imageUrl'] ?? '',
+                                      date: item['date'] ?? '',
+                                      location: item['location'] ?? '',
+                                      title: item['title'] ?? '',
+                                      description: item['description'] ?? '',
+                                    )
+                                  : EventItem(
+                                      imageUrl: item['imageUrl'] ?? '',
+                                      date: item['date'] ?? '',
+                                      location: item['location'] ?? '',
+                                      title: item['title'] ?? '',
+                                      description: item['description'] ?? '',
+                                    ),
+                              ),
                               const SizedBox(height: 40),
                             ],
                           ),

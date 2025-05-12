@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.blue,
         primaryColor: AppColors.yellow,
       ),
-      initialRoute: '/trainingDetail',
+      initialRoute: '/home',
       routes: {
         '/': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
