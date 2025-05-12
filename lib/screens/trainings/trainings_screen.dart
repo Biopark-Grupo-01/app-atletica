@@ -1,5 +1,6 @@
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/trainings/expandable_text.dart';
+import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,7 +29,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'AMISTOSOS',
     'category': 'FUTEBOL',
     'date': '12/05/2025',
-    'location': 'Estádio Municipal'
+    'location': 'Estádio Municipal',
+    'isSubscribed': 'true',
   },
   {
     'title': 'Treino de Vôlei',
@@ -36,7 +38,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'TREINOS',
     'category': 'VOLEI',
     'date': '15/05/2025',
-    'location': 'Ginásio Poliesportivo'
+    'location': 'Ginásio Poliesportivo',
+    'isSubscribed': 'false',
   },
   {
     'title': 'Treino de Tênis Avançado',
@@ -44,7 +47,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'TREINOS',
     'category': 'TENIS',
     'date': '18/05/2025',
-    'location': 'Quadra de Tênis A'
+    'location': 'Quadra de Tênis A',
+    'isSubscribed': 'false',
   },
   {
     'title': 'Basquete Amistoso',
@@ -52,7 +56,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'AMISTOSOS',
     'category': 'BASQUETE',
     'date': '20/05/2025',
-    'location': 'Ginásio Central'
+    'location': 'Ginásio Central',
+    'isSubscribed': 'false',
   },
   {
     'title': 'Treino de Handebol - Iniciantes',
@@ -60,7 +65,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'TREINOS',
     'category': 'HANDEBOL',
     'date': '22/05/2025',
-    'location': 'Quadra B'
+    'location': 'Quadra B',
+    'isSubscribed': 'false',
   },
   {
     'title': 'Natação Amistosa - Revezamento',
@@ -68,7 +74,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'AMISTOSOS',
     'category': 'NATACAO',
     'date': '25/05/2025',
-    'location': 'Piscina Olímpica'
+    'location': 'Piscina Olímpica',
+    'isSubscribed': 'false',
   },
   {
     'title': 'Treino de Futebol - Tática Avançada',
@@ -76,7 +83,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'TREINOS',
     'category': 'FUTEBOL',
     'date': '28/05/2025',
-    'location': 'Campo A'
+    'location': 'Campo A',
+    'isSubscribed': 'true',
   },
   {
     'title': 'Vôlei Amistoso - Equipe Feminina',
@@ -84,7 +92,8 @@ final List<Map<String, String>> _allEvents = [
     'type': 'AMISTOSOS',
     'category': 'VOLEI',
     'date': '30/05/2025',
-    'location': 'Ginásio Feminino'
+    'location': 'Ginásio Feminino',
+    'isSubscribed': 'false',
   },
 ];
 
@@ -188,7 +197,7 @@ final List<Map<String, String>> _allEvents = [
                         padding: const EdgeInsets.only(bottom: 16),
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, '/trainingDetail', arguments: 'productId');
+                            showTrainingModal(context);
                           },
                           child: _buildEventCard(
                             event['title']!,
@@ -196,6 +205,7 @@ final List<Map<String, String>> _allEvents = [
                             event['date']!,
                             event['location']!,
                             event['category']!,
+                            event['isSubscribed'] == 'true',
                           ),
                         )
                       );
@@ -304,12 +314,24 @@ final List<Map<String, String>> _allEvents = [
     );
   }
 
-  Widget _buildEventCard(String title, String description, String date, String location, String category) {
+  Widget _buildEventCard(String title, String description, String date, String location, String category, bool isSubscribed) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: isSubscribed ? const Color(0xFF1E88E5).withOpacity(0.2) : Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
+        border: isSubscribed
+            ? Border.all(color: const Color(0xFF42A5F5), width: 2)
+            : null,
+        boxShadow: isSubscribed
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF42A5F5).withOpacity(0.5),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,13 +358,13 @@ final List<Map<String, String>> _allEvents = [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFD700),
+                  color: isSubscribed ? Colors.greenAccent : const Color(0xFFFFD700),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  category,
-                  style: const TextStyle(
-                    color: Colors.black,
+                  isSubscribed ? "INSCRITO" : category,
+                  style: TextStyle(
+                    color: isSubscribed ? Colors.black : Colors.black,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -354,7 +376,7 @@ final List<Map<String, String>> _allEvents = [
           Text(
             title,
             style: TextStyle(
-              color: const Color(0xFFFFD700),
+              color: isSubscribed ? Colors.greenAccent : const Color(0xFFFFD700),
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -373,4 +395,14 @@ final List<Map<String, String>> _allEvents = [
       ),
     );
   }
+}
+
+void showTrainingModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(0.5),
+    builder: (_) => const TrainingModal(),
+  );
 }

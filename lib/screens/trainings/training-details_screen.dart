@@ -352,7 +352,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
       ),
 
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 1,
+        currentIndex: 3,
         onTap: (index) {
           switch (index) {
             case 0:
