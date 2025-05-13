@@ -1,4 +1,6 @@
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
+import 'package:app_atletica/screens/account/memberShipCard.dart';
+import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
 import 'package:app_atletica/screens/trainings/training-details_screen.dart';
@@ -35,6 +37,8 @@ class MyApp extends StatelessWidget {
         '/store': (context) => StoreScreen(),
         '/productDetail': (context) => ProductScreen(),
         '/profile': (context) => AccountSettingsScreen(),
+        '/tickets': (context) => const TicketsScreen(),
+        '/membership': (context) => const MembershipCardScreen(),
       },
     );
   }

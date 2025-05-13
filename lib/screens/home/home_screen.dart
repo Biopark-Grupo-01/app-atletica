@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.yellow,
                       label: 'Ingressos',
                       onPressed: () {
-                        Navigator.pushNamed(context, '/home');
+                        Navigator.pushNamed(context, '/tickets');
                       },
                     ),
                     CustomSquareButton(
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: AppColors.white,
                       label: 'Carteirinha',
                       onPressed: () {
-                        Navigator.pushNamed(context, '/home');
+                        Navigator.pushNamed(context, '/membership');
                       },
                     ),
                     CustomSquareButton(

@@ -18,8 +18,8 @@ class _StoreScreenState extends State<StoreScreen> {
 
   final List<Map<String, String>> storeProducts = [
     {'name': 'Caneca Oficial', 'category': 'CANECAS', 'price': '25,00', 'image': 'https://via.placeholder.com/150?text=Caneca'},
-    {'name': 'Camiseta Masculina', 'category': 'ROUPAS', 'price': '50,00', 'image': 'https://via.placeholder.com/150?text=Camiseta'},
-    {'name': 'Camiseta Feminina', 'category': 'ROUPAS', 'price': '50,00', 'image': 'https://via.placeholder.com/150?text=Camiseta'},
+    {'name': 'Camiseta Masculina', 'category': 'ROUPAS', 'price': '50,00', 'image': '/assets/images/roupa1.png'},
+    {'name': 'Camiseta Feminina', 'category': 'ROUPAS', 'price': '50,00', 'image': '/assets/images/roupa2.png'},
     {'name': 'Chaveiro Tigre', 'category': 'CHAVEIROS', 'price': '15,00', 'image': 'https://via.placeholder.com/150?text=Chaveiro'},
     {'name': 'Tatuagem Temporária', 'category': 'TATUAGENS', 'price': '10,00', 'image': 'https://via.placeholder.com/150?text=Tatuagem'},
     {'name': 'Caneca Personalizada', 'category': 'CANECAS', 'price': '30,00', 'image': 'https://via.placeholder.com/150?text=Caneca+'},

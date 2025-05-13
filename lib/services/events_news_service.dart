@@ -8,15 +8,15 @@ class EventsNewsService {
     final news = [
       {
         'imageUrl': 'https://picsum.photos/300/150',
-        'date': '23/04/2025',
-        'location': 'Porto Alegre',
-        'title': 'Título Notícia',
-        'description': 'Descrição da notícia',
+        'date': '15/05/2025',
+        'location': 'Toledo',
+        'title': 'Acesso Rápido',
+        'description': 'Foi realizado alterações nos botões de acesso rápido',
       },
       {
         'imageUrl': 'https://picsum.photos/301/150',
-        'date': '22/04/2025',
-        'location': 'São Paulo',
+        'date': '22/05/2025',
+        'location': 'Toledo',
         'title': 'Notícia do Backend',
         'description': 'Essa notícia veio da API.',
       },
@@ -25,15 +25,15 @@ class EventsNewsService {
     final events = [
       {
         'imageUrl': 'https://picsum.photos/302/150',
-        'date': '31/04/2025',
-        'location': 'Curitiba',
-        'title': 'Título Evento',
-        'description': 'Descrição do evento',
+        'date': '09/05/2025',
+        'location': 'Toledo',
+        'title': 'Confraternização Semana Acadêmica',
+        'description': 'Ocorrera uma festa para o fim da semana acadêmica',
       },
       {
         'imageUrl': 'https://picsum.photos/303/150',
-        'date': '30/04/2025',
-        'location': 'Rio de Janeiro',
+        'date': '30/05/2025',
+        'location': 'Toledo',
         'title': 'Evento da API',
         'description': 'Evento vindo do back-end.',
       },
