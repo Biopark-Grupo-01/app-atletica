@@ -128,7 +128,16 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
-                    buildClubeCheersCard(),
+                    buildClubeCheersCard(
+                      icon: Icons.event_available,
+                      title: "Eventos Inscritos",
+                      subtitle: "Eventos que você está inscrito",
+                    ),
+                    buildClubeCheersCard(
+                      icon: Icons.event_available,
+                      title: "Interesses",
+                      subtitle: "Notícias que você destacou",
+                    ),
                     // outros cards
                   ],
                 ),
@@ -242,13 +251,18 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   }
 }
 
-Widget buildClubeCheersCard() {
+Widget buildClubeCheersCard({
+  required IconData icon,
+  required String title,
+  required String subtitle,
+  Color backgroundColor = const Color(0xFFA60000),
+}) {
   return Container(
     width: 200,
     margin: const EdgeInsets.only(right: 12),
     padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
     decoration: BoxDecoration(
-      color: const Color.fromARGB(255, 158, 42, 34),
+      color: backgroundColor,
       borderRadius: BorderRadius.circular(8),
       boxShadow: [
         BoxShadow(
@@ -260,19 +274,19 @@ Widget buildClubeCheersCard() {
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Icon(Icons.event_available, color: Colors.white, size: 35),
-        SizedBox(height: 4),
+      children: [
+        Icon(icon, color: Colors.white, size: 35),
+        const SizedBox(height: 4),
         Text(
-          'Eventos Inscritos',
-          style: TextStyle(
+          title,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 14,
           ),
         ),
         Text(
-          'Eventos que você está inscrito',
-          style: TextStyle(
+          subtitle,
+          style: const TextStyle(
             color: Colors.white70,
             fontSize: 12,
           ),
