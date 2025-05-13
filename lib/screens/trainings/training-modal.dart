@@ -2,7 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class TrainingModal extends StatelessWidget {
-  const TrainingModal({super.key});
+  final bool isSubscribed;
+
+  const TrainingModal({super.key, this.isSubscribed = true});
 
   @override
   Widget build(BuildContext context) {
@@ -94,25 +96,42 @@ class TrainingModal extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // ação ao clicar
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: isSubscribed ? null : () {
+                          // ação ao clicar
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSubscribed ? Colors.white24 : Colors.white,
+                          foregroundColor: isSubscribed ? Colors.white70 : Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: isSubscribed
+                                ? const BorderSide(color: Colors.white54, width: 1.5)
+                                : BorderSide.none,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isSubscribed) ...[
+                              const Icon(Icons.check_circle_outline, color: Colors.white70),
+                              const SizedBox(width: 8),
+                            ],
+                            Text(
+                              isSubscribed ? 'Inscrição Concluída' : 'Se Inscrever',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: isSubscribed ? Colors.white70 : Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Text(
-                        'Se Inscrever',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
+                    ),                    
                   ),
                   const SizedBox(height: 16),
                 ],
