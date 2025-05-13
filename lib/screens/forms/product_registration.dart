@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:app_atletica/widgets/forms/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:app_atletica/theme/app_colors.dart';
@@ -9,14 +10,15 @@ import 'package:app_atletica/widgets/forms/custom_text_box.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 
-class NewsRegistrationForm extends StatefulWidget {
-  const NewsRegistrationForm({super.key});
+class ProductRegistrationForm extends StatefulWidget {
+  const ProductRegistrationForm({super.key});
 
   @override
-  State<NewsRegistrationForm> createState() => _NewsRegistrationFormState();
+  State<ProductRegistrationForm> createState() =>
+      _ProductRegistrationFormState();
 }
 
-class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
+class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
   File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
 
@@ -49,7 +51,7 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const CustomTitleForms(title: 'CADASTRO DE NOTÍCIA'),
+                        const CustomTitleForms(title: 'CADASTRO DE PRODUTO'),
                         GestureDetector(
                           onTap: _pickImage,
                           child: Container(
@@ -82,15 +84,13 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Título', icon: Icons.create),
+                        CustomTextField(label: 'Nome', icon: Icons.create),
                         CustomTextField(
-                          label: 'Data',
-                          icon: Icons.calendar_today,
+                          label: 'Valor',
+                          icon: Icons.attach_money,
                         ),
-                        CustomTextField(
-                          label: 'Local',
-                          icon: Icons.location_on,
-                        ),
+                        const SizedBox(height: 15),
+                        CustomDropdown(label: 'Categoria', icon: Icons.category),
                         const SizedBox(height: 15),
                         CustomTextBox(),
                         const SizedBox(height: 25),

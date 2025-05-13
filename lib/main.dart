@@ -10,6 +10,7 @@ import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
 import 'package:app_atletica/screens/forms/event_registration.dart';
 import 'package:app_atletica/screens/forms/news_registration.dart';
+import 'package:app_atletica/screens/forms/product_registration.dart';
 
 void main() {
   runApp(MyApp());
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => AccountSettingsScreen(),
         '/event_registration': (context) => EventRegistrationForm(),
         '/news_registration': (context) => NewsRegistrationForm(),
+        '/product_registration': (context) => ProductRegistrationForm(),
       },
     );
   }

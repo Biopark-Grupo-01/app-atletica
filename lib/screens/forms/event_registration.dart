@@ -82,7 +82,7 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Título', icon: Icons.edit),
+                        CustomTextField(label: 'Título', icon: Icons.create),
                         CustomTextField(
                           label: 'Data',
                           icon: Icons.calendar_today,
