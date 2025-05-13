@@ -18,11 +18,9 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen> {
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
-  // Lista combinada para exibir tudo em ordem cronológica
-  List<Map<String, dynamic>> combinedItems = [];
-
   bool isLoading = true;
   String? error;
+  int _selectedTabIndex = 0;
 
   @override
   void initState() {
@@ -33,40 +31,10 @@ class _EventsScreenState extends State<EventsScreen> {
   Future<void> _loadData() async {
     try {
       final data = await EventsNewsService.loadData(context);
-      
-      // Obter as listas separadas
       final newsList = data['news'] ?? [];
       final eventsList = data['events'] ?? [];
-      
-      // Criar a lista combinada com tipo identificado
-      List<Map<String, dynamic>> combined = [];
-      
-      // Adicionar notícias à lista combinada
-      for (var item in newsList) {
-        combined.add({
-          ...item,
-          'type': 'news',
-        });
-      }
-      
-      // Adicionar eventos à lista combinada
-      for (var item in eventsList) {
-        combined.add({
-          ...item,
-          'type': 'event',
-        });
-      }
-      
-      // Ordenar a lista combinada por data
-      combined.sort((a, b) {
-        DateTime dateA = _parseDate(a['date'] ?? '');
-        DateTime dateB = _parseDate(b['date'] ?? '');
-        // Ordenar do mais recente ao mais antigo
-        return dateB.compareTo(dateA);
-      });
-      
+
       setState(() {
-        combinedItems = combined;
         news = newsList;
         events = eventsList;
         isLoading = false;
@@ -78,80 +46,93 @@ class _EventsScreenState extends State<EventsScreen> {
       });
     }
   }
-  
-  // Função para converter string de data em objeto DateTime
+
   DateTime _parseDate(String dateStr) {
     try {
       return DateFormat('dd/MM/yyyy').parse(dateStr);
     } catch (e) {
-      // Retornar uma data mínima em caso de erro
       return DateTime(2000);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentList = _selectedTabIndex == 0 ? events : news;
+    final sortedList = [...currentList];
+    sortedList.sort((a, b) {
+      final dateA = _parseDate(a['date'] ?? '');
+      final dateB = _parseDate(b['date'] ?? '');
+      return dateB.compareTo(dateA);
+    });
+
     return Scaffold(
       backgroundColor: AppColors.blue,
       appBar: CustomAppBar(),
       body: SafeArea(
-        child:
-            isLoading
-                ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.yellow),
-                )
-                : error != null
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.yellow),
+              )
+            : error != null
                 ? Center(
-                  child: Text(
-                    'Erro: $error',
-                    style: const TextStyle(color: AppColors.white),
-                  ),
-                )
-                : SingleChildScrollView(
-                  child: Padding(
+                    child: Text(
+                      'Erro: \$error',
+                      style: const TextStyle(color: AppColors.white),
+                    ),
+                  )
+                : Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 10),
-                        CustomTitle(title: 'EVENTOS E NOTÍCIAS'),
-                        // Exibir itens combinados em ordem cronológica
-                        ...combinedItems.map(
-                          (item) => Column(
-                            children: [
-                              // Verificar o tipo do item e exibir o widget adequado
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/trainingDetail', // ou a rota da tela que quiser abrir
-                                    arguments: item, // se quiser passar o conteúdo do card
-                                  );
-                                },
-                                child: item['type'] == 'news'
-                                  ? NewsItem(
-                                      imageUrl: item['imageUrl'] ?? '',
-                                      date: item['date'] ?? '',
-                                      location: item['location'] ?? '',
-                                      title: item['title'] ?? '',
-                                      description: item['description'] ?? '',
-                                    )
-                                  : EventItem(
-                                      imageUrl: item['imageUrl'] ?? '',
-                                      date: item['date'] ?? '',
-                                      location: item['location'] ?? '',
-                                      title: item['title'] ?? '',
-                                      description: item['description'] ?? '',
-                                    ),
-                              ),
-                              const SizedBox(height: 40),
-                            ],
+                        Row(
+                          children: [
+                            Expanded(child: _buildTab('EVENTOS', 0)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildTab('NOTÍCIAS', 1)),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: sortedList.length,
+                            itemBuilder: (context, index) {
+                              final item = sortedList[index];
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/trainingDetail',
+                                        arguments: item,
+                                      );
+                                    },
+                                    child: _selectedTabIndex == 0
+                                        ? EventItem(
+                                            imageUrl: item['imageUrl'] ?? '',
+                                            date: item['date'] ?? '',
+                                            location: item['location'] ?? '',
+                                            title: item['title'] ?? '',
+                                            description: item['description'] ?? '',
+                                          )
+                                        : NewsItem(
+                                            imageUrl: item['imageUrl'] ?? '',
+                                            date: item['date'] ?? '',
+                                            location: item['location'] ?? '',
+                                            title: item['title'] ?? '',
+                                            description: item['description'] ?? '',
+                                          ),
+                                  ),
+                                  const SizedBox(height: 40),
+                                ],
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 3,
@@ -174,6 +155,41 @@ class _EventsScreenState extends State<EventsScreen> {
               break;
           }
         },
+      ),
+    );
+  }
+
+  Widget _buildTab(String text, int index) {
+    final isSelected = index == _selectedTabIndex;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _selectedTabIndex = index;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: isSelected ? AppColors.yellow : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected ? AppColors.yellow : AppColors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }
