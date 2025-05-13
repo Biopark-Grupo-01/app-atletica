@@ -9,6 +9,7 @@ import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:app_atletica/widgets/training_match_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
+  List<Map<String, String>> trainings = [];
 
   bool isLoading = true;
   String? error;
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         news = data['news'] ?? [];
         events = data['events'] ?? [];
+        trainings = data['trainings'] ?? [];
         isLoading = false;
       });
     } catch (e) {
@@ -66,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: FontAwesomeIcons.ticket,
                       offsetXFactor: -0.033,
                       offsetYFactor: 0.0015,
-                      color: AppColors.white,
+                      color: AppColors.yellow,
                       label: 'Ingressos',
                       onPressed: () {
                         Navigator.pushNamed(context, '/home');
@@ -76,24 +79,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: FontAwesomeIcons.idCard,
                       offsetXFactor: -0.033,
                       offsetYFactor: 0.0015,
+                      color: AppColors.white,
                       label: 'Carteirinha',
                       onPressed: () {
                         Navigator.pushNamed(context, '/home');
                       },
                     ),
                     CustomSquareButton(
-                      icon: FontAwesomeIcons.newspaper,
-                      label: 'Notícias',
-                      color: AppColors.white,
+                      icon: Icons.support_agent_rounded,
+                      label: 'Suporte',
+                      color: AppColors.yellow,
                       onPressed: () {
-                        Navigator.pushNamed(context, '/events');
-                      },
-                    ),
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.calendarDay,
-                      label: 'Eventos',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/events');
+                        Navigator.pushNamed(context, '/home');
                       },
                     ),
                   ],
@@ -124,6 +121,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: item['title'] ?? '',
                         description: item['description'] ?? '',
                       ),
+                ),
+                CustomTitle(title: 'TREINOS E AMISTOSOS'),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(), // Para evitar rolagem dupla
+                  itemCount: trainings.length, // Supondo que você tenha uma lista de treinos
+                  itemBuilder: (context, index) {
+                    final training = trainings[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: TrainingMatchItem(
+                        title: training['title'] ?? '',
+                        description: training['description'] ?? '',
+                        date: training['date'] ?? '',
+                        location: training['location'] ?? '',
+                        category: training['category'] ?? '',
+                        type: training['type'] ?? '',
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
