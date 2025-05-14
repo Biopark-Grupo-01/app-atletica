@@ -283,15 +283,15 @@ class _ProductScreenState extends State<ProductScreen> {
                 scrollDirection: Axis.horizontal,
                 children: [
                   _buildProductCard(
-                    image: '/assets/images/camiseta_masculina.webp',
+                    image: 'assets/images/camisetaa_masculina.png',
                     title: 'Camiseta Masculina',
                   ),
                   _buildProductCard(
-                    image: '/assets/images/camiseta_feminina.jpeg',
+                    image: 'assets/images/camiseta_feminina_1.png',
                     title: 'Camiseta Feminina',
                   ),
                   _buildProductCard(
-                    image: '/assets/images/caneca_oficial',
+                    image: 'assets/images/caneca_oficial.png',
                     title: 'Caneca Oficial',
                   ),
                 ],
