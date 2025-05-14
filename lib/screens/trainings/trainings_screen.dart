@@ -1,4 +1,6 @@
 import 'package:app_atletica/screens/store/store_screen.dart';
+import 'package:app_atletica/screens/trainings/expandable_text.dart';
+import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,41 +13,150 @@ class TrainingsScreen extends StatefulWidget {
 }
 
 class _TrainingsScreenState extends State<TrainingsScreen> {
+final List<Map<String, dynamic>> sports = [
+  {'label': 'Futebol', 'icon': Icons.sports_soccer, 'category': 'FUTEBOL'},
+  {'label': 'Vôlei', 'icon': Icons.sports_volleyball, 'category': 'VOLEI'},
+  {'label': 'Tênis', 'icon': Icons.sports_tennis, 'category': 'TENIS'},
+  {'label': 'Basquete', 'icon': Icons.sports_basketball, 'category': 'BASQUETE'},
+  {'label': 'Handebol', 'icon': Icons.sports_handball, 'category': 'HANDEBOL'},
+  {'label': 'Natação', 'icon': Icons.pool, 'category': 'NATACAO'},
+];
+
+final List<Map<String, String>> _allEvents = [
+  {
+    'title': 'Futebol Amistoso',
+    'description': 'Jogo amistoso contra o time X no estádio municipal.',
+    'type': 'AMISTOSOS',
+    'category': 'FUTEBOL',
+    'date': '12/05/2025',
+    'location': 'Estádio Municipal',
+    'isSubscribed': 'true',
+  },
+  {
+    'title': 'Treino de Vôlei',
+    'description': 'Treino técnico para o campeonato estadual.',
+    'type': 'TREINOS',
+    'category': 'VOLEI',
+    'date': '15/05/2025',
+    'location': 'Ginásio Poliesportivo',
+    'isSubscribed': 'false',
+  },
+  {
+    'title': 'Treino de Tênis Avançado',
+    'description': 'Sessão intensa para atletas avançados. Treino específico para resistência física e técnica.',
+    'type': 'TREINOS',
+    'category': 'TENIS',
+    'date': '18/05/2025',
+    'location': 'Quadra de Tênis A',
+    'isSubscribed': 'false',
+  },
+  {
+    'title': 'Basquete Amistoso',
+    'description': 'Jogo amistoso contra o time Y. Venha torcer!',
+    'type': 'AMISTOSOS',
+    'category': 'BASQUETE',
+    'date': '20/05/2025',
+    'location': 'Ginásio Central',
+    'isSubscribed': 'false',
+  },
+  {
+    'title': 'Treino de Handebol - Iniciantes',
+    'description': 'Treino aberto para novos atletas, venha experimentar handebol!',
+    'type': 'TREINOS',
+    'category': 'HANDEBOL',
+    'date': '22/05/2025',
+    'location': 'Quadra B',
+    'isSubscribed': 'false',
+  },
+  {
+    'title': 'Natação Amistosa - Revezamento',
+    'description': 'Competição amistosa de revezamento 4x50m entre clubes locais.',
+    'type': 'AMISTOSOS',
+    'category': 'NATACAO',
+    'date': '25/05/2025',
+    'location': 'Piscina Olímpica',
+    'isSubscribed': 'false',
+  },
+  {
+    'title': 'Treino de Futebol - Tática Avançada',
+    'description': 'Treinamento exclusivo focado em jogadas táticas e estratégias de campo, recomendado para jogadores experientes que desejam melhorar a visão de jogo.',
+    'type': 'TREINOS',
+    'category': 'FUTEBOL',
+    'date': '28/05/2025',
+    'location': 'Campo A',
+    'isSubscribed': 'true',
+  },
+  {
+    'title': 'Vôlei Amistoso - Equipe Feminina',
+    'description': 'Jogo amistoso entre equipes femininas. Compareça para apoiar!',
+    'type': 'AMISTOSOS',
+    'category': 'VOLEI',
+    'date': '30/05/2025',
+    'location': 'Ginásio Feminino',
+    'isSubscribed': 'false',
+  },
+];
+
+  int _selectedIndex = -1;
+  int _selectedTabIndex = 0;
+  List<String> _selectedCategories = [];
 
   @override
   Widget build(BuildContext context) {
+  final selectedType = _selectedTabIndex == 0 ? 'AMISTOSOS' : 'TREINOS';
+  final filteredEvents = _allEvents.where((event) {
+    final matchesType = event['type'] == selectedType;
+    final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(event['category']);
+    return matchesType && matchesCategory;
+  }).toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
       body: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.black,
-              child: const Center(
-                child: Text(
-                  'A.A.A.B.E',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            
-            // Sports Icons
+            // Sports list horizontal
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildSportIcon('Futebol', Icons.sports_soccer),
-                  _buildSportIcon('Vôlei', Icons.sports_volleyball),
-                  _buildSportIcon('Tênis', Icons.sports_tennis),
-                  _buildSportIcon('Basquete', Icons.sports_basketball, isSelected: true),
-                ],
+              padding: const EdgeInsets.only(top: 16, bottom: 16),
+              child: SizedBox(
+                height: 100,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 16),
+                  itemCount: sports.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 20),
+                  itemBuilder: (context, index) {
+                    final sport = sports[index];
+                    final isLast = index == sports.length - 1;
+                    final isSelected = _selectedCategories.contains(sport['category']);
+
+                    return Padding(
+                      padding: EdgeInsets.only(right: isLast ? 16 : 0),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            setState(() {
+                              final category = sport['category'];
+                              if (_selectedCategories.contains(category)) {
+                                _selectedCategories.remove(category);
+                              } else {
+                                _selectedCategories.add(category);
+                              }
+                            });
+                          },
+                          child: _buildSportIcon(
+                            sport['label'],
+                            sport['icon'],
+                            isSelected: isSelected,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
 
@@ -54,37 +165,62 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  Expanded(
-                    child: _buildTab('AMISTOSOS', isSelected: true),
-                  ),
+                  Expanded(child: _buildTab('AMISTOSOS', 0)),
                   const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildTab('TREINOS'),
-                  ),
+                  Expanded(child: _buildTab('TREINOS', 1)),
                 ],
               ),
             ),
 
-            // Event Cards
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: ListView(
-                  children: [
-                    _buildEventCard('ESPORTE', 'Descrição'),
-                    const SizedBox(height: 16),
-                    _buildEventCard('ESPORTE', 'Descrição'),
-                  ],
-                ),
-              ),
+            const SizedBox(height: 16),
+
+            // Event list
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: filteredEvents.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Text(
+                        'Nenhum valor encontrado.',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : Column(
+                    children: filteredEvents.map((event) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: GestureDetector(
+                          onTap: () {
+                            showTrainingModal(context);
+                          },
+                          child: _buildEventCard(
+                            event['title']!,
+                            event['description']!,
+                            event['date']!,
+                            event['location']!,
+                            event['category']!,
+                            event['isSubscribed'] == 'true',
+                          ),
+                        )
+                      );
+                    }).toList(),
+                  ),
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
+
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 1,
         onTap: (index) {
-          // Handle bottom navigation tap
           switch (index) {
             case 0:
               Navigator.pushNamed(context, '/home');
@@ -114,13 +250,19 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFFD700) : Colors.white,
+            gradient: LinearGradient(
+              colors: isSelected
+                ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
+                : [const Color.fromARGB(128, 52, 90, 167), const Color.fromARGB(128, 52, 90, 167)],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             icon,
             size: 30,
-            color: Colors.black,
+            color: isSelected ? Colors.black : Colors.white,
           ),
         ),
         const SizedBox(height: 8),
@@ -135,66 +277,97 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     );
   }
 
-  Widget _buildTab(String text, {bool isSelected = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: isSelected ? const Color(0xFFFFD700) : Colors.transparent,
-            width: 2,
+  Widget _buildTab(String text, int index) {
+    final isSelected = index == _selectedTabIndex;
+
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              _selectedTabIndex = index;
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: isSelected ? const Color(0xFFFFD700) : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+            ),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFFFFD700) : Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: isSelected ? const Color(0xFFFFD700) : Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
 
-  Widget _buildEventCard(String title, String description) {
+  Widget _buildEventCard(String title, String description, String date, String location, String category, bool isSubscribed) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: isSubscribed ? const Color(0xFF1E88E5).withOpacity(0.2) : Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
+        border: isSubscribed
+            ? Border.all(color: const Color(0xFF42A5F5), width: 2)
+            : null,
+        boxShadow: isSubscribed
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF42A5F5).withOpacity(0.5),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(
-                Icons.calendar_today,
-                color: Colors.white,
-                size: 16,
-              ),
-              SizedBox(width: 8),
+            children: [
+              const Icon(Icons.calendar_today, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
               Text(
-                'Data',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+                date,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+              const SizedBox(width: 12),
+              const Icon(Icons.location_on, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  location,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ),
-              SizedBox(width: 16),
-              Icon(
-                Icons.location_on,
-                color: Colors.white,
-                size: 16,
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Local',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSubscribed ? Colors.greenAccent : const Color(0xFFFFD700),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  isSubscribed ? "INSCRITO" : category,
+                  style: TextStyle(
+                    color: isSubscribed ? Colors.black : Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -203,14 +376,16 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
           Text(
             title,
             style: TextStyle(
-              color: const Color(0xFFFFD700),
+              color: isSubscribed ? Colors.greenAccent : const Color(0xFFFFD700),
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            description,
+          ExpandableText(
+            key: ValueKey(description),
+            text: description,
+            trimLines: 2,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -220,4 +395,14 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       ),
     );
   }
+}
+
+void showTrainingModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(0.5),
+    builder: (_) => const TrainingModal(),
+  );
 }

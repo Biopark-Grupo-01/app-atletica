@@ -39,6 +39,33 @@ class EventsNewsService {
       },
     ];
 
+    final trainings = [
+      {
+        'type': 'TREINOS',
+        'category': 'Basquete',
+        'date': '03/05/2025',
+        'location': 'Ginásio Central',
+        'title': 'Treino de Arremesso',
+        'description': 'Foco em fundamentos e agilidade.',
+      },
+      {
+        'type': 'AMISTOSOS',
+        'category': 'Futebol',
+        'date': '05/05/2025',
+        'location': 'Estádio Tigre',
+        'title': 'Amistoso com Raposa',
+        'description': 'Jogo preparatório para o torneio.',
+      },
+      {
+        'type': 'AMISTOSOS',
+        'category': 'Futebol',
+        'date': '05/05/2025',
+        'location': 'Estádio Tigre',
+        'title': 'Amistoso com Raposa',
+        'description': 'Jogo preparatório para o torneio.',
+      },
+    ];
+
     // Uncomment this when you're ready to use the real API
     // try {
     //   final newsResponse = await makeHttpRequest(context, "/news");
@@ -60,6 +87,7 @@ class EventsNewsService {
     return {
       'news': news,
       'events': events,
+      'trainings': trainings,
     };
   }
 }
