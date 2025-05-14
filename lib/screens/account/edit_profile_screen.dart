@@ -128,7 +128,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Image.asset(
-            "assets/images/logo_tigre.png",
+            "assets/images/aaabe.png",
             height: 40, // mais harmonioso para AppBar padrão
             fit: BoxFit.contain,
           ),
