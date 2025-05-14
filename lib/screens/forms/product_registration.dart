@@ -22,6 +22,35 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
   File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
 
+  final List<DropdownMenuItem<String>> category = [
+    const DropdownMenuItem(value: 'Caneca', child: Text('Caneca')),
+    const DropdownMenuItem(
+      value: 'Camiseta Masculina',
+      child: Text('Camiseta Masculina'),
+    ),
+    const DropdownMenuItem(
+      value: 'Camiseta Feminina',
+      child: Text('Camiseta Feminina'),
+    ),
+    const DropdownMenuItem(
+      value: 'Chaveiro Tigre',
+      child: Text('Chaveiro Tigre'),
+    ),
+    const DropdownMenuItem(
+      value: 'Tatuagem Temporaria',
+      child: Text('Tatuagem Temporária'),
+    ),
+    const DropdownMenuItem(
+      value: 'Caneca Personalizada',
+      child: Text('Caneca Personalizada'),
+    ),
+    const DropdownMenuItem(
+      value: 'Caneca Estampada Premium',
+      child: Text('Caneca Estampada Premium'),
+    ),
+    const DropdownMenuItem(value: 'Bone Oficial', child: Text('Boné Oficial')),
+  ];
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -90,7 +119,11 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                           icon: Icons.attach_money,
                         ),
                         const SizedBox(height: 15),
-                        CustomDropdown(label: 'Categoria', icon: Icons.category),
+                        CustomDropdown(
+                          label: 'Categoria',
+                          icon: Icons.category,
+                          items: category,
+                        ),
                         const SizedBox(height: 15),
                         CustomTextBox(),
                         const SizedBox(height: 25),

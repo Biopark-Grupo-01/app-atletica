@@ -14,12 +14,27 @@ class TrainingsRegistrationForm extends StatefulWidget {
   const TrainingsRegistrationForm({super.key});
 
   @override
-  State<TrainingsRegistrationForm> createState() => _TrainingsRegistrationFormState();
+  State<TrainingsRegistrationForm> createState() =>
+      _TrainingsRegistrationFormState();
 }
 
 class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
   File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
+
+  final List<DropdownMenuItem<String>> type = [
+    const DropdownMenuItem(value: 'Treinos', child: Text('Treinos')),
+    const DropdownMenuItem(value: 'Amistosos', child: Text('Amistosos')),
+  ];
+
+  final List<DropdownMenuItem<String>> sports = [
+    const DropdownMenuItem(value: 'Futebol', child: Text('Futebol')),
+    const DropdownMenuItem(value: 'Basquete', child: Text('Basquete')),
+    const DropdownMenuItem(value: 'Volei', child: Text('Vôlei')),
+    const DropdownMenuItem(value: 'Handebol', child: Text('Handebol')),
+    const DropdownMenuItem(value: 'Natacao', child: Text('Natação')),
+    const DropdownMenuItem(value: 'Tenis', child: Text('Tênis')),
+  ];
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -93,9 +108,17 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                           icon: Icons.location_on,
                         ),
                         const SizedBox(height: 15),
-                        CustomDropdown(label: 'Esporte', icon: Icons.sports_baseball),
+                        CustomDropdown(
+                          label: 'Esporte',
+                          icon: Icons.sports_baseball,
+                          items: sports,
+                        ),
                         const SizedBox(height: 15),
-                        CustomDropdown(label: 'Tipo', icon: Icons.category),
+                        CustomDropdown(
+                          label: 'Tipo',
+                          icon: Icons.category,
+                          items: type,
+                        ),
                         const SizedBox(height: 15),
                         CustomTextBox(),
                         const SizedBox(height: 25),

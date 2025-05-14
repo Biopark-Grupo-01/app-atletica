@@ -4,8 +4,9 @@ import 'package:app_atletica/theme/app_colors.dart';
 class CustomDropdown extends StatelessWidget {
   final String label;
   final IconData icon;
+  final List<DropdownMenuItem<String>> items;
 
-  const CustomDropdown({super.key, required this.label, required this.icon});
+  const CustomDropdown({super.key, required this.label, required this.icon, required this.items});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -29,19 +30,7 @@ class CustomDropdown extends StatelessWidget {
           dropdownColor: AppColors.blue,
           style: TextStyle(color: AppColors.white),
           icon: Icon(Icons.arrow_drop_down, color: AppColors.white),
-          
-          items:
-              <String>[
-                'Canecas',
-                'Roupas',
-                'Chaveiros',
-                'Tatuagens',
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+          items: items,
           onChanged: (String? newValue) {
             // Aqui você pode atualizar o estado com o novo valor selecionado
             // Por exemplo, usando setState() ou algum gerenciador de estado
