@@ -11,33 +11,37 @@ class CustomTitleForms extends StatelessWidget {
   });
 @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Center(
-          child: SizedBox(
-            width: 276,
-            child: Divider(color: AppColors.yellow, thickness: 1),
-          ),
-        ),
-        Center(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return Container(
+      width: MediaQuery.sizeOf(context).width  * 0.65,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Center(
+            child: SizedBox(
+              width: double.infinity,
+              child: Divider(color: AppColors.yellow, thickness: 1),
             ),
           ),
-        ),
-        const Center(
-          child: SizedBox(
-            width: 276,
-            child: Divider(color: AppColors.yellow, thickness: 1),
+          Center(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 30),
-      ],
+          const Center(
+            child: SizedBox(
+              width: double.infinity,
+              child: Divider(color: AppColors.yellow, thickness: 1),
+            ),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
     );
   }
 }

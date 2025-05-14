@@ -80,7 +80,11 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const CustomTitleForms(title: 'CADASTRO DE PRODUTO'),
+                        Center(
+                          child: const CustomTitleForms(
+                            title: 'CADASTRO DE PRODUTO',
+                          ),
+                        ),
                         GestureDetector(
                           onTap: _pickImage,
                           child: Container(

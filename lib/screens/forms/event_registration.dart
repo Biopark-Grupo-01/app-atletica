@@ -49,7 +49,11 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const CustomTitleForms(title: 'CADASTRO DE EVENTO'),
+                        Center(
+                          child: const CustomTitleForms(
+                            title: 'CADASTRO DE EVENTO',
+                          ),
+                        ),
                         GestureDetector(
                           onTap: _pickImage,
                           child: Container(

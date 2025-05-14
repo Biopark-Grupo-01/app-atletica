@@ -49,7 +49,11 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const CustomTitleForms(title: 'CADASTRO DE NOTÍCIA'),
+                        Center(
+                          child: const CustomTitleForms(
+                            title: 'CADASTRO DE NOTÍCIA',
+                          ),
+                        ),
                         GestureDetector(
                           onTap: _pickImage,
                           child: Container(

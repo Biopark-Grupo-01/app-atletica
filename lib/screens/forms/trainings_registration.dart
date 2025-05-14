@@ -65,7 +65,11 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const CustomTitleForms(title: 'CADASTRO DE TREINOS E AMISTOSOS'),
+                        Center(
+                          child: const CustomTitleForms(
+                            title: 'CADASTRO DE TREINOS E AMISTOSOS',
+                          ),
+                        ),
                         GestureDetector(
                           onTap: _pickImage,
                           child: Container(
