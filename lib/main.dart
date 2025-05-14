@@ -1,3 +1,4 @@
+import 'package:app_atletica/screens/forms/trainings_registration.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/screens/login/login_screen.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/event_registration': (context) => EventRegistrationForm(),
         '/news_registration': (context) => NewsRegistrationForm(),
         '/product_registration': (context) => ProductRegistrationForm(),
+        '/trainings_registration': (context) => TrainingsRegistrationForm(),
       },
     );
   }
