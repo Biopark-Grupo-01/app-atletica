@@ -8,15 +8,15 @@ class EventsNewsService {
     final news = [
       {
         'imageUrl': 'https://picsum.photos/300/150',
-        'date': '23/04/2025',
-        'location': 'Porto Alegre',
-        'title': 'Título Notícia',
-        'description': 'Descrição da notícia',
+        'date': '15/05/2025',
+        'location': 'Toledo',
+        'title': 'Acesso Rápido',
+        'description': 'Foi realizado alterações nos botões de acesso rápido',
       },
       {
         'imageUrl': 'https://picsum.photos/301/150',
-        'date': '22/04/2025',
-        'location': 'São Paulo',
+        'date': '22/05/2025',
+        'location': 'Toledo',
         'title': 'Notícia do Backend',
         'description': 'Essa notícia veio da API.',
       },
@@ -25,15 +25,15 @@ class EventsNewsService {
     final events = [
       {
         'imageUrl': 'https://picsum.photos/302/150',
-        'date': '31/04/2025',
-        'location': 'Curitiba',
-        'title': 'Título Evento',
-        'description': 'Descrição do evento',
+        'date': '09/05/2025',
+        'location': 'Toledo',
+        'title': 'Confraternização Semana Acadêmica',
+        'description': 'Ocorrera uma festa para o fim da semana acadêmica',
       },
       {
         'imageUrl': 'https://picsum.photos/303/150',
-        'date': '30/04/2025',
-        'location': 'Rio de Janeiro',
+        'date': '30/05/2025',
+        'location': 'Toledo',
         'title': 'Evento da API',
         'description': 'Evento vindo do back-end.',
       },
@@ -63,6 +63,80 @@ class EventsNewsService {
         'location': 'Estádio Tigre',
         'title': 'Amistoso com Raposa',
         'description': 'Jogo preparatório para o torneio.',
+      },
+    ];
+
+    final List<Map<String, dynamic>> storeCategories = [
+      {
+        'label': 'Canecas', 
+        'icon': Icons.local_drink, 
+        'category': 'CANECAS'
+      },
+      {
+        'label': 'Roupas', 
+        'icon': Icons.checkroom, 
+        'category': 'ROUPAS'
+      },
+      {
+        'label': 'Chaveiros', 
+        'icon': Icons.key, 
+        'category': 'CHAVEIROS'
+      },
+      {
+        'label': 'Tatuagens', 
+        'icon': Icons.brush, 
+        'category': 'TATUAGENS'
+      },
+    ];
+
+    final List<Map<String, String>> storeProducts = [
+      {
+        'name': 'Caneca Oficial', 
+        'category': 'CANECAS', 
+        'price': '25,00', 
+        'image': 'assets/images/caneca_oficial.png'
+      },
+      {
+        'name': 'Camiseta Masculina', 
+        'category': 'ROUPAS', 
+        'price': '50,00', 
+        'image': 'assets/images/camisetaa_masculina.png'
+      },
+      {
+        'name': 'Camiseta Feminina', 
+        'category': 'ROUPAS', 
+        'price': '50,00', 
+        'image': 'assets/images/camiseta_feminina_1.png'
+      },
+      {
+        'name': 'Chaveiro Tigre', 
+        'category': 'CHAVEIROS', 
+        'price': '15,00', 
+        'image': 'assets/images/chaveiro.jpeg'
+      },
+      {
+        'name': 'Tatuagem Temporária', 
+        'category': 'TATUAGENS', 
+        'price': '10,00', 
+        'image': 'assets/images/tatuagens_temporarias.jpeg'
+      },
+      {
+        'name': 'Caneca Personalizada', 
+        'category': 'CANECAS', 
+        'price': '30,00', 
+        'image': 'assets/images/caneca_personalizada.jpeg'
+      },
+      {
+        'name': 'Caneca Estampada Premium', 
+        'category': 'CANECAS', 
+        'price': '35,00', 
+        'image': 'assets/images/caneca_estampa_premium.jpeg'
+      },
+      {
+        'name': 'Boné Oficial', 
+        'category': 'ROUPAS', 
+        'price': '40,00', 
+        'image': 'assets/images/bone.jpeg'
       },
     ];
 
