@@ -11,7 +11,7 @@ class CustomTitleForms extends StatelessWidget {
   });
 @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.sizeOf(context).width  * 0.65,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
