@@ -107,7 +107,7 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                             text: 'Salvar',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                Navigator.pushNamed(context, '/home');
+                                Navigator.pop(context);
                               }
                             },
                           ),

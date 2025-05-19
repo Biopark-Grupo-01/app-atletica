@@ -103,7 +103,7 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                             text: 'Salvar',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                Navigator.pushNamed(context, '/home');
+                                Navigator.pop(context);
                               }
                             },
                           ),

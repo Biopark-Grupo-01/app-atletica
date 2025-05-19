@@ -131,7 +131,7 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                             text: 'Salvar',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                Navigator.pushNamed(context, '/home');
+                                Navigator.pop(context);
                               }
                             },
                           ),
