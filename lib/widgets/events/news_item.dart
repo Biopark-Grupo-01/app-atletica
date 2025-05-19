@@ -26,7 +26,7 @@ class NewsItem extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
           ),
           clipBehavior: Clip.antiAlias,
           child: SizedBox(
