@@ -27,9 +27,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     final fetchedUser = UserModel(
       id: "123",
       email: "teste@gmail.com",
-      name: "Lucas Dreveck",
+      name: "Djonathan Leonardo de Souza",
       cpf: "123.456.789-00",
-      avatarUrl: "https://example.com/avatar.png",
+      avatarUrl: "assets/images/selfieCarteirinha.png",
     );
     setState(() {
       user = fetchedUser;
@@ -72,8 +72,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: MediaQuery.of(context).size.height * 0.09,
-                                  backgroundImage: user!.avatarUrl.isEmpty
-                                      ? NetworkImage(user!.avatarUrl)
+                                  backgroundImage: user!.avatarUrl.isNotEmpty
+                                      ? AssetImage(user!.avatarUrl)
                                       : const AssetImage("assets/images/emblema.png") as ImageProvider,
                                 ),
                                 const SizedBox(width: 12),
@@ -85,7 +85,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                                       Text(
                                         user!.name,
                                         maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                        // overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 26,
                                           fontWeight: FontWeight.bold,

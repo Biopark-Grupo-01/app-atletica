@@ -1,6 +1,7 @@
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/trainings/expandable_text.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
+import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -112,6 +113,7 @@ final List<Map<String, String>> _allEvents = [
 
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
+      appBar: CustomAppBar(),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,

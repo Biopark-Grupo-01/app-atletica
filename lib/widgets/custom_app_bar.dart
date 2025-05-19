@@ -8,11 +8,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
-      title: Center(child: Image.asset('assets/images/aaabe.png', height: 110)),
+      title: Image.asset(
+        'assets/images/aaabe.png',
+        height: 60,
+      ),
       backgroundColor: AppColors.darkGrey,
       centerTitle: true,
       elevation: 0,
-      toolbarHeight: 110,
+      toolbarHeight: 70,
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.darkGrey,
+        ),
+      ),
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1.0),
         child: Container(color: AppColors.lightGrey, height: 1),
@@ -21,5 +29,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(110.0);
+  Size get preferredSize => const Size.fromHeight(70.0);
 }

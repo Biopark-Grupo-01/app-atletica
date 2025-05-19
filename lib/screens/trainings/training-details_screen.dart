@@ -320,7 +320,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Associação Atlética Acadêmica XV de Setembro',
+                                'Associação Atlética Tigre Branco',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
