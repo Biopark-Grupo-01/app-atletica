@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class TrainingModal extends StatelessWidget {
   final bool isSubscribed;
 
-  const TrainingModal({super.key, this.isSubscribed = true});
+  const TrainingModal({super.key, this.isSubscribed = false});
 
   @override
   Widget build(BuildContext context) {

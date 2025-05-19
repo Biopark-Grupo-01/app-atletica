@@ -1,3 +1,4 @@
+import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,12 +12,12 @@ class TicketsScreen extends StatefulWidget {
 
 class _TicketsScreenState extends State<TicketsScreen> {
   final List<Map<String, String>> tickets = [
-    {'date': '10/04/2025', 'title': 'Título Evento 1', 'status': 'Ativo'},
-    {'date': '11/04/2025', 'title': 'Título Evento 2', 'status': 'Utilizado'},
-    {'date': '12/04/2025', 'title': 'Título Evento 3', 'status': 'Inativo'},
-    {'date': '13/04/2025', 'title': 'Título Evento 4', 'status': 'Ativo'},
-    {'date': '13/04/2025', 'title': 'Título Evento 5', 'status': 'Ativo'},
-    {'date': '13/04/2025', 'title': 'Título Evento 6', 'status': 'Ativo'},
+    {'date': '15/03/2025', 'title': 'Festa de Abertura', 'status': 'Ativo', 'imagePath': 'https://picsum.photos/300/150'},
+    {'date': '16/04/2025', 'title': 'Competição de Atletismo', 'status': 'Utilizado', 'imagePath': 'https://picsum.photos/301/150'},
+    {'date': '17/05/2025', 'title': 'Show de Talentos', 'status': 'Utilizado', 'imagePath': 'https://picsum.photos/302/150'},
+    {'date': '18/06/2025', 'title': 'Corrida Noturna', 'status': 'Ativo', 'imagePath': 'https://picsum.photos/303/150'},
+    {'date': '19/07/2025', 'title': 'Feira Gastronômica', 'status': 'Ativo', 'imagePath': 'https://picsum.photos/304/150'},
+    {'date': '20/08/2025', 'title': 'Encerramento com Banda', 'status': 'Ativo', 'imagePath': 'https://picsum.photos/305/150'},
   ];
 
   String _searchQuery = '';
@@ -32,25 +33,12 @@ class _TicketsScreenState extends State<TicketsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
+      appBar: CustomAppBar(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.black,
-                child: const Center(
-                  child: Text(
-                    'A.A.A.B.E',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Column(
@@ -149,7 +137,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                     date: ticket['date']!,
                     title: ticket['title']!,
                     status: ticket['status']!,
-                    imagePath: 'assets/images/caneca.png',
+                    imagePath: ticket['imagePath']!,
                   );
                 },
               ),
@@ -211,7 +199,7 @@ class TicketCard extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
+                    child: Image.network(
                       imagePath,
                       fit: BoxFit.cover,
                       width: double.infinity,
@@ -229,7 +217,7 @@ class TicketCard extends StatelessWidget {
                     children: [
                       Text(date, style: TextStyle(color: Colors.grey[900], fontSize: 12)),
                       const SizedBox(height: 4),
-                      Text(title.toUpperCase(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                      Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
                       const SizedBox(height: 4),
                       Text(status, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
                     ],

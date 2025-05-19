@@ -109,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         description: item['description'] ?? '',
                       ),
                 ),
+                const SizedBox(height: 30),
                 CustomTitle(title: 'NOTÍCIAS'),
                 CarouselItem(
                   items: news,

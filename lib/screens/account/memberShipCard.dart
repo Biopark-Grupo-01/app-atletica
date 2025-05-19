@@ -1,3 +1,4 @@
+import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,35 +17,20 @@ class _MembershipCardScreenState extends State<MembershipCardScreen> {
   Widget build(BuildContext context) {
     // Mock user data - This would normally come from your backend
     final user = (
-      name: 'Pedro Aparecido Furini',
+      name: 'Djonathan Leonardo de Souza',
       registration: '12345678',
       cpf: '123.456.789-01',
-      email: 'pedro@gmail.com',
-      validUntil: '12/34/5678',
-      avatarUrl: 'https://example.com/avatar.jpg', // Replace with actual avatar URL
+      email: 'djonathan@gmail.com',
+      validUntil: '31/12/2025',
+      avatarUrl: 'assets/images/selfieCarteirinha.png',
     );
 
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
+      appBar: CustomAppBar(),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Colors.black,
-              child: const Center(
-                child: Text(
-                  'A.A.A.B.E',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -63,7 +49,7 @@ class _MembershipCardScreenState extends State<MembershipCardScreen> {
                         children: [
                           CircleAvatar(
                             radius: MediaQuery.of(context).size.width * 0.18, // responsivo
-                            backgroundImage: NetworkImage(user.avatarUrl),
+                            backgroundImage: AssetImage(user.avatarUrl),
                           ),
                           const SizedBox(height: 16),
                           Text(
