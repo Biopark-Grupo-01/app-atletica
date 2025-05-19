@@ -31,6 +31,22 @@ class _StoreScreenState extends State<StoreScreen> {
   List<String> _selectedCategories = [];
   String _searchQuery = '';
 
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      final String? categoria = ModalRoute.of(context)?.settings.arguments as String?;
+      if (categoria != null && !_selectedCategories.contains(categoria)) {
+        setState(() {
+          _selectedCategories.add(categoria);
+          _initialized = true;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredProducts = storeProducts.where((product) {
