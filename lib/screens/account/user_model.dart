@@ -4,6 +4,7 @@ class UserModel {
   final String email;
   final String? cpf;
   final String avatarUrl;
+  final String? role;
 
   UserModel({
     required this.id,
@@ -11,5 +12,6 @@ class UserModel {
     required this.email,
     this.cpf,
     required this.avatarUrl,
+    this.role,
   });
 }
