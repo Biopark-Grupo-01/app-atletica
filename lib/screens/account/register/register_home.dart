@@ -2,7 +2,7 @@ import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
-import 'package:app_atletica/widgets/forms/menu_card.dart';
+import 'package:app_atletica/widgets/menu_card.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 

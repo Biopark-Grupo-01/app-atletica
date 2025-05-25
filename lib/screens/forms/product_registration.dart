@@ -125,7 +125,7 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                         const SizedBox(height: 15),
                         CustomDropdown(
                           label: 'Categoria',
-                          icon: Icons.category,
+                          icon: Icons.interests,
                           items: category,
                         ),
                         const SizedBox(height: 15),

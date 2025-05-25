@@ -16,24 +16,25 @@ class MenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      alignment: Alignment.center,
+      height: 85,
       decoration: BoxDecoration(
         color: AppColors.blue,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.yellow),
       ),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.yellow, size: 28),
+        leading: Icon(icon, color: AppColors.yellow, size: 35),
         title: Text(
           title,
           style: const TextStyle(
             color: AppColors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(color: AppColors.white, fontSize: 14),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
         ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
