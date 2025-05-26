@@ -13,8 +13,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final iconSize = screenWidth * 0.06;
+    final double iconSize = 30;
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,

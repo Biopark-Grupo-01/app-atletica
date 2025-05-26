@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const SizedBox(height: 10),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     CustomSquareButton(
                       icon: FontAwesomeIcons.ticket,
@@ -109,7 +109,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         description: item['description'] ?? '',
                       ),
                 ),
-                const SizedBox(height: 30),
                 CustomTitle(title: 'NOTÍCIAS'),
                 CarouselItem(
                   items: news,

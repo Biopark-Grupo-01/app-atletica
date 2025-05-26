@@ -120,7 +120,7 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                         const SizedBox(height: 15),
                         CustomDropdown(
                           label: 'Tipo',
-                          icon: Icons.category,
+                          icon: Icons.interests,
                           items: type,
                         ),
                         const SizedBox(height: 15),
