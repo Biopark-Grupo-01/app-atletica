@@ -35,7 +35,7 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: Column(
           children: [

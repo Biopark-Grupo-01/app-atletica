@@ -51,7 +51,7 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: Column(
           children: [

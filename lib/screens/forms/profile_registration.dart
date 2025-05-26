@@ -35,7 +35,7 @@ class _ProfileRegistrationFormState extends State<ProfileRegistrationForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: Column(
           children: [

@@ -18,7 +18,7 @@ class _RegisterAccountScreenState extends State<RegisterAccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
