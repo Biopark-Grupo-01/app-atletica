@@ -1,10 +1,11 @@
 import 'package:app_atletica/screens/account/edit_profile_screen.dart';
+import 'package:app_atletica/screens/admin/admin_area.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/menu_card.dart';
 import 'package:flutter/material.dart';
 
-import 'package:app_atletica/screens/account/memberShipCard.dart';
+import 'package:app_atletica/screens/account/membershipCard.dart';
 import 'package:app_atletica/screens/account/register/register_home.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/screens/account/user_model.dart';
@@ -74,8 +75,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                                   radius:
                                       MediaQuery.of(context).size.height * 0.08,
                                   backgroundImage:
-                                      user!.avatarUrl.isNotEmpty
-                                          ? AssetImage(user!.avatarUrl)
+                                      user!.avatarUrl!.isNotEmpty
+                                          ? AssetImage(user!.avatarUrl!)
                                           : const AssetImage(
                                                 "assets/images/emblema.png",
                                               )
@@ -209,7 +210,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const MembershipCardScreen(),
+                            builder: (_) => MembershipCardScreen(user: user!),
                           ),
                         );
                       },
@@ -223,15 +224,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       ),
                     if (user != null && user!.role == "admin")
                       MenuCard(
-                        icon: Icons.add_circle,
-                        title: "Cadastros",
-                        subtitle: "Cadastrar atividades",
+                        icon: FontAwesomeIcons.userTie,
+                        title: "Administração",
+                        subtitle: "Área do administrador",
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => const RegisterAccountScreen(),
+                              builder: (context) => const AdminArea(),
                             ),
                           );
                         },

@@ -1,98 +1,60 @@
+import 'package:app_atletica/theme/app_colors.dart';
+import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:app_atletica/screens/account/user_model.dart';
 
+class MembershipCardScreen extends StatelessWidget {
+  final UserModel? user;
 
-class MembershipCardScreen extends StatefulWidget {
-  const MembershipCardScreen({super.key});
-
-  @override
-  State<MembershipCardScreen> createState() => _MembershipCardScreenState();
-}
-
-class _MembershipCardScreenState extends State<MembershipCardScreen> {
+  const MembershipCardScreen({super.key, this.user});
 
   @override
   Widget build(BuildContext context) {
-    // Mock user data - This would normally come from your backend
-    final user = (
-      name: 'Djonathan Leonardo de Souza',
-      registration: '12345678',
-      cpf: '123.456.789-01',
-      email: 'djonathan@gmail.com',
-      validUntil: '31/12/2025',
-      avatarUrl: 'assets/images/selfieCarteirinha.png',
-    );
-
     return Scaffold(
-      backgroundColor: const Color(0xFF001835),
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20.0),
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF001835),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.white, width: 1),
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const SizedBox(height: 24),
-                      // Nome + Foto
+                      Text(
+                        user!.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      CircleAvatar(
+                        radius: MediaQuery.of(context).size.height * 0.09,
+                        backgroundImage: AssetImage(user!.avatarUrl!),
+                      ),
+                      _buildInfoRow('Matrícula:', user!.registration.toString()),
+                      _buildInfoRow('CPF:', user!.cpf!),
+                      _buildInfoRow('E-mail:', user!.email),
+                      _buildInfoRow('Validade:', user!.validUntil!),
                       Column(
-                        children: [
-                          CircleAvatar(
-                            radius: MediaQuery.of(context).size.width * 0.18, // responsivo
-                            backgroundImage: AssetImage(user.avatarUrl),
-                          ),
-                          const SizedBox(height: 16),
+                        children: const [
                           Text(
-                            user.name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            'Associação Tigre Branco - 2025',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                          Text(
+                            '(01/01/2025 - 31/12/2025)',
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Infos do usuário com espaçamento proporcional
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildInfoRow('Matrícula:', user.registration),
-                            _buildInfoRow('CPF:', user.cpf),
-                            _buildInfoRow('E-mail:', user.email),
-                            _buildInfoRow('Validade:', user.validUntil),
-                          ],
-                        ),
-                      ),
-
-                      // Rodapé fixado embaixo
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Column(
-                          children: const [
-                            Text(
-                              'Associação Tigre Branco - 2025',
-                              style: TextStyle(color: Colors.white, fontSize: 14),
-                            ),
-                            Text(
-                              '(01/01/2025 - 31/12/2025)',
-                              style: TextStyle(color: Colors.white, fontSize: 12),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -129,34 +91,33 @@ class _MembershipCardScreenState extends State<MembershipCardScreen> {
   }
 
   _buildInfoRow(String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 18, // era 16
-          ),
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            value,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
             style: const TextStyle(
-              color: Colors.white,
-              // height: 3,          // mais altur
-                fontFeatures: [FontFeature.enable('smcp')], // Habilita small caps
-              fontSize: 18, // era 16
+              color: AppColors.white,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
+              fontFamily: 'Oswald',
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: AppColors.white,
+                fontSize: 20,
+                fontFamily: 'Oswald',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

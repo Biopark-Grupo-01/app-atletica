@@ -41,7 +41,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         nameController.text = user.name;
         cpfController.text = user.cpf!;
         emailController.text = user.email;
-        avatarUrl = user.avatarUrl;
+        avatarUrl = user.avatarUrl!;
         // phoneController.text = user.phone;
         // birthDateController.text = user.birthDate;
       });
