@@ -1,3 +1,4 @@
+import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +57,7 @@ class _StoreScreenState extends State<StoreScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF001835),
+      backgroundColor: AppColors.blue,
       appBar: CustomAppBar(),
       body: SafeArea(
         child: ListView(
@@ -74,11 +75,11 @@ class _StoreScreenState extends State<StoreScreen> {
                     _searchQuery = value;
                   });
                 },
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: AppColors.white),
                 decoration: InputDecoration(
                   hintText: 'Buscar',
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                  hintStyle: const TextStyle(color: AppColors.lightGrey),
+                  prefixIcon: const Icon(Icons.search, color: AppColors.lightGrey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -140,7 +141,7 @@ class _StoreScreenState extends State<StoreScreen> {
                 child: Center(
                   child: Text(
                     'Nenhum produto encontrado para as categorias ou busca selecionadas.',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: const TextStyle(color: AppColors.white, fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                 ),

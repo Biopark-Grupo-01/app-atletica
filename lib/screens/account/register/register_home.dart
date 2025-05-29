@@ -13,6 +13,54 @@ class RegisterAccountScreen extends StatefulWidget {
   State<RegisterAccountScreen> createState() => _RegisterAccountScreenState();
 }
 
+Widget _buildMenuCards(BuildContext context) {
+  return Column(
+    spacing: 25,
+    children: [
+      MenuCard(
+        icon: FontAwesomeIcons.calendarDay,
+        title: 'Eventos',
+        subtitle: 'Cadastro de Eventos',
+        onTap: () {
+          Navigator.pushNamed(context, '/event_registration');
+        },
+      ),
+      MenuCard(
+        icon: FontAwesomeIcons.newspaper,
+        title: 'Notícias',
+        subtitle: 'Cadastro de Notícias',
+        onTap: () {
+          Navigator.pushNamed(context, '/news_registration');
+        },
+      ),
+      MenuCard(
+        icon: FontAwesomeIcons.personRunning,
+        title: 'Treinos e Amistosos',
+        subtitle: 'Cadastro de Treinos e Amistosos',
+        onTap: () {
+          Navigator.pushNamed(context, '/trainings_registration');
+        },
+      ),
+      MenuCard(
+        icon: FontAwesomeIcons.tag,
+        title: 'Produtos',
+        subtitle: 'Cadastro de Produtos',
+        onTap: () {
+          Navigator.pushNamed(context, '/product_registration');
+        },
+      ),
+      MenuCard(
+        icon: FontAwesomeIcons.solidCircleUser,
+        title: 'Perfil',
+        subtitle: 'Cadastro de Perfil',
+        onTap: () {
+          Navigator.pushNamed(context, '/profile_registration');
+        },
+      ),
+    ],
+  );
+}
+
 class _RegisterAccountScreenState extends State<RegisterAccountScreen> {
   @override
   Widget build(BuildContext context) {
@@ -24,53 +72,9 @@ class _RegisterAccountScreenState extends State<RegisterAccountScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Center(child: const CustomTitleForms(title: 'CADASTRO')),
+              const Center(child: CustomTitleForms(title: 'CADASTRO')),
               Expanded(
-                child: Column(
-                  spacing: 25,
-                  children: [
-                    MenuCard(
-                      icon: FontAwesomeIcons.calendarDay,
-                      title: 'Eventos',
-                      subtitle: 'Cadastro de Eventos',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/event_registration');
-                      },
-                    ),
-                    MenuCard(
-                      icon: FontAwesomeIcons.newspaper,
-                      title: 'Notícias',
-                      subtitle: 'Cadastro de Notícias',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/news_registration');
-                      },
-                    ),
-                    MenuCard(
-                      icon: FontAwesomeIcons.personRunning,
-                      title: 'Treinos e Amistosos',
-                      subtitle: 'Cadastro de Treinos e Amistosos',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/trainings_registration');
-                      },
-                    ),
-                    MenuCard(
-                      icon: FontAwesomeIcons.tag,
-                      title: 'Produtos',
-                      subtitle: 'Cadastro de Produtos',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/product_registration');
-                      },
-                    ),
-                    MenuCard(
-                      icon: FontAwesomeIcons.solidCircleUser,
-                      title: 'Perfil',
-                      subtitle: 'Cadastro de Perfil',
-                      onTap: () {
-                        Navigator.pushNamed(context, '/profile_registration');
-                      },
-                    ),
-                  ],
-                ),
+                child: SingleChildScrollView(child: _buildMenuCards(context)),
               ),
             ],
           ),
