@@ -1,4 +1,5 @@
 import 'package:app_atletica/screens/account/memberShipCard.dart';
+import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -159,7 +160,7 @@ class UsersListState extends State<UsersList> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => MembershipCardScreen(user: user),
+                                  builder: (_) => TicketsScreen(),
                                 ),
                               );
                             },
