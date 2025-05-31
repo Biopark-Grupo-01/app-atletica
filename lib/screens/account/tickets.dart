@@ -194,6 +194,50 @@ class _TicketsScreenState extends State<TicketsScreen> {
                             ),
                           ),
                         ),
+
+                        // Dropdown de Ordenação
+                        Container(
+                          width: 150,
+                          height: 50,
+                          margin: const EdgeInsets.only(right: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF003366),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              menuWidth: 155,
+                              isDense: true,
+                              value: _sortCriteria,
+                              dropdownColor: const Color(0xFF003366),
+                              style: const TextStyle(color: AppColors.white),
+                              icon: const Icon(
+                                Icons.sort,
+                                color: AppColors.white,
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'date',
+                                  child: Text('Data'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'title',
+                                  child: Text('A-Z'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'added',
+                                  child: Text('Mais Recente'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _sortCriteria = value!;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
                       ],
                     ),
 
