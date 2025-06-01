@@ -193,7 +193,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF003366),
+        color:  AppColors.lightBlue,
         borderRadius: BorderRadius.circular(10),
       ),
       child: DropdownButtonHideUnderline(
@@ -201,7 +201,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
           menuWidth: width + 5,
           isDense: true,
           value: value,
-          dropdownColor: const Color(0xFF003366),
+          dropdownColor:  AppColors.lightBlue,
           style: const TextStyle(color: AppColors.white),
           icon: Icon(icon, color: AppColors.white),
           items:
