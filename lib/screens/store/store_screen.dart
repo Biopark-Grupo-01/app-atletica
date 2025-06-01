@@ -1,6 +1,7 @@
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/widgets/search_bar.dart'; // Importar o CustomSearchBar
 import 'package:flutter/material.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -70,9 +71,23 @@ class _StoreScreenState extends State<StoreScreen> {
   ];
 
   List<String> _selectedCategories = [];
-  String _searchQuery = '';
-
+  final TextEditingController _searchController = TextEditingController(); // Adicionar controller
   bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Atualizar a busca quando o texto mudar
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
@@ -91,16 +106,15 @@ class _StoreScreenState extends State<StoreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredProducts =
-        storeProducts.where((product) {
-          final matchesCategory =
-              _selectedCategories.isEmpty ||
-              _selectedCategories.contains(product['category']);
-          final matchesSearch = product['name']!.toLowerCase().contains(
-            _searchQuery.toLowerCase(),
-          );
-          return matchesCategory && matchesSearch;
-        }).toList();
+    final filteredProducts = storeProducts.where((product) {
+      final matchesCategory =
+          _selectedCategories.isEmpty ||
+          _selectedCategories.contains(product['category']);
+      final matchesSearch = product['name']!.toLowerCase().contains(
+        _searchController.text.toLowerCase(),
+      );
+      return matchesCategory && matchesSearch;
+    }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.blue,
@@ -109,36 +123,9 @@ class _StoreScreenState extends State<StoreScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Search bar
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF003366),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-                style: const TextStyle(color: AppColors.white),
-                decoration: InputDecoration(
-                  hintText: 'Buscar',
-                  hintStyle: const TextStyle(color: AppColors.lightGrey),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppColors.lightGrey,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
+            CustomSearchBar(
+              hintText: 'Buscar',
+              controller: _searchController,
             ),
 
             const SizedBox(height: 16),

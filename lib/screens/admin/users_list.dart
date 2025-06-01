@@ -2,11 +2,11 @@ import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/utils/utils.dart';
+import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/screens/account/user_model.dart';
-import 'package:app_atletica/screens/admin/users_info.dart';
 
 class UsersList extends StatefulWidget {
   const UsersList({super.key});
@@ -145,7 +145,7 @@ class UsersListState extends State<UsersList> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => UsersInfo(user: user),
+                                    builder: (_) => MembershipCardScreen(user: user),
                                   ),
                                 );
                               },
@@ -182,32 +182,7 @@ class UsersListState extends State<UsersList> {
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF003366),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                controller: searchController,
-                style: const TextStyle(color: AppColors.white),
-                decoration: InputDecoration(
-                  hintText: 'Buscar',
-                  hintStyle: const TextStyle(color: AppColors.lightGrey),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    color: AppColors.lightGrey,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-            ),
+            child: CustomSearchBar(hintText: 'Buscar usuários', controller: searchController)
           ),
 
           Expanded(
@@ -221,7 +196,6 @@ class UsersListState extends State<UsersList> {
           ),
         ],
       ),
-
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
