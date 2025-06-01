@@ -145,8 +145,7 @@ class UsersListState extends State<UsersList> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (_) => UsersInfo(user: user),
+                                    builder: (_) => UsersInfo(user: user),
                                   ),
                                 );
                               },
@@ -183,8 +182,7 @@ class UsersListState extends State<UsersList> {
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child:
-            Container(
+            child: Container(
               decoration: BoxDecoration(
                 color: Color(0xFF003366),
                 borderRadius: BorderRadius.circular(8),
@@ -224,29 +222,7 @@ class UsersListState extends State<UsersList> {
         ],
       ),
 
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4,
-        onTap: (index) {
-          // Handle bottom navigation tap
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }

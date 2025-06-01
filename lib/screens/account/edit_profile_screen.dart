@@ -90,20 +90,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 enabledBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.white),
                 ),
-                suffixIcon: isPassword
-                    ? IconButton(
-                        icon: Icon(
-                          obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          setState(() => obscurePassword = !obscurePassword);
-                        },
-                      )
-                    : null,
-                    // : const Icon(Icons.edit, color: Colors.white),
+                suffixIcon:
+                    isPassword
+                        ? IconButton(
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() => obscurePassword = !obscurePassword);
+                          },
+                        )
+                        : null,
+                // : const Icon(Icons.edit, color: Colors.white),
               ),
             ),
           ),
@@ -135,7 +136,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
 
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -143,7 +143,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 16),
             const Text(
               "Editar Perfil",
-              style: TextStyle(color: Colors.yellow, fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.yellow,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const Divider(color: Colors.yellow, thickness: 2),
             const SizedBox(height: 24),
@@ -185,7 +189,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               label: "Data de Nascimento",
               controller: birthDateController,
               inputFormatters: [birthDateMask],
-            ),            buildEditableField(label: "E-mail", controller: emailController),
+            ),
+            buildEditableField(label: "E-mail", controller: emailController),
             buildEditableField(
               label: "Senha",
               controller: passwordController,
@@ -208,30 +213,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4,
-        onTap: (index) {
-          // Handle bottom navigation tap
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
-
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }

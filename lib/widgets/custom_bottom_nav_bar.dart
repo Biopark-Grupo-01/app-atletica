@@ -6,17 +6,20 @@ class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
     super.key,
     required this.currentIndex,
-    required this.onTap,
   });
   final int currentIndex; // Índice do item atualmente selecionado
-  final Function(int) onTap; // Função chamada quando um item é tocado
 
   @override
   Widget build(BuildContext context) {
     final double iconSize = 30;
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      onTap: onTap,
+      onTap: (index) {
+        final routes = ['/home', '/trainings', '/store', '/events', '/profile'];
+        if (index >= 0 && index < routes.length) {
+          Navigator.pushNamed(context, routes[index]);
+        }
+      },
       selectedItemColor: AppColors.yellow,
       unselectedItemColor: AppColors.lightGrey,
       backgroundColor: AppColors.darkGrey,

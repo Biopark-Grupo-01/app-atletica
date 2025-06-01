@@ -25,7 +25,9 @@ class _AdminAreaState extends State<AdminArea> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Center(child: const CustomTitleForms(title: 'ÁREA DO ADMINISTRADOR')),
+              Center(
+                child: const CustomTitleForms(title: 'ÁREA DO ADMINISTRADOR'),
+              ),
               Expanded(
                 child: Column(
                   spacing: 25,
@@ -50,9 +52,7 @@ class _AdminAreaState extends State<AdminArea> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => UsersList(),
-                          ),
+                          MaterialPageRoute(builder: (context) => UsersList()),
                         );
                       },
                     ),
@@ -63,29 +63,7 @@ class _AdminAreaState extends State<AdminArea> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4,
-        onTap: (index) {
-          // Handle bottom navigation tap
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }
