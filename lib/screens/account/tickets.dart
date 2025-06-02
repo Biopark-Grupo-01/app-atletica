@@ -1,7 +1,6 @@
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:app_atletica/widgets/custom_title.dart';
 import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:app_atletica/widgets/tickets/ticket_card.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +141,6 @@ class _TicketsScreenState extends State<TicketsScreen> {
                   controller: _searchController,
                 ),
                 const SizedBox(height: 25),
-                CustomTitle(title: 'INGRESSOS'),
                 _buildFilters(),
                 const SizedBox(height: 30),
                 _buildTicketsList(),
