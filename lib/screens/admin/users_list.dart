@@ -145,7 +145,8 @@ class UsersListState extends State<UsersList> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => MembershipCardScreen(user: user),
+                                    builder:
+                                        (_) => MembershipCardScreen(user: user),
                                   ),
                                 );
                               },
@@ -159,7 +160,7 @@ class UsersListState extends State<UsersList> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => TicketsScreen(),
+                                  builder: (_) => TicketsScreen(user: user),
                                 ),
                               );
                             },
@@ -182,7 +183,10 @@ class UsersListState extends State<UsersList> {
         children: [
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: CustomSearchBar(hintText: 'Buscar usuários', controller: searchController)
+            child: CustomSearchBar(
+              hintText: 'Buscar usuários',
+              controller: searchController,
+            ),
           ),
 
           Expanded(

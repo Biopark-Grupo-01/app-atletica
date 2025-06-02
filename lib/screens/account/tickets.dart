@@ -1,16 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:app_atletica/widgets/tickets/ticket_card.dart';
-import 'package:flutter/material.dart';
+import 'package:app_atletica/screens/account/user_model.dart';
 
 class TicketsScreen extends StatefulWidget {
-  const TicketsScreen({super.key});
+  final UserModel? user;
+
+  const TicketsScreen({super.key, this.user});
 
   @override
   State<TicketsScreen> createState() => _TicketsScreenState();
 }
+
 
 const List<Map<String, String>> _mockTickets = [
   {

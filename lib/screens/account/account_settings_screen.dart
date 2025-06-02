@@ -182,7 +182,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const TicketsScreen(),
+                            builder: (context) => TicketsScreen(user: user!),
                           ),
                         );
                       },
@@ -195,7 +195,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const TicketsScreen(),
+                            builder: (context) => TicketsScreen(user: user!),
                           ),
                         );
                       },
