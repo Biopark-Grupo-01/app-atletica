@@ -125,8 +125,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 CustomTitle(title: 'TREINOS E AMISTOSOS'),
                 ListView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(), // Para evitar rolagem dupla
-                  itemCount: trainings.length, // Supondo que você tenha uma lista de treinos
+                  physics:
+                      NeverScrollableScrollPhysics(), // Para evitar rolagem dupla
+                  itemCount:
+                      trainings
+                          .length, // Supondo que você tenha uma lista de treinos
                   itemBuilder: (context, index) {
                     final training = trainings[index];
                     return Padding(
@@ -147,29 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 0,
-        onTap: (index) {
-          // Handle bottom navigation tap
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 0),
     );
   }
 }

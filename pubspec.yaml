@@ -44,3 +44,7 @@ flutter:
     - assets/images/chaveiro.jpeg
     - assets/images/tatuagens_temporarias.jpeg
     - assets/images/selfieCarteirinha.png
+  fonts:
+    - family: Oswald
+      fonts:
+        - asset: assets/fonts/Oswald-VariableFont_wght.ttf

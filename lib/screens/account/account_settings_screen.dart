@@ -1,14 +1,13 @@
-import 'package:app_atletica/screens/account/edit_profile_screen.dart';
-import 'package:app_atletica/theme/app_colors.dart';
-import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:app_atletica/widgets/menu_card.dart';
 import 'package:flutter/material.dart';
-
-import 'package:app_atletica/screens/account/memberShipCard.dart';
-import 'package:app_atletica/screens/account/register/register_home.dart';
-import 'package:app_atletica/screens/account/tickets.dart';
-import 'package:app_atletica/screens/account/user_model.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/screens/account/user_model.dart';
+import 'package:app_atletica/widgets/menu_card.dart';
+import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/screens/account/edit_profile_screen.dart';
+import 'package:app_atletica/screens/account/tickets.dart';
+import 'package:app_atletica/screens/account/membershipCard.dart';
+import 'package:app_atletica/screens/admin/admin_area.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -74,8 +73,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                                   radius:
                                       MediaQuery.of(context).size.height * 0.08,
                                   backgroundImage:
-                                      user!.avatarUrl.isNotEmpty
-                                          ? AssetImage(user!.avatarUrl)
+                                      user!.avatarUrl!.isNotEmpty
+                                          ? AssetImage(user!.avatarUrl!)
                                           : const AssetImage(
                                                 "assets/images/emblema.png",
                                               )
@@ -183,7 +182,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const TicketsScreen(),
+                            builder: (context) => TicketsScreen(user: user!),
                           ),
                         );
                       },
@@ -196,7 +195,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const TicketsScreen(),
+                            builder: (context) => TicketsScreen(user: user!),
                           ),
                         );
                       },
@@ -209,7 +208,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const MembershipCardScreen(),
+                            builder: (_) => MembershipCardScreen(user: user!),
                           ),
                         );
                       },
@@ -223,15 +222,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       ),
                     if (user != null && user!.role == "admin")
                       MenuCard(
-                        icon: Icons.add_circle,
-                        title: "Cadastros",
-                        subtitle: "Cadastrar atividades",
+                        icon: FontAwesomeIcons.userTie,
+                        title: "Administração",
+                        subtitle: "Área do administrador",
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder:
-                                  (context) => const RegisterAccountScreen(),
+                              builder: (context) => const AdminArea(),
                             ),
                           );
                         },
@@ -243,28 +241,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }

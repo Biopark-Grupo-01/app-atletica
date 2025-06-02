@@ -1,4 +1,5 @@
 import 'package:app_atletica/screens/login/login_screen.dart';
+import 'package:app_atletica/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -72,5 +73,18 @@ Future<http.Response> makeHttpRequest(BuildContext context, String endpoint, {St
   } catch (e) {
     print('Error making HTTP request: $e');
     rethrow;
+  }
+}
+
+Color roleColor(String role) {
+  switch (role) {
+    case 'Associado':
+      return const Color.fromARGB(255, 49, 151, 234);
+    case 'Diretoria':
+      return AppColors.yellow;
+    case 'Não associado':
+      return AppColors.lightGrey;
+    default:
+      return AppColors.lightGrey;
   }
 }

@@ -35,7 +35,7 @@ class _ProfileRegistrationFormState extends State<ProfileRegistrationForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: Column(
           children: [
@@ -110,7 +110,6 @@ class _ProfileRegistrationFormState extends State<ProfileRegistrationForm> {
                           decoration: InputDecoration(
                             labelText: 'Cargo',
                             labelStyle: TextStyle(color: AppColors.white),
-                            
                           ),
                           dropdownColor: AppColors.blue,
                           style: TextStyle(color: AppColors.white),
@@ -132,8 +131,7 @@ class _ProfileRegistrationFormState extends State<ProfileRegistrationForm> {
                               child: Text('Diretoria'),
                             ),
                           ],
-                          onChanged: (String? newValue) {
-                          },
+                          onChanged: (String? newValue) {},
                         ),
                         const SizedBox(height: 45),
                         Center(
@@ -155,29 +153,7 @@ class _ProfileRegistrationFormState extends State<ProfileRegistrationForm> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 4,
-        onTap: (index) {
-          // Handle bottom navigation tap
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }

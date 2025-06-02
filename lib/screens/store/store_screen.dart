@@ -1,5 +1,7 @@
+import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/widgets/search_bar.dart'; // Importar o CustomSearchBar
 import 'package:flutter/material.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -18,26 +20,81 @@ class _StoreScreenState extends State<StoreScreen> {
   ];
 
   final List<Map<String, String>> storeProducts = [
-    {'name': 'Caneca Oficial', 'category': 'CANECAS', 'price': '25,00', 'image': 'assets/images/caneca_personalizada.jpeg'},
-    {'name': 'Camiseta Masculina', 'category': 'ROUPAS', 'price': '50,00', 'image': 'assets/images/camisetaa_masculina.png'},
-    {'name': 'Camiseta Feminina', 'category': 'ROUPAS', 'price': '50,00', 'image': 'assets/images/camiseta_feminina_1.png'},
-    {'name': 'Chaveiro Tigre', 'category': 'CHAVEIROS', 'price': '15,00', 'image': 'assets/images/chaveiro.jpeg'},
-    {'name': 'Tatuagem Temporária', 'category': 'TATUAGENS', 'price': '10,00', 'image': 'assets/images/tatuagens_temporarias.jpeg'},
-    {'name': 'Caneca Personalizada', 'category': 'CANECAS', 'price': '30,00', 'image': 'assets/images/caneca_personalizada.jpeg'},
-    {'name': 'Caneca Estampada Premium', 'category': 'CANECAS', 'price': '35,00', 'image': 'assets/images/caneca_estampa_premium.jpeg'},
-    {'name': 'Boné Oficial', 'category': 'ROUPAS', 'price': '40,00', 'image': 'assets/images/bone.jpeg'},
+    {
+      'name': 'Caneca Oficial',
+      'category': 'CANECAS',
+      'price': '25,00',
+      'image': 'assets/images/caneca_personalizada.jpeg',
+    },
+    {
+      'name': 'Camiseta Masculina',
+      'category': 'ROUPAS',
+      'price': '50,00',
+      'image': 'assets/images/camisetaa_masculina.png',
+    },
+    {
+      'name': 'Camiseta Feminina',
+      'category': 'ROUPAS',
+      'price': '50,00',
+      'image': 'assets/images/camiseta_feminina_1.png',
+    },
+    {
+      'name': 'Chaveiro Tigre',
+      'category': 'CHAVEIROS',
+      'price': '15,00',
+      'image': 'assets/images/chaveiro.jpeg',
+    },
+    {
+      'name': 'Tatuagem Temporária',
+      'category': 'TATUAGENS',
+      'price': '10,00',
+      'image': 'assets/images/tatuagens_temporarias.jpeg',
+    },
+    {
+      'name': 'Caneca Personalizada',
+      'category': 'CANECAS',
+      'price': '30,00',
+      'image': 'assets/images/caneca_personalizada.jpeg',
+    },
+    {
+      'name': 'Caneca Estampada Premium',
+      'category': 'CANECAS',
+      'price': '35,00',
+      'image': 'assets/images/caneca_estampa_premium.jpeg',
+    },
+    {
+      'name': 'Boné Oficial',
+      'category': 'ROUPAS',
+      'price': '40,00',
+      'image': 'assets/images/bone.jpeg',
+    },
   ];
 
   List<String> _selectedCategories = [];
-  String _searchQuery = '';
-
+  final TextEditingController _searchController = TextEditingController(); // Adicionar controller
   bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Atualizar a busca quando o texto mudar
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      final String? categoria = ModalRoute.of(context)?.settings.arguments as String?;
+      final String? categoria =
+          ModalRoute.of(context)?.settings.arguments as String?;
       if (categoria != null && !_selectedCategories.contains(categoria)) {
         setState(() {
           _selectedCategories.add(categoria);
@@ -50,42 +107,25 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredProducts = storeProducts.where((product) {
-      final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(product['category']);
-      final matchesSearch = product['name']!.toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchesCategory =
+          _selectedCategories.isEmpty ||
+          _selectedCategories.contains(product['category']);
+      final matchesSearch = product['name']!.toLowerCase().contains(
+        _searchController.text.toLowerCase(),
+      );
       return matchesCategory && matchesSearch;
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF001835),
+      backgroundColor: AppColors.blue,
       appBar: CustomAppBar(),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Search bar
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF003366),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Buscar',
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
-              ),
+            CustomSearchBar(
+              hintText: 'Buscar',
+              controller: _searchController,
             ),
 
             const SizedBox(height: 16),
@@ -101,7 +141,9 @@ class _StoreScreenState extends State<StoreScreen> {
                 itemBuilder: (context, index) {
                   final category = storeCategories[index];
                   final isLast = index == storeCategories.length - 1;
-                  final isSelected = _selectedCategories.contains(category['category']);
+                  final isSelected = _selectedCategories.contains(
+                    category['category'],
+                  );
 
                   return Padding(
                     padding: EdgeInsets.only(right: isLast ? 16 : 0),
@@ -140,7 +182,10 @@ class _StoreScreenState extends State<StoreScreen> {
                 child: Center(
                   child: Text(
                     'Nenhum produto encontrado para as categorias ou busca selecionadas.',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 16,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -151,7 +196,11 @@ class _StoreScreenState extends State<StoreScreen> {
                   padding: const EdgeInsets.only(bottom: 15),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/productDetail', arguments: product);
+                      Navigator.pushNamed(
+                        context,
+                        '/productDetail',
+                        arguments: product,
+                      );
                     },
                     child: LayoutBuilder(
                       builder: (context, constraints) {
@@ -169,32 +218,15 @@ class _StoreScreenState extends State<StoreScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: 2,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushNamed(context, '/home');
-              break;
-            case 1:
-              Navigator.pushNamed(context, '/trainings');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/store');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/events');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/profile');
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 2),
     );
   }
 
-  Widget _buildCategoryIcon(String label, IconData icon, {bool isSelected = false}) {
+  Widget _buildCategoryIcon(
+    String label,
+    IconData icon, {
+    bool isSelected = false,
+  }) {
     return Column(
       children: [
         Container(
@@ -202,9 +234,13 @@ class _StoreScreenState extends State<StoreScreen> {
           height: 60,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: isSelected
-                ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
-                : [const Color.fromARGB(128, 52, 90, 167), const Color.fromARGB(128, 52, 90, 167)],
+              colors:
+                  isSelected
+                      ? [const Color(0xFFFFD700), const Color(0xFFFFE066)]
+                      : [
+                        const Color.fromARGB(128, 52, 90, 167),
+                        const Color.fromARGB(128, 52, 90, 167),
+                      ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
             ),
@@ -228,7 +264,12 @@ class _StoreScreenState extends State<StoreScreen> {
     );
   }
 
-  Widget _buildHorizontalProductCard(String productName, String price, String imageUrl, double maxWidth) {
+  Widget _buildHorizontalProductCard(
+    String productName,
+    String price,
+    String imageUrl,
+    double maxWidth,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -246,7 +287,9 @@ class _StoreScreenState extends State<StoreScreen> {
                 imageUrl,
                 fit: BoxFit.cover,
                 height: 120,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
+                errorBuilder:
+                    (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image, color: Colors.white),
               ),
             ),
           ),
@@ -282,10 +325,7 @@ class _StoreScreenState extends State<StoreScreen> {
                   children: [
                     const TextSpan(
                       text: 'R\$ ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFFFFD700),
-                      ),
+                      style: TextStyle(fontSize: 14, color: Color(0xFFFFD700)),
                     ),
                     TextSpan(
                       text: price,
