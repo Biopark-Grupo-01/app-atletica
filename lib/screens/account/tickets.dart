@@ -15,7 +15,6 @@ class TicketsScreen extends StatefulWidget {
   State<TicketsScreen> createState() => _TicketsScreenState();
 }
 
-
 const List<Map<String, String>> _mockTickets = [
   {
     'date': '15/03/2025',
@@ -64,16 +63,16 @@ const List<Map<String, String>> _statusOptions = [
 ];
 
 class _TicketsScreenState extends State<TicketsScreen> {
-  final List<Map<String, String>> tickets = _mockTickets;
-  final TextEditingController _searchController =
-      TextEditingController();
+  late List<Map<String, String>> tickets;
+  final TextEditingController _searchController = TextEditingController();
   String _selectedStatus = 'valid';
   String _sortCriteria = 'date';
 
   @override
   void initState() {
     super.initState();
-    // Atualizar a busca quando o texto mudar
+    // Criar uma cópia mutável dos tickets
+    tickets = _mockTickets.map((ticket) => Map<String, String>.from(ticket)).toList();
     _searchController.addListener(() {
       setState(() {});
     });
@@ -86,16 +85,14 @@ class _TicketsScreenState extends State<TicketsScreen> {
   }
 
   List<Map<String, String>> get _filteredTickets {
-    final filtered =
-        tickets.where((ticket) {
-          final matchesTitle = ticket['title']!.toLowerCase().contains(
-            _searchController.text.toLowerCase(),
-          );
-          final matchesStatus =
-              _selectedStatus == 'all' ||
-              ticket['status']!.toLowerCase() == _selectedStatus.toLowerCase();
-          return matchesTitle && matchesStatus;
-        }).toList();
+    final filtered = tickets.where((ticket) {
+      final matchesTitle = ticket['title']!.toLowerCase().contains(
+        _searchController.text.toLowerCase(),
+      );
+      final matchesStatus = _selectedStatus == 'all' ||
+          ticket['status']!.toLowerCase() == _selectedStatus.toLowerCase();
+      return matchesTitle && matchesStatus;
+    }).toList();
 
     _sortTickets(filtered);
     return filtered;
@@ -127,6 +124,134 @@ class _TicketsScreenState extends State<TicketsScreen> {
           return 0;
         });
         break;
+    }
+  }
+
+  void _showUseTicketDialog(int ticketIndex) {
+    final ticket = tickets[ticketIndex];
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              const Text(
+                'Usar Ingresso',
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Deseja marcar este ingresso como utilizado?',
+                style: TextStyle(
+                  color: AppColors.darkGrey,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGrey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ticket['title']!,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      ticket['date']!,
+                      style: TextStyle(
+                        color: AppColors.darkGrey,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Esta ação não pode ser desfeita.',
+                style: TextStyle(
+                  color: AppColors.darkGrey,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancelar',
+                style: TextStyle(
+                  color: AppColors.darkGrey,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  tickets[ticketIndex]['status'] = 'used';
+                });
+                Navigator.of(context).pop();
+                
+                // Mostrar mensagem de sucesso
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Ingresso marcado como utilizado!'),
+                    backgroundColor: AppColors.blue,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blue,
+                foregroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Confirmar',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleTicketTap(int index) {
+    final ticket = tickets[index];
+    if (ticket['status']!.toLowerCase() == 'valid') {
+      _showUseTicketDialog(index);
     }
   }
 
@@ -195,7 +320,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color:  AppColors.lightBlue,
+        color: AppColors.lightBlue,
         borderRadius: BorderRadius.circular(10),
       ),
       child: DropdownButtonHideUnderline(
@@ -203,16 +328,15 @@ class _TicketsScreenState extends State<TicketsScreen> {
           menuWidth: width + 5,
           isDense: true,
           value: value,
-          dropdownColor:  AppColors.lightBlue,
+          dropdownColor: AppColors.lightBlue,
           style: const TextStyle(color: AppColors.white),
           icon: Icon(icon, color: AppColors.white),
-          items:
-              items.map((item) {
-                return DropdownMenuItem(
-                  value: item['value'],
-                  child: Text(item['text']!),
-                );
-              }).toList(),
+          items: items.map((item) {
+            return DropdownMenuItem(
+              value: item['value'],
+              child: Text(item['text']!),
+            );
+          }).toList(),
           onChanged: onChanged,
         ),
       ),
@@ -227,11 +351,16 @@ class _TicketsScreenState extends State<TicketsScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final ticket = _filteredTickets[index];
-        return TicketCard(
-          date: ticket['date']!,
-          title: ticket['title']!,
-          status: ticket['status']!,
-          imagePath: ticket['imagePath']!,
+        final originalIndex = tickets.indexOf(ticket);
+        
+        return GestureDetector(
+          onTap: () => _handleTicketTap(originalIndex),
+          child: TicketCard(
+            date: ticket['date']!,
+            title: ticket['title']!,
+            status: ticket['status']!,
+            imagePath: ticket['imagePath']!,
+          ),
         );
       },
     );
