@@ -19,7 +19,8 @@ import 'package:app_atletica/screens/forms/event_registration.dart';
 import 'package:app_atletica/screens/forms/news_registration.dart';
 import 'package:app_atletica/screens/forms/product_registration.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 

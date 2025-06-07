@@ -1,3 +1,4 @@
+import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:app_atletica/widgets/custom_square_button.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/services/events_news_service.dart';
@@ -10,6 +11,8 @@ import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_atletica/widgets/training_match_item.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,38 +93,59 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: 'Suporte',
                       color: AppColors.yellow,
                       onPressed: () {
-                        Navigator.pushNamed(context, '/home');
+                        openWhatsApp("5544999719743", text: "Olá! Preciso de suporte com o app da Atlética.");
                       },
                     ),
                   ],
                 ),
                 const SizedBox(height: 30),
                 CustomTitle(title: 'EVENTOS'),
+
                 CarouselItem(
                   items: events,
                   useCarousel: true,
-                  itemBuilder:
-                      (item) => EventItem(
-                        imageUrl: item['imageUrl'] ?? '',
-                        date: item['date'] ?? '',
-                        location: item['location'] ?? '',
-                        title: item['title'] ?? '',
-                        description: item['description'] ?? '',
-                      ),
+                  itemBuilder: (item) => GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                      context,
+                      '/trainingDetail',
+                      arguments: item,
+                      );
+                    },
+                    child: EventItem(
+                      imageUrl: item['imageUrl'] ?? '',
+                      date: item['date'] ?? '',
+                      location: item['location'] ?? '',
+                      title: item['title'] ?? '',
+                      description: item['description'] ?? '',
+                    ),
+                  ),
                 ),
+
                 CustomTitle(title: 'NOTÍCIAS'),
+
                 CarouselItem(
                   items: news,
                   useCarousel: true,
-                  itemBuilder:
-                      (item) => NewsItem(
-                        imageUrl: item['imageUrl'] ?? '',
-                        date: item['date'] ?? '',
-                        location: item['location'] ?? '',
-                        title: item['title'] ?? '',
-                        description: item['description'] ?? '',
-                      ),
+                  itemBuilder: (item) => GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                      context,
+                      '/trainingDetail',
+                      arguments: item,
+                      );
+                    },
+                    child: EventItem(
+                      imageUrl: item['imageUrl'] ?? '',
+                      date: item['date'] ?? '',
+                      location: item['location'] ?? '',
+                      title: item['title'] ?? '',
+                      description: item['description'] ?? '',
+                    ),
+                  ),
                 ),
+
+                
                 CustomTitle(title: 'TREINOS E AMISTOSOS'),
                 ListView.builder(
                   shrinkWrap: true,
@@ -134,14 +158,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     final training = trainings[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
-                      child: TrainingMatchItem(
-                        title: training['title'] ?? '',
-                        description: training['description'] ?? '',
-                        date: training['date'] ?? '',
-                        location: training['location'] ?? '',
-                        category: training['category'] ?? '',
-                        type: training['type'] ?? '',
+                      child: GestureDetector(
+                        onTap: () {
+                            showTrainingModal(context);
+                        },
+                        child: TrainingMatchItem(
+                          title: training['title'] ?? '',
+                          description: training['description'] ?? '',
+                          date: training['date'] ?? '',
+                          location: training['location'] ?? '',
+                          category: training['category'] ?? '',
+                          type: training['type'] ?? '',
+                        ),
                       ),
+
                     );
                   },
                 ),
@@ -152,5 +182,28 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 0),
     );
+  }
+}
+
+void showTrainingModal(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(0.5),
+    builder: (_) => const TrainingModal(),
+  );
+}
+
+void openWhatsApp(String phoneNumber, {String? text}) async {
+  String url = "whatsapp://send?phone=$phoneNumber";
+  if (text != null) {
+    url += "&text=${Uri.encodeComponent(text)}";
+  }
+
+  if (await launch(url)) {
+    await launch(url);
+  } else {
+    // Não há suporte para este tipo de URL
   }
 }
