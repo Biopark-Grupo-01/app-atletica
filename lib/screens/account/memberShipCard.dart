@@ -28,14 +28,17 @@ class MembershipCardScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(
-                        user!.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+                          child: Text(
+                            user!.name,
+                            style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
                       CircleAvatar(
                         radius: MediaQuery.of(context).size.height * 0.09,
                         backgroundImage: AssetImage(user!.avatarUrl!),

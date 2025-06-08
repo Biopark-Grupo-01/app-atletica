@@ -34,7 +34,7 @@ class MenuCard extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w100),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
         ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
