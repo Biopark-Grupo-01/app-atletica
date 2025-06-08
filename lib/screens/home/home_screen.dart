@@ -201,9 +201,9 @@ void openWhatsApp(String phoneNumber, {String? text}) async {
     url += "&text=${Uri.encodeComponent(text)}";
   }
 
-  if (await launch(url)) {
+  // if (await launch(url)) {
     await launch(url);
-  } else {
-    // Não há suporte para este tipo de URL
-  }
+  // } else {
+  //   // Não há suporte para este tipo de URL
+  // }
 }

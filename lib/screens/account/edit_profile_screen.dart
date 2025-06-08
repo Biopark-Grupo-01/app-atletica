@@ -1,3 +1,10 @@
+import 'dart:io';
+import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/widgets/forms/profile_custom_text_field.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:app_atletica/widgets/custom_app_bar.dart';
+import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
+import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,8 +32,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final birthDateMask = MaskTextInputFormatter(mask: '##/##/####');
   final cpfMask = MaskTextInputFormatter(mask: '###.###.###-##');
 
+  File? _imageFile;
   String avatarUrl = "";
   bool obscurePassword = true;
+  final _formKey = GlobalKey<FormState>();
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _imageFile = File(image.path);
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -68,147 +87,110 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     Navigator.pop(context);
   }
 
-  Widget buildEditableField({
-    required String label,
-    required TextEditingController controller,
-    List<TextInputFormatter>? inputFormatters,
-    bool isPassword = false,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              obscureText: isPassword ? obscurePassword : false,
-              style: const TextStyle(color: Colors.white),
-              inputFormatters: inputFormatters,
-              decoration: InputDecoration(
-                labelText: label,
-                labelStyle: const TextStyle(color: Colors.white),
-                enabledBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-                suffixIcon:
-                    isPassword
-                        ? IconButton(
-                          icon: Icon(
-                            obscurePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            setState(() => obscurePassword = !obscurePassword);
-                          },
-                        )
-                        : null,
-                // : const Icon(Icons.edit, color: Colors.white),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF091B40),
-
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64), // altura controlada
-        child: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 2,
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Image.asset(
-            "assets/images/aaabe.png",
-            height: 40, // mais harmonioso para AppBar padrão
-            fit: BoxFit.contain,
-          ),
-        ),
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+      backgroundColor: AppColors.blue,
+      appBar: CustomAppBar(showBackButton: true),
+      body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 16),
-            const Text(
-              "Editar Perfil",
-              style: TextStyle(
-                color: Colors.yellow,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Divider(color: Colors.yellow, thickness: 2),
-            const SizedBox(height: 24),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+                        Center(
+                          child: CustomTitleForms(title: 'EDITAR PERFIL'),
+                        ),
+                        Center(
+                          child: GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              width: 150,
+                              height: 150,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: _imageFile != null
+                                  ? Image.file(_imageFile!, fit: BoxFit.cover)
+                                  : (avatarUrl.isNotEmpty
+                                      ? Image.network(avatarUrl, fit: BoxFit.cover)
+                                      : Image.asset('assets/images/aaabe.png', fit: BoxFit.cover)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
 
-            // Avatar
-            Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(avatarUrl),
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
+                        
+                        CustomTextFieldProfile(
+                          controller: nameController,
+                          label: 'Nome: ',
+                          icon: Icons.create,
+                        ),
+
+                        CustomTextFieldProfile(
+                          controller: cpfController,
+                          label: 'CPF: ',
+                          icon: Icons.create,
+                          inputFormatters: [cpfMask],
+                        ),
+
+                        CustomTextFieldProfile(
+                          controller: emailController,
+                          label: 'E-mail: ',
+                          icon: Icons.create,
+                        ),
+
+                        CustomTextFieldProfile(
+                          controller: passwordController,
+                          label: 'Senha: ',
+                          icon: Icons.create,
+                          obscureText: obscurePassword,
+                          suffixIcon: IconButton(
+                            icon: Icon(obscurePassword ? Icons.visibility : Icons.visibility_off),
+                            onPressed: () => setState(() => obscurePassword = !obscurePassword),
+                          ),
+                          validator: (value) => value == null || value.isEmpty ? 'Campo obrigatório' : null,
+                        ),
+
+                        CustomTextFieldProfile(
+                          controller: phoneController,
+                          label: 'Telefone: ',
+                          icon: Icons.create,
+                          inputFormatters: [phoneMask],
+                        ),
+
+                        CustomTextFieldProfile(
+                          controller: birthDateController,
+                          label: 'Data de Nascimento: ',
+                          icon: Icons.create,
+                          inputFormatters: [birthDateMask],
+                        ),
+
+                        const SizedBox(height: 45),
+                        Center(
+                          child: CustomButton(
+                            text: 'Salvar',
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _saveProfile();
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: IconButton(
-                    icon: const Icon(Icons.photo_camera, size: 20),
-                    onPressed: () {
-                      // TODO: lógica para trocar imagem
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 32),
-
-            // Campos editáveis
-            buildEditableField(label: "Nome", controller: nameController),
-            buildEditableField(label: "CPF", controller: cpfController),
-            buildEditableField(
-              label: "Telefone",
-              controller: phoneController,
-              inputFormatters: [phoneMask],
-            ),
-            buildEditableField(
-              label: "Data de Nascimento",
-              controller: birthDateController,
-              inputFormatters: [birthDateMask],
-            ),
-            buildEditableField(label: "E-mail", controller: emailController),
-            buildEditableField(
-              label: "Senha",
-              controller: passwordController,
-              isPassword: true,
-            ),
-
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _saveProfile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow,
-                foregroundColor: Colors.black,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text("Salvar"),
             ),
           ],
         ),

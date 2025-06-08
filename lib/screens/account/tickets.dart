@@ -133,7 +133,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
