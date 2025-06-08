@@ -25,50 +25,59 @@ class _StoreScreenState extends State<StoreScreen> {
       'category': 'CANECAS',
       'price': '25,00',
       'image': 'assets/images/caneca_personalizada.jpeg',
+      'description': 'Caneca oficial da Atlética Biopark, perfeita para mostrar seu espírito universitário em qualquer lugar!'
     },
     {
       'name': 'Camiseta Masculina',
       'category': 'ROUPAS',
       'price': '50,00',
       'image': 'assets/images/camisetaa_masculina.png',
+      'description': 'Camiseta masculina do Kit Atlética Biopark 2025. Conforto, estilo e identidade em uma só peça!'
     },
     {
       'name': 'Camiseta Feminina',
       'category': 'ROUPAS',
       'price': '50,00',
       'image': 'assets/images/camiseta_feminina_1.png',
+      'description': 'Camiseta feminina exclusiva da Atlética Biopark 2025. Corte moderno, tecido leve e visual marcante.'
     },
     {
       'name': 'Chaveiro Tigre',
       'category': 'CHAVEIROS',
       'price': '15,00',
       'image': 'assets/images/chaveiro.jpeg',
+      'description': 'Chaveiro estilizado com o mascote Tigre da Atlética Biopark. Ideal para mochilas, chaves e estilo!'
     },
     {
       'name': 'Tatuagem Temporária',
       'category': 'TATUAGENS',
       'price': '10,00',
       'image': 'assets/images/tatuagens_temporarias.jpeg',
+      'description': 'Tatuagens temporárias com o emblema da Atlética. Demonstre sua torcida nos jogos e eventos!'
     },
     {
       'name': 'Caneca Personalizada',
       'category': 'CANECAS',
       'price': '30,00',
       'image': 'assets/images/caneca_personalizada.jpeg',
+      'description': 'Caneca personalizada com a identidade visual da Atlética. Ótima para café, chás ou decorar sua mesa.'
     },
     {
       'name': 'Caneca Estampada Premium',
       'category': 'CANECAS',
       'price': '35,00',
       'image': 'assets/images/caneca_estampa_premium.jpeg',
+      'description': 'Caneca premium com estampa vibrante e acabamento de alta qualidade. Um item de colecionador!'
     },
     {
       'name': 'Boné Oficial',
       'category': 'ROUPAS',
       'price': '40,00',
       'image': 'assets/images/bone.jpeg',
+      'description': 'Boné oficial da Atlética Biopark. Ideal para proteger do sol com muito estilo e representar sua atlética.'
     },
   ];
+
 
   List<String> _selectedCategories = [];
   final TextEditingController _searchController = TextEditingController(); // Adicionar controller
