@@ -2,7 +2,7 @@ import 'package:app_atletica/screens/account/edit_profile_screen.dart';
 import 'package:app_atletica/screens/forms/profile_registration.dart';
 import 'package:app_atletica/screens/forms/trainings_registration.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
-import 'package:app_atletica/screens/account/membershipCard.dart';
+import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
         '/trainings_registration': (context) => TrainingsRegistrationForm(),
         '/profile_registration': (context) => ProfileRegistrationForm(),
         '/tickets': (context) => const TicketsScreen(),
-        '/membership': (context) => const MembershipCardScreen(),
+        '/membership': (context) => const AccountSettingsScreen(),
       },
     );
   }
