@@ -1,8 +1,10 @@
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:app_atletica/widgets/search_bar.dart'; // Importar o CustomSearchBar
+import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:app_atletica/models/product_model.dart';
+import 'package:app_atletica/services/product_service.dart';
 
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
@@ -12,6 +14,11 @@ class StoreScreen extends StatefulWidget {
 }
 
 class _StoreScreenState extends State<StoreScreen> {
+  final ProductService _productService = ProductService();
+  List<Product> _products = [];
+  bool _isLoading = true;
+  String? _error;
+
   final List<Map<String, dynamic>> storeCategories = [
     {'label': 'Canecas', 'icon': Icons.local_drink, 'category': 'CANECAS'},
     {'label': 'Roupas', 'icon': Icons.checkroom, 'category': 'ROUPAS'},
@@ -19,77 +26,37 @@ class _StoreScreenState extends State<StoreScreen> {
     {'label': 'Tatuagens', 'icon': Icons.brush, 'category': 'TATUAGENS'},
   ];
 
-  final List<Map<String, String>> storeProducts = [
-    {
-      'name': 'Caneca Oficial',
-      'category': 'CANECAS',
-      'price': '25,00',
-      'image': 'assets/images/caneca_personalizada.jpeg',
-      'description': 'Caneca oficial da Atlética Biopark, perfeita para mostrar seu espírito universitário em qualquer lugar!'
-    },
-    {
-      'name': 'Camiseta Masculina',
-      'category': 'ROUPAS',
-      'price': '50,00',
-      'image': 'assets/images/camisetaa_masculina.png',
-      'description': 'Camiseta masculina do Kit Atlética Biopark 2025. Conforto, estilo e identidade em uma só peça!'
-    },
-    {
-      'name': 'Camiseta Feminina',
-      'category': 'ROUPAS',
-      'price': '50,00',
-      'image': 'assets/images/camiseta_feminina_1.png',
-      'description': 'Camiseta feminina exclusiva da Atlética Biopark 2025. Corte moderno, tecido leve e visual marcante.'
-    },
-    {
-      'name': 'Chaveiro Tigre',
-      'category': 'CHAVEIROS',
-      'price': '15,00',
-      'image': 'assets/images/chaveiro.jpeg',
-      'description': 'Chaveiro estilizado com o mascote Tigre da Atlética Biopark. Ideal para mochilas, chaves e estilo!'
-    },
-    {
-      'name': 'Tatuagem Temporária',
-      'category': 'TATUAGENS',
-      'price': '10,00',
-      'image': 'assets/images/tatuagens_temporarias.jpeg',
-      'description': 'Tatuagens temporárias com o emblema da Atlética. Demonstre sua torcida nos jogos e eventos!'
-    },
-    {
-      'name': 'Caneca Personalizada',
-      'category': 'CANECAS',
-      'price': '30,00',
-      'image': 'assets/images/caneca_personalizada.jpeg',
-      'description': 'Caneca personalizada com a identidade visual da Atlética. Ótima para café, chás ou decorar sua mesa.'
-    },
-    {
-      'name': 'Caneca Estampada Premium',
-      'category': 'CANECAS',
-      'price': '35,00',
-      'image': 'assets/images/caneca_estampa_premium.jpeg',
-      'description': 'Caneca premium com estampa vibrante e acabamento de alta qualidade. Um item de colecionador!'
-    },
-    {
-      'name': 'Boné Oficial',
-      'category': 'ROUPAS',
-      'price': '40,00',
-      'image': 'assets/images/bone.jpeg',
-      'description': 'Boné oficial da Atlética Biopark. Ideal para proteger do sol com muito estilo e representar sua atlética.'
-    },
-  ];
-
-
   List<String> _selectedCategories = [];
-  final TextEditingController _searchController = TextEditingController(); // Adicionar controller
+  final TextEditingController _searchController = TextEditingController();
   bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Atualizar a busca quando o texto mudar
+    _loadProducts();
     _searchController.addListener(() {
       setState(() {});
     });
+  }
+
+  Future<void> _loadProducts() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final products = await _productService.getProducts();
+      setState(() {
+        _products = products;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Não foi possível carregar os produtos: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -113,119 +80,154 @@ class _StoreScreenState extends State<StoreScreen> {
     }
   }
 
+  // Método para converter os produtos da API para o formato da UI
+  List<Map<String, String>> _getProductsForUI() {
+    if (_products.isNotEmpty) {
+      return _products.map((product) => product.toMapForUI()).toList();
+    } else {
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredProducts = storeProducts.where((product) {
-      final matchesCategory =
-          _selectedCategories.isEmpty ||
-          _selectedCategories.contains(product['category']);
-      final matchesSearch = product['name']!.toLowerCase().contains(
-        _searchController.text.toLowerCase(),
-      );
-      return matchesCategory && matchesSearch;
-    }).toList();
+    final allProductsForUI = _getProductsForUI();
+
+    final filteredProducts =
+        allProductsForUI.where((product) {
+          final matchesCategory =
+              _selectedCategories.isEmpty ||
+              _selectedCategories.contains(product['category']);
+          final matchesSearch = product['name']!.toLowerCase().contains(
+            _searchController.text.toLowerCase(),
+          );
+          return matchesCategory && matchesSearch;
+        }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.blue,
       appBar: CustomAppBar(),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            CustomSearchBar(
-              hintText: 'Buscar',
-              controller: _searchController,
-            ),
+        child:
+            _isLoading
+                ? const Center(
+                  child: CircularProgressIndicator(color: AppColors.yellow),
+                )
+                : _error != null
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _error!,
+                        style: const TextStyle(color: AppColors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadProducts,
+                        child: const Text('Tentar novamente'),
+                      ),
+                    ],
+                  ),
+                )
+                : ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    CustomSearchBar(
+                      hintText: 'Buscar',
+                      controller: _searchController,
+                    ),
+                    const SizedBox(height: 16),
 
-            const SizedBox(height: 16),
+                    // Categories horizontal list
+                    SizedBox(
+                      height: 100,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.only(left: 0),
+                        itemCount: storeCategories.length,
+                        separatorBuilder:
+                            (context, index) => const SizedBox(width: 20),
+                        itemBuilder: (context, index) {
+                          final category = storeCategories[index];
+                          final isLast = index == storeCategories.length - 1;
+                          final isSelected = _selectedCategories.contains(
+                            category['category'],
+                          );
 
-            // Categories horizontal list
-            SizedBox(
-              height: 100,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(left: 0),
-                itemCount: storeCategories.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 20),
-                itemBuilder: (context, index) {
-                  final category = storeCategories[index];
-                  final isLast = index == storeCategories.length - 1;
-                  final isSelected = _selectedCategories.contains(
-                    category['category'],
-                  );
-
-                  return Padding(
-                    padding: EdgeInsets.only(right: isLast ? 16 : 0),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          setState(() {
-                            final cat = category['category'];
-                            if (_selectedCategories.contains(cat)) {
-                              _selectedCategories.remove(cat);
-                            } else {
-                              _selectedCategories.add(cat);
-                            }
-                          });
+                          return Padding(
+                            padding: EdgeInsets.only(right: isLast ? 16 : 0),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  setState(() {
+                                    final cat = category['category'];
+                                    if (_selectedCategories.contains(cat)) {
+                                      _selectedCategories.remove(cat);
+                                    } else {
+                                      _selectedCategories.add(cat);
+                                    }
+                                  });
+                                },
+                                child: _buildCategoryIcon(
+                                  category['label'],
+                                  category['icon'],
+                                  isSelected: isSelected,
+                                ),
+                              ),
+                            ),
+                          );
                         },
-                        child: _buildCategoryIcon(
-                          category['label'],
-                          category['icon'],
-                          isSelected: isSelected,
-                        ),
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
 
-            const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-            // Product list or message
-            if (filteredProducts.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(
-                  child: Text(
-                    'Nenhum produto encontrado para as categorias ou busca selecionadas.',
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              )
-            else
-              ...filteredProducts.map((product) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 15),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/productDetail',
-                        arguments: product,
-                      );
-                    },
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return _buildHorizontalProductCard(
-                          product['name']!,
-                          product['price']!,
-                          product['image']!,
-                          constraints.maxWidth,
+                    // Product list or message
+                    if (filteredProducts.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Center(
+                          child: Text(
+                            'Nenhum produto encontrado para as categorias ou busca selecionadas.',
+                            style: const TextStyle(
+                              color: AppColors.white,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    else
+                      ...filteredProducts.map((product) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 15),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/productDetail',
+                                arguments: product,
+                              );
+                            },
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return _buildHorizontalProductCard(
+                                  product['name']!,
+                                  product['price']!,
+                                  product['image']!,
+                                  constraints.maxWidth,
+                                );
+                              },
+                            ),
+                          ),
                         );
-                      },
-                    ),
-                  ),
-                );
-              }).toList(),
-          ],
-        ),
+                      }).toList(),
+                  ],
+                ),
       ),
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 2),
     );
@@ -262,13 +264,7 @@ class _StoreScreenState extends State<StoreScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-          ),
-        ),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
       ],
     );
   }
@@ -292,14 +288,28 @@ class _StoreScreenState extends State<StoreScreen> {
             flex: 3,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.cover,
-                height: 120,
-                errorBuilder:
-                    (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image, color: Colors.white),
-              ),
+              child:
+                  imageUrl.startsWith('http')
+                      ? Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        height: 120,
+                        errorBuilder:
+                            (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white,
+                            ),
+                      )
+                      : Image.asset(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        height: 120,
+                        errorBuilder:
+                            (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white,
+                            ),
+                      ),
             ),
           ),
           const SizedBox(width: 12),

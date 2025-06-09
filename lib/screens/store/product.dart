@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'dart:convert';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -19,7 +18,8 @@ class _ProductScreenState extends State<ProductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final product = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final product =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
       backgroundColor: const Color(0xFF091B40),
@@ -47,15 +47,58 @@ class _ProductScreenState extends State<ProductScreen> {
                 child: PageView(
                   controller: _pageController,
                   children: [
-                    // Imagem dinâmica do produto
-                    Image.asset(
-                      product['image'],
-                      fit: BoxFit.contain,
-                    ),
-                    Image.asset(
-                      product['image'],
-                      fit: BoxFit.contain,
-                    ) 
+                    // Verificar se a imagem é URL ou asset local
+                    product['image'].toString().startsWith('http')
+                        ? Image.network(
+                          product['image'],
+                          fit: BoxFit.contain,
+                          errorBuilder:
+                              (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white,
+                                  size: 80,
+                                ),
+                              ),
+                        )
+                        : Image.asset(
+                          product['image'],
+                          fit: BoxFit.contain,
+                          errorBuilder:
+                              (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white,
+                                  size: 80,
+                                ),
+                              ),
+                        ),
+                    // Segunda imagem do carrossel (mesma lógica)
+                    product['image'].toString().startsWith('http')
+                        ? Image.network(
+                          product['image'],
+                          fit: BoxFit.contain,
+                          errorBuilder:
+                              (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white,
+                                  size: 80,
+                                ),
+                              ),
+                        )
+                        : Image.asset(
+                          product['image'],
+                          fit: BoxFit.contain,
+                          errorBuilder:
+                              (context, error, stackTrace) => const Center(
+                                child: Icon(
+                                  Icons.broken_image,
+                                  color: Colors.white,
+                                  size: 80,
+                                ),
+                              ),
+                        ),
                   ],
                 ),
               ),
@@ -94,7 +137,11 @@ class _ProductScreenState extends State<ProductScreen> {
             // Link clicável
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/store', arguments: product['category']);
+                Navigator.pushNamed(
+                  context,
+                  '/store',
+                  arguments: product['category'],
+                );
               },
               child: Text(
                 'Categoria: ${product['category']}',
@@ -118,13 +165,9 @@ class _ProductScreenState extends State<ProductScreen> {
               ),
             ),
             Text(
-              product['price'],
+              'R\$ ${product['price']}',
               style: GoogleFonts.archivoBlack(
-                textStyle: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  // fontWeight: FontWeight.bold,
-                ),
+                textStyle: const TextStyle(color: Colors.white, fontSize: 28),
               ),
             ),
 
@@ -132,57 +175,57 @@ class _ProductScreenState extends State<ProductScreen> {
 
             // Modelo dropdown
             if (product['category'] == 'ROUPAS')
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Modelo',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(128, 52, 90, 167),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xff3e6cc9)),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: DropdownButton<String>(
-                    dropdownColor: const Color.fromARGB(255, 52, 90, 167),
-                    value: selectedModel,
-                    isExpanded: true,
-                    underline: const SizedBox(),
-                    icon: const Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.white,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Modelo',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
                     ),
-                    items:
-                        ['PP', 'P', 'M', 'G', 'GG']
-                            .map(
-                              (size) => DropdownMenuItem(
-                                value: size,
-                                child: Text(
-                                  '$size (R\$50,00)',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedModel = value!;
-                      });
-                    },
                   ),
-                ),
-              ],
-            ),
+
+                  const SizedBox(height: 4),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(128, 52, 90, 167),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xff3e6cc9)),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<String>(
+                      dropdownColor: const Color.fromARGB(255, 52, 90, 167),
+                      value: selectedModel,
+                      isExpanded: true,
+                      underline: const SizedBox(),
+                      icon: const Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                      items:
+                          ['PP', 'P', 'M', 'G', 'GG']
+                              .map(
+                                (size) => DropdownMenuItem(
+                                  value: size,
+                                  child: Text(
+                                    '$size (R\$${product['price']})',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedModel = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
 
             const SizedBox(height: 16),
 
@@ -268,13 +311,15 @@ class _ProductScreenState extends State<ProductScreen> {
                     '- Modelo: $model\n'
                     '- Quantidade: $quantity\n'
                     '- Preço unitário: $price\n\n'
-                    'Poderia me ajudar com o próximo passo?'
+                    'Poderia me ajudar com o próximo passo?',
                   );
 
-                  final Uri url = Uri.parse('https://wa.me/$phoneNumber?text=$message');
+                  final Uri url = Uri.parse(
+                    'https://wa.me/$phoneNumber?text=$message',
+                  );
 
                   // if (await canLaunchUrl(url)) {
-                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
                   // } else {
                   //   ScaffoldMessenger.of(context).showSnackBar(
                   //     const SnackBar(content: Text('Não foi possível abrir o WhatsApp.')),
@@ -344,7 +389,7 @@ class _ProductScreenState extends State<ProductScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              product['description'],
+              product['description'] ?? 'Sem descrição disponível.',
               style: TextStyle(color: Colors.white),
             ),
 
@@ -392,14 +437,14 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
-  Widget _buildProductCard({required String image, required String title, required Map<String, dynamic> product}) {
+  Widget _buildProductCard({
+    required String image,
+    required String title,
+    required Map<String, dynamic> product,
+  }) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/productDetail',
-          arguments: product,
-        );
+        Navigator.pushNamed(context, '/productDetail', arguments: product);
       },
       child: Container(
         width: 140,
