@@ -1,20 +1,41 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:app_atletica/models/product_model.dart';
 
 class ProductService {
-  // URL base da API - altere esta URL quando fizer deploy
-  // Durante desenvolvimento: http://localhost:3001/api
-  // Para produção: https://seu-backend.com/api
-  static const String baseUrl = 'http://localhost:3001/api';
+  // URL base da API - usando o IP real da sua máquina
+  static String getBaseUrl() {
+    // Para desenvolvimento local:
+    if (kIsWeb) {
+      // Se estiver rodando na web, use localhost
+      return 'http://localhost:3001/api';
+    } else {
+      // Para dispositivos móveis, use o IP real da máquina na rede
+      return 'http://10.200.142.159:3001/api';
+    }
+
+    // Para produção, descomente e use a URL de produção:
+    // return 'https://seu-backend-de-producao.com/api';
+  }
 
   // Método para buscar todos os produtos
   Future<List<Product>> getProducts() async {
+    final baseUrl = getBaseUrl();
     try {
       print('Fazendo requisição para: $baseUrl/products');
-      final response = await http.get(Uri.parse('$baseUrl/products'));
+
+      // Aumentar o timeout para dar mais tempo para a conexão ser estabelecida
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/products'),
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
+        print('Resposta recebida com sucesso');
         // Parse da resposta JSON
         final Map<String, dynamic> responseData = json.decode(response.body);
 
@@ -43,8 +64,14 @@ class ProductService {
 
   // Método para buscar um produto específico pelo ID
   Future<Product?> getProduct(String id) async {
+    final baseUrl = getBaseUrl();
     try {
-      final response = await http.get(Uri.parse('$baseUrl/products/$id'));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/products/$id'),
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -65,10 +92,14 @@ class ProductService {
 
   // Método para buscar produtos por categoria
   Future<List<Product>> getProductsByCategory(String category) async {
+    final baseUrl = getBaseUrl();
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/products?category=$category'),
-      );
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/products?category=$category'),
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
