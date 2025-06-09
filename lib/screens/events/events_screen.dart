@@ -101,11 +101,19 @@ class _EventsScreenState extends State<EventsScreen> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/trainingDetail',
-                                        arguments: item,
-                                      );
+                                        if (_selectedTabIndex == 0) {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/trainingDetail',
+                                          arguments: item,
+                                        );
+                                        } else {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/newsDetail',
+                                          arguments: item,
+                                        );
+                                        }
                                     },
                                     child: _selectedTabIndex == 0
                                         ? EventItem(

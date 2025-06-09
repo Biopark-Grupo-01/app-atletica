@@ -1,5 +1,5 @@
 import 'package:app_atletica/screens/account/main/main_screen.dart';
-import 'package:app_atletica/screens/news/news_screen.dart';
+import 'package:app_atletica/screens/news/news_screen_old.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/trainings/trainings_screen.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';

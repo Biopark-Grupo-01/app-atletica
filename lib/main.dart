@@ -4,6 +4,7 @@ import 'package:app_atletica/screens/forms/trainings_registration.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
 import 'package:app_atletica/screens/account/membershipCard.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
+import 'package:app_atletica/screens/news/news_screen.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
 import 'package:app_atletica/screens/trainings/training-details_screen.dart';
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/events': (context) => EventsScreen(),
         '/trainings': (context) => TrainingsScreen(),
         '/trainingDetail': (context) => TreinoDetalhesScreen(),
+        '/newsDetail': (context) => NewsScreen(),
         '/store': (context) => StoreScreen(),
         '/productDetail': (context) => ProductScreen(),
         '/profile': (context) => AccountSettingsScreen(),

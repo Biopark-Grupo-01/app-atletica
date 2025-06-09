@@ -1,152 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-void main() {
-  runApp(const NewsScreen());
-}
+import 'package:intl/intl.dart';
 
 class NewsScreen extends StatelessWidget {
   const NewsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AAABE News',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.robotoTextTheme(),
-      ),
-      home: const HomeScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
+    final DateTime now = DateTime.now();
+    final String formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(now);
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF001835),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.black,
-                child: const Center(
-                  child: Text(
-                    'A.A.A.B.E',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Notícia", style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Palmeiras faz jogo-treino antes de viagem: veja lista de relacionados para Copa do Mundo de Clubes',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                height: 1.4,
               ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Verdão seguirá viagem com 29 atletas, deixando no Brasil apenas Bruno Rodrigues e Figueiredo; Paulinho, assim como no sábado, trabalhou na parte interna do CT, mas vai aos EUA',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Por Redação do ge — São Paulo',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[800],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$formattedDate · Atualizado há 4 horas',
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Divider(),
 
-              // Section Title
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'EVENTOS E NOTÍCIAS',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+            /// Descrição principal da notícia
+            const Text(
+              'O Palmeiras realizou um jogo-treino antes de embarcar para os Estados Unidos, onde disputará a Copa do Mundo de Clubes. A delegação conta com 29 jogadores, e apenas Bruno Rodrigues e Figueiredo permaneceram no Brasil. Paulinho, que treinou separadamente no CT, está confirmado na viagem. O técnico Abel Ferreira deve utilizar os treinos nos EUA para ajustar a equipe titular antes da estreia no torneio. A comissão técnica avaliou o desempenho físico e técnico dos atletas durante a preparação e espera um bom desempenho no campeonato internacional.',
+              style: TextStyle(fontSize: 16, height: 1.5),
+            ),
 
-              // News Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: _buildCard(
-                  'TÍTULO NOTÍCIA',
-                  'Data • Local',
-                  'Descrição',
-                  const Color(0xFFFFD700),
-                ),
-              ),
+            const SizedBox(height: 32),
 
-              // Event Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: _buildCard(
-                  'TÍTULO EVENTO',
-                  'Data • Local',
-                  'Descrição',
-                  const Color(0xFFFFD700),
+            /// Botões de compartilhamento (estáticos para exemplo)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.facebook, color: Colors.blue),
+                  onPressed: () {}, // ação de compartilhar
                 ),
-              ),
-            ],
-          ),
+                IconButton(
+                  icon: const Icon(Icons.whatshot_sharp, color: Colors.green),
+                  onPressed: () {}, // ação de compartilhar
+                ),
+                IconButton(
+                  icon: const Icon(Icons.share, color: Colors.black87),
+                  onPressed: () {}, // ação de compartilhar
+                ),
+              ],
+            ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCard(String title, String metadata, String description, Color titleColor) {
-    return Container(
-      width: double.infinity,
-      height: 220,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    metadata,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: titleColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
