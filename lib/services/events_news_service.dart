@@ -9,14 +9,12 @@ class EventsNewsService {
       {
         'imageUrl': 'https://picsum.photos/300/150',
         'date': '15/05/2025',
-        'location': 'Toledo',
         'title': 'Acesso Rápido',
         'description': 'Foi realizado alterações nos botões de acesso rápido',
       },
       {
         'imageUrl': 'https://picsum.photos/301/150',
         'date': '22/05/2025',
-        'location': 'Toledo',
         'title': 'Notícia do Backend',
         'description': 'Essa notícia veio da API.',
       },

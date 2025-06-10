@@ -4,7 +4,6 @@ import 'package:app_atletica/theme/app_colors.dart';
 class NewsItem extends StatelessWidget {
   final String imageUrl;
   final String date;
-  final String location;
   final String title;
   final String description;
 
@@ -12,7 +11,6 @@ class NewsItem extends StatelessWidget {
     super.key,
     required this.imageUrl,
     required this.date,
-    required this.location,
     required this.title,
     required this.description,
   });
@@ -63,19 +61,6 @@ class NewsItem extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
-                    Icons.location_on,
-                    size: 16,
-                    color: AppColors.lightGrey,
-                  ),
-                  const SizedBox(width: 2),
-                  Text(
-                    location,
-                    style: const TextStyle(
-                      color: AppColors.lightGrey,
-                      fontSize: 16,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 4),

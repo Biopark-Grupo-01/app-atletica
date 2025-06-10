@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: _buildCard(
                   'TÍTULO NOTÍCIA',
-                  'Data • Local',
+                  'Data',
                   'Descrição',
                   const Color(0xFFFFD700),
                 ),
@@ -79,7 +79,7 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: _buildCard(
                   'TÍTULO EVENTO',
-                  'Data • Local',
+                  'Data',
                   'Descrição',
                   const Color(0xFFFFD700),
                 ),

@@ -4,6 +4,7 @@ import 'package:app_atletica/screens/forms/trainings_registration.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
 import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
+import 'package:app_atletica/screens/news/news_details.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
 import 'package:app_atletica/screens/trainings/training-details_screen.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/edit_profile': (context) => EditProfileScreen(),
         '/event_registration': (context) => EventRegistrationForm(),
         '/news_registration': (context) => NewsRegistrationForm(),
+        '/newsDetail': (context) => TelaNoticiasDetalhes(),
         '/product_registration': (context) => ProductRegistrationForm(),
         '/trainings_registration': (context) => TrainingsRegistrationForm(),
         '/profile_registration': (context) => ProfileRegistrationForm(),

@@ -7,7 +7,7 @@ import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_title.dart';
 import 'package:app_atletica/widgets/home/carousel_item.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
-import 'package:app_atletica/widgets/events/news_item.dart';
+import 'package:app_atletica/widgets/news/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_atletica/widgets/training_match_item.dart';
@@ -138,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: EventItem(
                       imageUrl: item['imageUrl'] ?? '',
                       date: item['date'] ?? '',
-                      location: item['location'] ?? '',
                       title: item['title'] ?? '',
                       description: item['description'] ?? '',
                     ),
