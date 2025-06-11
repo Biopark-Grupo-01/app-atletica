@@ -67,10 +67,10 @@ class ProductService {
   }
 
   // Método para obter produtos mockados em caso de falha na API
-  List<Product> _getMockProducts() {
+  List<ProductModel> _getMockProducts() {
     print('Usando produtos mockados para teste');
     return [
-      Product(
+      ProductModel(
         id: '1',
         name: 'Camiseta Masculina',
         description: 'Camiseta oficial da Atlética',
@@ -79,7 +79,7 @@ class ProductService {
         category: 'ROUPAS',
         image: 'assets/images/camisetaa_masculina.png',
       ),
-      Product(
+      ProductModel(
         id: '2',
         name: 'Caneca Oficial',
         description: 'Caneca oficial da Atlética Biopark',

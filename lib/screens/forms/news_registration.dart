@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
