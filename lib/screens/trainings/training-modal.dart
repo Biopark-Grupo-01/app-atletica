@@ -27,68 +27,70 @@ class TrainingModal extends StatelessWidget {
             child: Container(
               height: screenHeight * 0.7,
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 26,47,74),
+                color: const Color.fromARGB(255, 26, 47, 74),
                 borderRadius: BorderRadius.circular(20),
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  Expanded( 
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            "assets/images/cartao.png",
-                            height: 180,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'FUTSAL FEMININO',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/images/cartao.png",
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        _infoSection(
-                          icon: Icons.notes,
-                          title: 'Descrição',
-                          content: const Text(
-                            'Sessão intensa para atletas avançados. Treino específico para resistência física e técnica',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                          const SizedBox(height: 16),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'FUTSAL FEMININO',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
-                        _infoSection(
-                          icon: Icons.how_to_reg,
-                          title: 'Técnico',
-                          content: const Text(
-                            'João Vitor Carrara',
-                            style: TextStyle(color: Colors.white70),
+                          _infoSection(
+                            icon: Icons.notes,
+                            title: 'Descrição',
+                            content: const Text(
+                              'Sessão intensa para atletas avançados. Treino específico para resistência física e técnica',
+                              style: TextStyle(color: Colors.white70, fontSize: 14),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        _infoSection(
-                          icon: Icons.how_to_reg,
-                          title: 'Responsável',
-                          content: const Text(
-                            'Emilly Tavares (43) 98817-3878',
-                            style: TextStyle(color: Colors.white70),
+                          _infoSection(
+                            icon: Icons.how_to_reg,
+                            title: 'Técnico',
+                            content: const Text(
+                              'João Vitor Carrara',
+                              style: TextStyle(color: Colors.white70),
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+
+                          _infoSection(
+                            icon: Icons.how_to_reg,
+                            title: 'Responsável',
+                            content: const Text(
+                              'Emilly Tavares (43) 98817-3878',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -96,42 +98,38 @@ class TrainingModal extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: isSubscribed ? null : () {
-                          // ação ao clicar
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isSubscribed ? Colors.white24 : Colors.white,
-                          foregroundColor: isSubscribed ? Colors.white70 : Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: isSubscribed
-                                ? const BorderSide(color: Colors.white54, width: 1.5)
-                                : BorderSide.none,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (isSubscribed) ...[
-                              const Icon(Icons.check_circle_outline, color: Colors.white70),
-                              const SizedBox(width: 8),
-                            ],
-                            Text(
-                              isSubscribed ? 'Inscrição Concluída' : 'Se Inscrever',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: isSubscribed ? Colors.white70 : Colors.black,
-                              ),
-                            ),
-                          ],
+                    child: ElevatedButton(
+                      onPressed: isSubscribed ? null : () {
+                        // ação ao clicar
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isSubscribed ? Colors.white24 : Colors.white,
+                        foregroundColor: isSubscribed ? Colors.white70 : Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: isSubscribed
+                              ? const BorderSide(color: Colors.white54, width: 1.5)
+                              : BorderSide.none,
                         ),
                       ),
-                    ),                    
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (isSubscribed) ...[
+                            const Icon(Icons.check_circle_outline, color: Colors.white70),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            isSubscribed ? 'Inscrição Concluída' : 'Se Inscrever',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isSubscribed ? Colors.white70 : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -179,27 +177,25 @@ Widget _infoSection({
   required String title,
   required Widget content,
 }) {
-  return Container(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 4),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        content,
-      ],
-    ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 4),
+      content,
+    ],
   );
 }

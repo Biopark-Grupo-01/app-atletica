@@ -1,62 +1,73 @@
-class Product {
-  final String id;
+// Modelo para categorias de produtos
+class ProductCategory {
+  final String id; // CANECAS, ROUPAS, etc.
   final String name;
-  final String? description;
-  final double price;
-  final int stock;
-  final String? category;
-  final String? image;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final String icon;
 
-  Product({
+  ProductCategory({
     required this.id,
     required this.name,
-    this.description,
-    required this.price,
-    required this.stock,
-    this.category,
-    this.image,
-    this.createdAt,
-    this.updatedAt,
+    required this.icon,
   });
 
-  // Converter de JSON para objeto Product
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      description: json['description'],
-      // Converte preço de string para double
-      price:
-          json['price'] != null
-              ? double.tryParse(json['price'].toString()) ?? 0.0
-              : 0.0,
-      stock: json['stock'] ?? 0,
-      category: json['category'],
-      image: json['image'],
-      createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt:
-          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'icon': icon,
+    };
   }
 
-  // Converter objeto Product para o formato esperado pela UI
-  Map<String, String> toMapForUI() {
+  factory ProductCategory.fromJson(Map<String, dynamic> json) {
+    return ProductCategory(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      icon: json['icon'] ?? 'package',
+    );
+  }
+}
+
+// Modelo para produtos
+class ProductModel {
+  final String id;
+  final String name;
+  final String category;
+  final String price;
+  final String image;
+  final String? description;
+  final int? stock;
+
+  ProductModel({
+    required this.id,
+    required this.name,
+    required this.category,
+    required this.price,
+    required this.image,
+    this.description,
+    this.stock,
+  });
+  
+  Map<String, String> toJson() {
     return {
+      'id': id,
       'name': name,
-      // Se não tiver categoria, usa 'OUTROS' como padrão
-      'category': category ?? 'OUTROS',
-      'price': price.toStringAsFixed(2).replaceAll('.', ','),
-      // Se não tiver imagem, usa um placeholder
-      'image':
-          image != null && image!.startsWith('http')
-              ? image!
-              : image != null
-              ? 'assets/images/$image'
-              : 'assets/images/emblema.png',
-      'description': description ?? 'Sem descrição disponível.',
+      'category': category,
+      'price': price,
+      'image': image,
+      'description': description ?? '',
+      'stock': stock?.toString() ?? '0',
     };
+  }
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      id: json['id'] != null ? json['id'].toString() : DateTime.now().millisecondsSinceEpoch.toString(),
+      name: json['name'] ?? '',
+      category: json['category'] ?? '',
+      price: json['price'] ?? '0,00',
+      image: json['image'] ?? '',
+      description: json['description'],
+      stock: json['stock'] != null ? int.parse(json['stock'].toString()) : null,
+    );
   }
 }

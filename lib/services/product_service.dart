@@ -21,7 +21,7 @@ class ProductService {
   }
 
   // Método para buscar todos os produtos
-  Future<List<Product>> getProducts() async {
+  Future<List<ProductModel>> getProducts() async {
     final baseUrl = getBaseUrl();
     try {
       print('Fazendo requisição para: $baseUrl/products');
@@ -45,7 +45,7 @@ class ProductService {
           print('Produtos recebidos da API: ${productsData.length}');
 
           // Mapeia os dados para objetos Product
-          return productsData.map((json) => Product.fromJson(json)).toList();
+          return productsData.map((json) => ProductModel.fromJson(json)).toList();
         } else {
           print('Formato de resposta inesperado: ${response.body}');
           return [];
@@ -63,7 +63,7 @@ class ProductService {
   }
 
   // Método para buscar um produto específico pelo ID
-  Future<Product?> getProduct(String id) async {
+  Future<ProductModel?> getProduct(String id) async {
     final baseUrl = getBaseUrl();
     try {
       final response = await http
@@ -77,7 +77,7 @@ class ProductService {
         final Map<String, dynamic> responseData = json.decode(response.body);
 
         if (responseData.containsKey('data')) {
-          return Product.fromJson(responseData['data']);
+          return ProductModel.fromJson(responseData['data']);
         } else {
           return null;
         }
@@ -91,7 +91,7 @@ class ProductService {
   }
 
   // Método para buscar produtos por categoria
-  Future<List<Product>> getProductsByCategory(String category) async {
+  Future<List<ProductModel>> getProductsByCategory(String category) async {
     final baseUrl = getBaseUrl();
     try {
       final response = await http
@@ -106,7 +106,7 @@ class ProductService {
 
         if (responseData.containsKey('data') && responseData['data'] is List) {
           final List<dynamic> productsData = responseData['data'];
-          return productsData.map((json) => Product.fromJson(json)).toList();
+          return productsData.map((json) => ProductModel.fromJson(json)).toList();
         } else {
           return [];
         }

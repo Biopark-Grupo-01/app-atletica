@@ -6,7 +6,7 @@ import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
-import 'package:app_atletica/screens/account/user_model.dart';
+import 'package:app_atletica/models/user_model.dart';
 
 class UsersList extends StatefulWidget {
   const UsersList({super.key});
@@ -146,7 +146,7 @@ class UsersListState extends State<UsersList> {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (_) => MembershipCardScreen(user: user),
+                                        (_) => MembershipCardScreen(),
                                   ),
                                 );
                               },
@@ -160,7 +160,7 @@ class UsersListState extends State<UsersList> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => TicketsScreen(user: user),
+                                  builder: (_) => TicketsScreen(),
                                 ),
                               );
                             },

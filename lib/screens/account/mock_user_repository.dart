@@ -1,5 +1,5 @@
 import 'dart:async';
-import './user_model.dart';
+import '../../models/user_model.dart';
 
 
 class MockUserRepository {

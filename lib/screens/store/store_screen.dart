@@ -1,9 +1,9 @@
+import 'package:app_atletica/models/product_model.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:app_atletica/models/product_model.dart';
 import 'package:app_atletica/services/product_service.dart';
 
 class StoreScreen extends StatefulWidget {
@@ -15,7 +15,7 @@ class StoreScreen extends StatefulWidget {
 
 class _StoreScreenState extends State<StoreScreen> {
   final ProductService _productService = ProductService();
-  List<Product> _products = [];
+  List<ProductModel> _products = [];
   bool _isLoading = true;
   String? _error;
 
@@ -83,7 +83,7 @@ class _StoreScreenState extends State<StoreScreen> {
   // Método para converter os produtos da API para o formato da UI
   List<Map<String, String>> _getProductsForUI() {
     if (_products.isNotEmpty) {
-      return _products.map((product) => product.toMapForUI()).toList();
+      return _products.map((product) => product.toJson()).toList();
     } else {
       return [];
     }
