@@ -13,7 +13,7 @@ class ProductService {
       return 'http://localhost:3001/api';
     } else {
       // Para dispositivos móveis, use o IP real da máquina na rede
-      return 'http://10.200.142.159:3001/api';
+      return 'http://192.168.1.2:3001/api';
     }
 
     // Para produção, descomente e use a URL de produção:

@@ -1,9 +1,10 @@
 // import 'dart:convert';
+import 'package:app_atletica/models/training_model.dart';
 import 'package:flutter/material.dart';
 // import 'package:app_atletica/utils/utils.dart';
 
 class EventsNewsService {
-  static Future<Map<String, List<Map<String, String>>>> loadData(BuildContext context) async {
+  static Future<Map<String, dynamic>> loadData(BuildContext context) async {
     // Mock data for now
     final news = [
       {
@@ -39,32 +40,45 @@ class EventsNewsService {
       },
     ];
 
-    final trainings = [
-      {
-        'type': 'TREINOS',
-        'category': 'Basquete',
-        'date': '03/05/2025',
-        'location': 'Ginásio Central',
-        'title': 'Treino de Arremesso',
-        'description': 'Foco em fundamentos e agilidade.',
-      },
-      {
-        'type': 'AMISTOSOS',
-        'category': 'Futebol',
-        'date': '05/05/2025',
-        'location': 'Estádio Tigre',
-        'title': 'Amistoso com Raposa',
-        'description': 'Jogo preparatório para o torneio.',
-      },
-      {
-        'type': 'AMISTOSOS',
-        'category': 'Futebol',
-        'date': '05/05/2025',
-        'location': 'Estádio Tigre',
-        'title': 'Amistoso com Raposa',
-        'description': 'Jogo preparatório para o torneio.',
-      },
+    final List<Training> trainings = [
+      Training(
+        id: '1',
+        title: 'Treino de Arremesso',
+        description: 'Foco em fundamentos e agilidade.',
+        modality: 'Basquete',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Ginásio Central',
+        date: '03/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
+      ),
+      Training(
+        id: '2',
+        title: 'Amistoso com Raposa',
+        description: 'Jogo preparatório para o torneio.',
+        modality: 'Futebol',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Estádio Tigre',
+        date: '05/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
+      ),
+      Training(
+        id: '3',
+        title: 'Amistoso com Raposa',
+        description: 'Jogo preparatório para o torneio.',
+        modality: 'Futebol',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Estádio Tigre',
+        date: '05/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
+      ),
     ];
+
 
     final List<Map<String, dynamic>> storeCategories = [
       {

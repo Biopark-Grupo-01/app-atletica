@@ -5,8 +5,8 @@ class TrainingMatchItem extends StatelessWidget {
   final String location;
   final String title;
   final String description;
-  final String category;  // Categoria
-  final String type;      // Tipo (TREINO ou AMISTOSO)
+  final String modality;  // Substitui category
+  final bool isMatch;     // Substitui type
 
   const TrainingMatchItem({
     super.key,
@@ -14,8 +14,8 @@ class TrainingMatchItem extends StatelessWidget {
     required this.description,
     required this.date,
     required this.location,
-    required this.category,
-    required this.type,
+    required this.modality,
+    required this.isMatch, // true para AMISTOSO, false para TREINO
   });
 
   @override
@@ -31,7 +31,7 @@ class TrainingMatchItem extends StatelessWidget {
         children: [
           // Título
           Text(
-            type == 'TREINOS' ? 'Treino: $title' : 'Amistoso: $title',
+            isMatch ? 'Amistoso: $title' : 'Treino: $title',
             style: const TextStyle(
               color: Color(0xFFFFD700),
               fontSize: 18,
@@ -77,7 +77,7 @@ class TrainingMatchItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  category,
+                  modality.toUpperCase(),
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 13,

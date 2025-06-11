@@ -1,3 +1,4 @@
+import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:app_atletica/widgets/custom_square_button.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
-  List<Map<String, String>> trainings = [];
+  List<Training> trainings = [];
 
   bool isLoading = true;
   String? error;
@@ -160,16 +161,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: GestureDetector(
                         onTap: () {
-                            showTrainingModal(context);
+                            showTrainingModal(context, training);
                         },
                         child: TrainingMatchItem(
-                          title: training['title'] ?? '',
-                          description: training['description'] ?? '',
-                          date: training['date'] ?? '',
-                          location: training['location'] ?? '',
-                          category: training['category'] ?? '',
-                          type: training['type'] ?? '',
-                        ),
+                          title: training.title,
+                          description: training.description,
+                          date: training.date,
+                          location: training.place,
+                          modality: training.modality,
+                          isMatch: false, // ou true, se for amistoso
+                        )
                       ),
 
                     );
@@ -185,13 +186,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-void showTrainingModal(BuildContext context) {
+void showTrainingModal(BuildContext context, Training training) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withOpacity(0.5),
-    builder: (_) => const TrainingModal(),
+    builder: (_) => TrainingModal(training: training, isSubscribed: true),
   );
 }
 
