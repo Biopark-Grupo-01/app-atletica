@@ -49,13 +49,13 @@ class Product {
       // Se não tiver categoria, usa 'OUTROS' como padrão
       'category': category ?? 'OUTROS',
       'price': price.toStringAsFixed(2).replaceAll('.', ','),
-      // Se não tiver imagem, usa um placeholder
+      // Se não tiver imagem, usa brasao.png como padrão
       'image':
           image != null && image!.startsWith('http')
               ? image!
-              : image != null
+              : image != null && image!.isNotEmpty
               ? 'assets/images/$image'
-              : 'assets/images/emblema.png',
+              : 'assets/images/brasao.png',
       'description': description ?? 'Sem descrição disponível.',
     };
   }
