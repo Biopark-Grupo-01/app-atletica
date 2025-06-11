@@ -49,8 +49,8 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        Center(
-                          child: const CustomTitleForms(
+                        const Center(
+                          child: CustomTitleForms(
                             title: 'CADASTRO DE NOTÍCIA',
                           ),
                         ),
@@ -65,23 +65,38 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                             child: SizedBox(
                               width: double.infinity,
                               height: 250,
-                              child: Image.network(
-                                _imageUrl != null
-                                    ? _imageUrl!.path
-                                    : 'https://via.placeholder.com/350x150',
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: AppColors.lightGrey,
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                      ),
+                              child: _imageUrl != null // <--- Alteração aqui
+                                  ? Image.file( // <--- Usa Image.file para arquivos locais
+                                      _imageUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: AppColors.lightGrey,
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.broken_image, // Ícone para erro de arquivo
+                                              size: 50,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Image.network( // <--- Mantém Image.network para placeholder inicial
+                                      'https://via.placeholder.com/350x150', // Placeholder de rede
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          color: AppColors.lightGrey,
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.image_not_supported,
+                                              size: 50,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
                             ),
                           ),
                         ),
@@ -91,10 +106,7 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                           label: 'Data',
                           icon: Icons.calendar_today,
                         ),
-                        CustomTextField(
-                          label: 'Local',
-                          icon: Icons.location_on,
-                        ),
+                        // O campo de localização foi removido conforme solicitado
                         const SizedBox(height: 15),
                         CustomTextBox(),
                         const SizedBox(height: 25),
@@ -103,6 +115,7 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                             text: 'Salvar',
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
+                                // Lógica para salvar os dados
                                 Navigator.pop(context);
                               }
                             },

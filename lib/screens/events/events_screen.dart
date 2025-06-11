@@ -19,7 +19,7 @@ class _EventsScreenState extends State<EventsScreen> {
   List<Map<String, String>> events = [];
   bool isLoading = true;
   String? error;
-  int _selectedTabIndex = 0;
+  int _selectedTabIndex = 0; // 0 para EVENTOS, 1 para NOTÍCIAS
 
   @override
   void initState() {
@@ -50,6 +50,8 @@ class _EventsScreenState extends State<EventsScreen> {
     try {
       return DateFormat('dd/MM/yyyy').parse(dateStr);
     } catch (e) {
+      // Retorna uma data padrão em caso de erro na análise,
+      // para evitar quebras no sorting.
       return DateTime(2000);
     }
   }
@@ -61,7 +63,7 @@ class _EventsScreenState extends State<EventsScreen> {
     sortedList.sort((a, b) {
       final dateA = _parseDate(a['date'] ?? '');
       final dateB = _parseDate(b['date'] ?? '');
-      return dateB.compareTo(dateA);
+      return dateB.compareTo(dateA); // Ordena da mais nova para a mais antiga
     });
 
     return Scaffold(
@@ -75,7 +77,7 @@ class _EventsScreenState extends State<EventsScreen> {
             : error != null
                 ? Center(
                     child: Text(
-                      'Erro: \$error',
+                      'Erro: $error',
                       style: const TextStyle(color: AppColors.white),
                     ),
                   )
@@ -101,11 +103,24 @@ class _EventsScreenState extends State<EventsScreen> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/trainingDetail',
-                                        arguments: item,
-                                      );
+                                      // Lógica condicional para a navegação
+                                      if (_selectedTabIndex == 0) {
+                                        // Aba de EVENTOS selecionada
+                                        // Certifique-se de que '/trainingDetail' é a rota correta para detalhes de evento
+                                        // Se for um evento, talvez o nome da rota devesse ser algo como '/eventDetail'
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/trainingDetail', // Rota para detalhes de EVENTO
+                                          arguments: item,
+                                        );
+                                      } else {
+                                        // Aba de NOTÍCIAS selecionada
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/newsDetail', // Rota para detalhes de NOTÍCIA
+                                          arguments: item,
+                                        );
+                                      }
                                     },
                                     child: _selectedTabIndex == 0
                                         ? EventItem(

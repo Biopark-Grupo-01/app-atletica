@@ -131,15 +131,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       Navigator.pushNamed(
                       context,
-                      '/trainingDetail',
+                      '/newsDetail',
                       arguments: item,
                       );
                     },
                     child: EventItem(
                       imageUrl: item['imageUrl'] ?? '',
                       date: item['date'] ?? '',
+                      location: item['location'] ?? '',
                       title: item['title'] ?? '',
                       description: item['description'] ?? '',
+                      hideLocationIcon: true,
                     ),
                   ),
                 ),
