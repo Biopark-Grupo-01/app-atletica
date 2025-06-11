@@ -5,19 +5,18 @@ import 'package:http/http.dart' as http;
 import 'package:app_atletica/models/product_model.dart';
 
 class ProductService {
-  // URL base da API - usando o IP real da sua máquina
+  // URL base da API - adaptando para diferentes ambientes
   static String getBaseUrl() {
-    // Para desenvolvimento local:
     if (kIsWeb) {
-      // Se estiver rodando na web, use localhost
-      return 'http://localhost:3001/api';
+      // Para aplicações web, pode ser necessário usar um proxy CORS ou habilitar CORS no backend
+      return 'http://127.0.0.1:3001/api'; // Tentando com 127.0.0.1 em vez de localhost
+    } else if (Platform.isAndroid) {
+      // Para emulador Android
+      return 'http://10.0.2.2:3001/api';
     } else {
-      // Para dispositivos móveis, use o IP real da máquina na rede
-      return 'http://10.200.142.159:3001/api';
+      // Para outros casos
+      return 'http://localhost:3001/api';
     }
-
-    // Para produção, descomente e use a URL de produção:
-    // return 'https://seu-backend-de-producao.com/api';
   }
 
   // Método para buscar todos os produtos
@@ -26,13 +25,18 @@ class ProductService {
     try {
       print('Fazendo requisição para: $baseUrl/products');
 
-      // Aumentar o timeout para dar mais tempo para a conexão ser estabelecida
+      // Adicionando cabeçalhos para ajudar com CORS
+      final headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      };
+
       final response = await http
-          .get(
-            Uri.parse('$baseUrl/products'),
-            headers: {'Accept': 'application/json'},
-          )
+          .get(Uri.parse('$baseUrl/products'), headers: headers)
           .timeout(const Duration(seconds: 15));
+
+      print('Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Resposta recebida com sucesso');
@@ -57,9 +61,34 @@ class ProductService {
       }
     } catch (e) {
       print('Erro ao buscar produtos: $e');
-      // Em caso de erro na API, retornar lista vazia
-      return [];
+      // Em caso de erro, tentar usar produtos mockados para teste
+      return _getMockProducts();
     }
+  }
+
+  // Método para obter produtos mockados em caso de falha na API
+  List<Product> _getMockProducts() {
+    print('Usando produtos mockados para teste');
+    return [
+      Product(
+        id: '1',
+        name: 'Camiseta Masculina',
+        description: 'Camiseta oficial da Atlética',
+        price: 50.0,
+        stock: 10,
+        category: 'ROUPAS',
+        image: 'assets/images/camisetaa_masculina.png',
+      ),
+      Product(
+        id: '2',
+        name: 'Caneca Oficial',
+        description: 'Caneca oficial da Atlética Biopark',
+        price: 25.0,
+        stock: 15,
+        category: 'CANECAS',
+        image: 'assets/images/caneca_personalizada.jpeg',
+      ),
+    ];
   }
 
   // Método para buscar um produto específico pelo ID

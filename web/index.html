@@ -38,31 +38,23 @@
     </script>
     <!-- This script adds the flutter initialization JS code -->
     <script src="flutter.js" defer></script>
-
-    <script>
-      // Função para simular um proxy CORS
-      window.addEventListener("load", function () {
-        if (window.fetch) {
-          const originalFetch = window.fetch;
-          window.fetch = function (url, init) {
-            if (typeof url === "string" && url.includes("localhost:3001")) {
-              console.log("Interceptando requisição para localhost:3001", url);
-              // Modificando a URL para usar o endereço IP real da sua máquina
-              // Você precisará substituir este IP pelo IP da sua máquina na rede
-              const modifiedUrl = url.replace(
-                "localhost:3001",
-                "127.0.0.1:3001"
-              );
-              return originalFetch(modifiedUrl, init);
-            }
-            return originalFetch(url, init);
-          };
-        }
-      });
-    </script>
   </head>
   <body>
     <script>
+      // Adicionando um proxy na aplicação web para contornar problemas de CORS
+      let originalFetch = window.fetch;
+      window.fetch = function (url, init) {
+        console.log("Interceptando fetch request para:", url);
+        if (typeof url === "string" && url.includes("localhost:3001")) {
+          // Mostra o que está sendo requisitado
+          console.log("Requisição para API local:", url);
+        }
+        return originalFetch(url, init).catch((error) => {
+          console.error("Erro no fetch:", error);
+          throw error;
+        });
+      };
+
       window.addEventListener("load", function (ev) {
         // Download main.dart.js
         _flutter.loader.loadEntrypoint({
