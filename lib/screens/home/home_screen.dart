@@ -37,148 +37,220 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     try {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+      
       final data = await EventsNewsService.loadData(context);
       setState(() {
-        news = data['news'] ?? [];
-        events = data['events'] ?? [];
-        trainings = data['trainings'] ?? [];
+        news = List<Map<String, String>>.from(data['news'] ?? []);
+        events = List<Map<String, String>>.from(data['events'] ?? []);
+        trainings = List<Map<String, String>>.from(data['trainings'] ?? []);
         isLoading = false;
       });
     } catch (e) {
+      print('Erro ao carregar dados da tela home: $e');
       setState(() {
-        error = e.toString();
+        error = 'Não foi possível carregar os dados. Tente novamente.';
         isLoading = false;
       });
     }
+  }
+
+  // Widget que mostra o indicador de carregamento
+  Widget _buildLoadingView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: AppColors.yellow,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Carregando dados...',
+            style: TextStyle(
+              color: AppColors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget que mostra a mensagem de erro
+  Widget _buildErrorView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+            SizedBox(height: 16),
+            Text(
+              error ?? 'Ocorreu um erro inesperado',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _loadData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.yellow,
+                foregroundColor: AppColors.blue,
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              ),
+              child: Text(
+                'Tentar Novamente',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget que mostra uma mensagem quando a seção está vazia
+  Widget _buildEmptySection(String message) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 24),
+      alignment: Alignment.center,
+      child: Text(
+        message,
+        style: TextStyle(
+          color: AppColors.white,
+          fontSize: 14,
+          fontStyle: FontStyle.italic,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.ticket,
-                      offsetXFactor: -0.033,
-                      offsetYFactor: 0.0015,
-                      color: AppColors.yellow,
-                      label: 'Ingressos',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/tickets');
-                      },
-                    ),
-                    CustomSquareButton(
-                      icon: FontAwesomeIcons.idCard,
-                      offsetXFactor: -0.033,
-                      offsetYFactor: 0.0015,
-                      color: AppColors.white,
-                      label: 'Carteirinha',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/membership');
-                      },
-                    ),
-                    CustomSquareButton(
-                      icon: Icons.support_agent_rounded,
-                      label: 'Suporte',
-                      color: AppColors.yellow,
-                      onPressed: () {
-                        openWhatsApp("5544999719743", text: "Olá! Preciso de suporte com o app da Atlética.");
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                CustomTitle(title: 'EVENTOS'),
-
-                CarouselItem(
-                  items: events,
-                  useCarousel: true,
-                  itemBuilder: (item) => GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                      context,
-                      '/trainingDetail',
-                      arguments: item,
-                      );
-                    },
-                    child: EventItem(
-                      imageUrl: item['imageUrl'] ?? '',
-                      date: item['date'] ?? '',
-                      location: item['location'] ?? '',
-                      title: item['title'] ?? '',
-                      description: item['description'] ?? '',
-                    ),
-                  ),
-                ),
-
-                CustomTitle(title: 'NOTÍCIAS'),
-
-                CarouselItem(
-                  items: news,
-                  useCarousel: true,
-                  itemBuilder: (item) => GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                      context,
-                      '/trainingDetail',
-                      arguments: item,
-                      );
-                    },
-                    child: EventItem(
-                      imageUrl: item['imageUrl'] ?? '',
-                      date: item['date'] ?? '',
-                      location: item['location'] ?? '',
-                      title: item['title'] ?? '',
-                      description: item['description'] ?? '',
-                    ),
-                  ),
-                ),
-
-                
-                CustomTitle(title: 'TREINOS E AMISTOSOS'),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics:
-                      NeverScrollableScrollPhysics(), // Para evitar rolagem dupla
-                  itemCount:
-                      trainings
-                          .length, // Supondo que você tenha uma lista de treinos
-                  itemBuilder: (context, index) {
-                    final training = trainings[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: GestureDetector(
-                        onTap: () {
-                            showTrainingModal(context);
-                        },
-                        child: TrainingMatchItem(
-                          title: training['title'] ?? '',
-                          description: training['description'] ?? '',
-                          date: training['date'] ?? '',
-                          location: training['location'] ?? '',
-                          category: training['category'] ?? '',
-                          type: training['type'] ?? '',
-                        ),
+      appBar: CustomAppBar(),      body: SafeArea(
+        child: isLoading
+          ? _buildLoadingView()
+          : error != null
+            ? _buildErrorView()
+            : RefreshIndicator(
+                onRefresh: _loadData,
+                color: AppColors.yellow,
+                backgroundColor: AppColors.blue,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          CustomSquareButton(
+                            icon: FontAwesomeIcons.ticket,
+                            offsetXFactor: -0.033,
+                            offsetYFactor: 0.0015,
+                            color: AppColors.yellow,
+                            label: 'Ingressos',
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/tickets');
+                            },
+                          ),
+                          CustomSquareButton(
+                            icon: FontAwesomeIcons.idCard,
+                            offsetXFactor: -0.033,
+                            offsetYFactor: 0.0015,
+                            color: AppColors.white,
+                            label: 'Carteirinha',
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/membership');
+                            },
+                          ),
+                          CustomSquareButton(
+                            icon: Icons.support_agent_rounded,
+                            label: 'Suporte',
+                            color: AppColors.yellow,
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/home');
+                            },
+                          ),
+                        ],
                       ),
-
-                    );
-                  },
+                      const SizedBox(height: 30),
+                      CustomTitle(title: 'EVENTOS'),
+                      events.isNotEmpty
+                        ? CarouselItem(
+                            items: events,
+                            useCarousel: true,
+                            itemBuilder: (item) => EventItem(
+                              imageUrl: item['imageUrl'] ?? '',
+                              date: item['date'] ?? '',
+                              location: item['location'] ?? '',
+                              title: item['title'] ?? '',
+                              description: item['description'] ?? '',
+                            ),
+                          )
+                        : _buildEmptySection('Nenhum evento disponível no momento'),
+                      CustomTitle(title: 'NOTÍCIAS'),
+                      news.isNotEmpty
+                        ? CarouselItem(
+                            items: news,
+                            useCarousel: true,
+                            itemBuilder: (item) => NewsItem(
+                              imageUrl: item['imageUrl'] ?? '',
+                              date: item['date'] ?? '',
+                              location: item['location'] ?? '',
+                              title: item['title'] ?? '',
+                              description: item['description'] ?? '',
+                            ),
+                          )
+                        : _buildEmptySection('Nenhuma notícia disponível no momento'),
+                      CustomTitle(title: 'TREINOS E AMISTOSOS'),
+                      trainings.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: trainings.length,
+                            itemBuilder: (context, index) {
+                              final training = trainings[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: TrainingMatchItem(
+                                  title: training['title'] ?? '',
+                                  description: training['description'] ?? '',
+                                  date: training['date'] ?? '',
+                                  location: training['location'] ?? '',
+                                  category: training['category'] ?? '',
+                                  type: training['type'] ?? '',
+                                ),
+                              );
+                            },
+                          )
+                        : _buildEmptySection('Nenhum treino disponível no momento'),                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
       ),
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 0),
     );

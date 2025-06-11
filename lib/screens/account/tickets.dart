@@ -4,7 +4,7 @@ import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:app_atletica/widgets/tickets/ticket_card.dart';
-import 'package:app_atletica/screens/account/user_model.dart';
+import 'package:app_atletica/models/user_model.dart';
 
 class TicketsScreen extends StatefulWidget {
   final UserModel? user;

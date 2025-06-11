@@ -86,7 +86,7 @@ class _PasswordRecoveryScreenState extends State<PasswordRecoveryScreen> {
                     onPressed: _recoverPassword,
                   ),
               TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/'),
+                onPressed: () => Navigator.pushNamed(context, '/login'),
                 child: Text('Login', style: TextStyle(color: AppColors.white)),
               ),
             ],
