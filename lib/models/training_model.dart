@@ -1,55 +1,55 @@
-class TrainingModel {
+class Training {
   final String id;
-  final String type;      // TREINOS, AMISTOSOS
-  final String category;  // Basquete, Futebol, etc.
-  final String date;
-  final String location;
   final String title;
-  final String? description;
+  final String description;
+  final String modality;
+  final String coach;
+  final String responsible;
+  final String place;
+  final String date;
+  final String time;
+  final bool isSubscribed;
 
-  TrainingModel({
+  Training({
     required this.id,
-    required this.type,
-    required this.category,
-    required this.date,
-    required this.location,
     required this.title,
-    this.description,
+    required this.description,
+    required this.modality,
+    required this.coach,
+    required this.responsible,
+    required this.place,
+    required this.date,
+    required this.time,
+    required this.isSubscribed,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'type': type,
-      'category': category,
-      'date': date,
-      'location': location,
-      'title': title,
-      'description': description,
-    };
-  }
-  
-  Map<String, String> toDisplayMap() {
-    return {
-      'id': id,
-      'type': type,
-      'category': category,
-      'date': date,
-      'location': location,
-      'title': title,
-      'description': description ?? '',
-    };
-  }
-
-  factory TrainingModel.fromJson(Map<String, dynamic> json) {
-    return TrainingModel(
-      id: json['id'] != null ? json['id'].toString() : DateTime.now().millisecondsSinceEpoch.toString(),
-      type: json['type'] ?? 'TREINOS',
-      category: json['category'] ?? '',
-      date: json['date'] ?? '',
-      location: json['location'] ?? '',
+  factory Training.fromJson(Map<String, dynamic> json) {
+    return Training(
+      id: json['id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
+      modality: json['modality'] ?? '',
+      coach: json['coach'] ?? '',
+      responsible: json['responsible'] ?? '',
+      place: json['place'] ?? '',
+      date: json['start_date'] ?? '',
+      time: json['start_time'] ?? '',
+      isSubscribed: json['isSubscribed'] ?? false,
     );
+  }
+
+  Map<String, String> toMapForUI() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'modality': modality,
+      'coach': coach,
+      'responsible': responsible,
+      'place': place,
+      'date': date,
+      'time': time,
+      'isSubscribed': isSubscribed.toString(),
+    };
   }
 }

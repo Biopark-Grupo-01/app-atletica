@@ -1,3 +1,4 @@
+import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:app_atletica/widgets/custom_square_button.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
-  List<Map<String, String>> trainings = [];
+  List<Training> trainings = [];
 
   bool isLoading = true;
   String? error;
@@ -141,60 +142,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),      body: SafeArea(
-        child: isLoading
-          ? _buildLoadingView()
-          : error != null
-            ? _buildErrorView()
-            : RefreshIndicator(
-                onRefresh: _loadData,
-                color: AppColors.yellow,
-                backgroundColor: AppColors.blue,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          CustomSquareButton(
-                            icon: FontAwesomeIcons.ticket,
-                            offsetXFactor: -0.033,
-                            offsetYFactor: 0.0015,
-                            color: AppColors.yellow,
-                            label: 'Ingressos',
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/tickets');
-                            },
-                          ),
-                          CustomSquareButton(
-                            icon: FontAwesomeIcons.idCard,
-                            offsetXFactor: -0.033,
-                            offsetYFactor: 0.0015,
-                            color: AppColors.white,
-                            label: 'Carteirinha',
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/membership');
-                            },
-                          ),
-                          CustomSquareButton(
-                            icon: Icons.support_agent_rounded,
-                            label: 'Suporte',
-                            color: AppColors.yellow,
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/home');
-                            },
-                          ),
-                        ],
+                
+                CustomTitle(title: 'TREINOS E AMISTOSOS'),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics:
+                      NeverScrollableScrollPhysics(), // Para evitar rolagem dupla
+                  itemCount:
+                      trainings
+                          .length, // Supondo que você tenha uma lista de treinos
+                  itemBuilder: (context, index) {
+                    final training = trainings[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: GestureDetector(
+                        onTap: () {
+                            showTrainingModal(context, training);
+                        },
+                        child: TrainingMatchItem(
+                          title: training.title,
+                          description: training.description,
+                          date: training.date,
+                          location: training.place,
+                          modality: training.modality,
+                          isMatch: false, // ou true, se for amistoso
+                        )
                       ),
                       const SizedBox(height: 30),
                       CustomTitle(title: 'EVENTOS'),
@@ -257,13 +229,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-void showTrainingModal(BuildContext context) {
+void showTrainingModal(BuildContext context, Training training) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withOpacity(0.5),
-    builder: (_) => const TrainingModal(),
+    builder: (_) => TrainingModal(training: training, isSubscribed: true),
   );
 }
 

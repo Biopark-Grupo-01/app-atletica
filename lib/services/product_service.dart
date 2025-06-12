@@ -14,8 +14,8 @@ class ProductService {
       // Para emulador Android
       return 'http://10.0.2.2:3001/api';
     } else {
-      // Para outros casos
-      return 'http://localhost:3001/api';
+      // Para dispositivos móveis, use o IP real da máquina na rede
+      return 'http://10.200.71.122:3001/api';
     }
   }
 

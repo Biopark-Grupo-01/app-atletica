@@ -1,4 +1,5 @@
-import 'dart:convert';
+// import 'dart:convert';
+import 'package:app_atletica/models/training_model.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/models/news_event_model.dart';
 import 'package:app_atletica/models/training_model.dart';
@@ -6,14 +7,24 @@ import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
 
 class EventsNewsService {
-  // Endpoints da API
-  static const String _newsEndpoint = '/news';
-  static const String _eventsEndpoint = '/events';
-  static const String _trainingsEndpoint = '/trainings';
-  // Chaves para o cache
-  static const String _newsCache = 'cached_news';
-  static const String _eventsCache = 'cached_events';
-  static const String _trainingsCache = 'cached_trainings';
+  static Future<Map<String, dynamic>> loadData(BuildContext context) async {
+    // Mock data for now
+    final news = [
+      {
+        'imageUrl': 'https://picsum.photos/300/150',
+        'date': '15/05/2025',
+        'location': 'Toledo',
+        'title': 'Acesso Rápido',
+        'description': 'Foi realizado alterações nos botões de acesso rápido',
+      },
+      {
+        'imageUrl': 'https://picsum.photos/301/150',
+        'date': '22/05/2025',
+        'location': 'Toledo',
+        'title': 'Notícia do Backend',
+        'description': 'Essa notícia veio da API.',
+      },
+    ];
 
   // Método para carregar notícias com cache
   static Future<List<NewsModel>> getNews(BuildContext context) async {
@@ -48,124 +59,68 @@ class EventsNewsService {
     }
   }
 
-  // Método para carregar eventos com cache
-  static Future<List<EventModel>> getEvents(BuildContext context) async {
-    try {
-      if (ApiService.useMockData) {
-        final mockData = _getMockEvents();
-        // Salva os dados mockados no cache também
-        await LocalStorageService.cacheEvents(mockData.map((e) => e.toJson()).toList());
-        return mockData;
-      } else {
-        // Usa o sistema de cache do ApiService
-        final response = await ApiService.get(
-          context, 
-          _eventsEndpoint,
-          useCache: true,
-          cacheKey: _eventsCache,
-        );
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((item) => EventModel.fromJson(item)).toList();
-      }
-    } catch (e) {
-      print('Erro ao carregar eventos: $e');
-      
-      // Tenta obter dados do cache
-      final cachedData = await LocalStorageService.getCachedEvents();
-      if (cachedData != null) {
-        return cachedData.map((item) => EventModel.fromJson(item)).toList();
-      }
-      
-      // Se não há cache, retorna dados mockados
-      return _getMockEvents();
-    }
-  }
+    final List<Training> trainings = [
+      Training(
+        id: '1',
+        title: 'Treino de Arremesso',
+        description: 'Foco em fundamentos e agilidade.',
+        modality: 'Basquete',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Ginásio Central',
+        date: '03/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
+      ),
+      Training(
+        id: '2',
+        title: 'Amistoso com Raposa',
+        description: 'Jogo preparatório para o torneio.',
+        modality: 'Futebol',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Estádio Tigre',
+        date: '05/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
+      ),
+      Training(
+        id: '3',
+        title: 'Amistoso com Raposa',
+        description: 'Jogo preparatório para o torneio.',
+        modality: 'Futebol',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Estádio Tigre',
+        date: '05/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
+      ),
+    ];
 
-  // Método para carregar treinos e amistosos com cache
-  static Future<List<TrainingModel>> getTrainings(BuildContext context) async {
-    try {
-      if (ApiService.useMockData) {
-        final mockData = _getMockTrainings();
-        // Salva os dados mockados no cache também
-        await LocalStorageService.cacheTrainings(mockData.map((e) => e.toJson()).toList());
-        return mockData;
-      } else {
-        // Usa o sistema de cache do ApiService
-        final response = await ApiService.get(
-          context, 
-          _trainingsEndpoint,
-          useCache: true,
-          cacheKey: _trainingsCache,
-        );
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((item) => TrainingModel.fromJson(item)).toList();
-      }
-    } catch (e) {
-      print('Erro ao carregar treinos: $e');
-      
-      // Tenta obter dados do cache
-      final cachedData = await LocalStorageService.getCachedTrainings();
-      if (cachedData != null) {
-        return cachedData.map((item) => TrainingModel.fromJson(item)).toList();
-      }
-      
-      // Se não há cache, retorna dados mockados
-      return _getMockTrainings();
-    }
-  }  // Método para carregar todos os dados da tela principal
-  static Future<Map<String, dynamic>> loadData(BuildContext context) async {
-    try {
-      // Primeiro tentamos carregar dados através dos métodos padrão
-      final news = await getNews(context);
-      final events = await getEvents(context);
-      final trainings = await getTrainings(context);
 
-      // Converter objetos para Map<String, String> para exibição nos widgets
-      try {
-        final newsMapList = news.map((item) => item.toDisplayMap()).toList();
-        final eventsMapList = events.map((item) => item.toDisplayMap()).toList();
-        final trainingsMapList = trainings.map((item) => item.toDisplayMap()).toList();
-
-        return {
-          'news': newsMapList,
-          'events': eventsMapList,
-          'trainings': trainingsMapList,
-        };
-      } catch (conversionError) {
-        // Se houver um erro na conversão, provavelmente o método toDisplayMap não existe em alguns items
-        print('Erro de conversão para display map: $conversionError');
-        throw Exception('Erro ao formatar dados para exibição');
-      }
-    } catch (e) {
-      print('Erro ao carregar dados da tela principal: $e');
-      // Se houver erro, tenta usar os dados mockados diretamente
-      try {
-        print('Tentando carregar dados mockados...');
-        final news = _getMockNews();
-        final events = _getMockEvents();
-        final trainings = _getMockTrainings();
-
-        final newsMapList = news.map((item) => item.toDisplayMap()).toList();
-        final eventsMapList = events.map((item) => item.toDisplayMap()).toList();
-        final trainingsMapList = trainings.map((item) => item.toDisplayMap()).toList();
-
-        return {
-          'news': newsMapList,
-          'events': eventsMapList,
-          'trainings': trainingsMapList,
-        };
-      } catch (mockError) {
-        print('Erro também ao carregar dados mockados: $mockError');
-        
-        // Se tudo falhar, retorna listas vazias para não quebrar a UI
-        return {
-          'news': <Map<String, String>>[],
-          'events': <Map<String, String>>[],
-          'trainings': <Map<String, String>>[],
-        };
-      }
-    }
-  }
+    final List<Map<String, dynamic>> storeCategories = [
+      {
+        'label': 'Canecas', 
+        'icon': Icons.local_drink, 
+        'category': 'CANECAS'
+      },
+      {
+        'label': 'Roupas', 
+        'icon': Icons.checkroom, 
+        'category': 'ROUPAS'
+      },
+      {
+        'label': 'Chaveiros', 
+        'icon': Icons.key, 
+        'category': 'CHAVEIROS'
+      },
+      {
+        'label': 'Tatuagens', 
+        'icon': Icons.brush, 
+        'category': 'TATUAGENS'
+      },
+    ];
 
   // Método para adicionar ou atualizar uma notícia
   static Future<bool> saveNews(BuildContext context, NewsModel news) async {
