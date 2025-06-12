@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
@@ -17,19 +15,7 @@ class NewsRegistrationForm extends StatefulWidget {
 }
 
 class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
-  File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      setState(() {
-        _imageUrl = File(image.path);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,41 +35,8 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        Center(
-                          child: const CustomTitleForms(
-                            title: 'CADASTRO DE NOTÍCIA',
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 250,
-                              child: Image.network(
-                                _imageUrl != null
-                                    ? _imageUrl!.path
-                                    : 'https://via.placeholder.com/350x150',
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: AppColors.lightGrey,
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
+                        const Center(
+                          child: CustomTitleForms(title: 'CADASTRO DE NOTÍCIA'),
                         ),
                         const SizedBox(height: 20),
                         CustomTextField(label: 'Título', icon: Icons.create),

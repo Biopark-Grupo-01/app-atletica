@@ -1,43 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:app_atletica/screens/home/home_screen.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/theme/app_colors.dart';
-
+import 'package:provider/provider.dart';
+import 'package:app_atletica/providers/user_provider.dart';
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
-  bool isLoading = false;
   bool isChecked = false;
 
-  void _login() {
+  @override
+  void initState() {
+    super.initState();
+    
+    // Para testes: preenche os campos com credenciais de teste
+    if (emailController.text.isEmpty) {
+      emailController.text = 'admin@atletica.com';
+      passwordController.text = 'admin123';
+    }
+  }
+
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
+      // Acessa o provider para fazer login
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      
+      final success = await userProvider.login(
+        emailController.text.trim(), 
+        passwordController.text.trim()
+      );
 
-      // Simulação de delay para login (substituir com lógica de API real)
-      Future.delayed(Duration(seconds: 2), () {
-        setState(() {
-          isLoading = false;
-        });
-
-        // Exemplo: Mostrar um snackbar ao concluir o login
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Login realizado com sucesso!')));
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+      if (success) {
+        // Login bem-sucedido, mostra snackbar e navega para a tela principal
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login realizado com sucesso!'))
         );
-      });
+        
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        // Falha no login, mostra erro
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(userProvider.errorMessage ?? 'Falha ao fazer login. Tente novamente.'),
+            backgroundColor: Colors.red,
+          )
+        );
+      }
     }
   }
 
@@ -171,13 +186,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
+                    ),                    Spacer(), // Empurra os elementos restantes para baixo
+                    Consumer<UserProvider>(
+                      builder: (context, userProvider, child) {
+                        return userProvider.isLoading
+                          ? CircularProgressIndicator(
+                              color: Theme.of(context).colorScheme.secondary,
+                            )
+                          : CustomButton(text: 'Login', onPressed: _login);
+                      },
                     ),
-                    Spacer(), // Empurra os elementos restantes para baixo
-                    isLoading
-                        ? CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.secondary,
-                        )
-                        : CustomButton(text: 'Login', onPressed: _login),
                     SizedBox(height: 20), // Espaço padronizado
                     TextButton(
                       onPressed:

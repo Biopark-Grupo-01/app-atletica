@@ -61,7 +61,7 @@ class _TrainingModalState extends State<TrainingModal> {
                 color: const Color.fromARGB(255, 26, 47, 74),
                 borderRadius: BorderRadius.circular(20),
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Expanded(
@@ -115,8 +115,8 @@ class _TrainingModalState extends State<TrainingModal> {
                             training.responsible,
                             style: const TextStyle(color: Colors.white70),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -154,6 +154,7 @@ class _TrainingModalState extends State<TrainingModal> {
                                 ),
                               ],
                             ),
+
                     ),
                   ),
                   const SizedBox(height: 16),

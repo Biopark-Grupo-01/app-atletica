@@ -5,34 +5,38 @@ import 'package:http/http.dart' as http;
 import 'package:app_atletica/models/product_model.dart';
 
 class ProductService {
-  // URL base da API - usando o IP real da sua máquina
+  // URL base da API - adaptando para diferentes ambientes
   static String getBaseUrl() {
-    // Para desenvolvimento local:
     if (kIsWeb) {
-      // Se estiver rodando na web, use localhost
-      return 'http://localhost:3001/api';
+      // Para aplicações web, pode ser necessário usar um proxy CORS ou habilitar CORS no backend
+      return 'http://127.0.0.1:3001/api'; // Tentando com 127.0.0.1 em vez de localhost
+    } else if (Platform.isAndroid) {
+      // Para emulador Android
+      return 'http://10.0.2.2:3001/api';
     } else {
       // Para dispositivos móveis, use o IP real da máquina na rede
       return 'http://10.200.71.122:3001/api';
     }
-
-    // Para produção, descomente e use a URL de produção:
-    // return 'https://seu-backend-de-producao.com/api';
   }
 
   // Método para buscar todos os produtos
-  Future<List<Product>> getProducts() async {
+  Future<List<ProductModel>> getProducts() async {
     final baseUrl = getBaseUrl();
     try {
       print('Fazendo requisição para: $baseUrl/products');
 
-      // Aumentar o timeout para dar mais tempo para a conexão ser estabelecida
+      // Adicionando cabeçalhos para ajudar com CORS
+      final headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      };
+
       final response = await http
-          .get(
-            Uri.parse('$baseUrl/products'),
-            headers: {'Accept': 'application/json'},
-          )
+          .get(Uri.parse('$baseUrl/products'), headers: headers)
           .timeout(const Duration(seconds: 15));
+
+      print('Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         print('Resposta recebida com sucesso');
@@ -45,7 +49,7 @@ class ProductService {
           print('Produtos recebidos da API: ${productsData.length}');
 
           // Mapeia os dados para objetos Product
-          return productsData.map((json) => Product.fromJson(json)).toList();
+          return productsData.map((json) => ProductModel.fromJson(json)).toList();
         } else {
           print('Formato de resposta inesperado: ${response.body}');
           return [];
@@ -57,13 +61,38 @@ class ProductService {
       }
     } catch (e) {
       print('Erro ao buscar produtos: $e');
-      // Em caso de erro na API, retornar lista vazia
-      return [];
+      // Em caso de erro, tentar usar produtos mockados para teste
+      return _getMockProducts();
     }
   }
 
+  // Método para obter produtos mockados em caso de falha na API
+  List<ProductModel> _getMockProducts() {
+    print('Usando produtos mockados para teste');
+    return [
+      ProductModel(
+        id: '1',
+        name: 'Camiseta Masculina',
+        description: 'Camiseta oficial da Atlética',
+        price: 50.0,
+        stock: 10,
+        category: 'ROUPAS',
+        image: 'assets/images/camisetaa_masculina.png',
+      ),
+      ProductModel(
+        id: '2',
+        name: 'Caneca Oficial',
+        description: 'Caneca oficial da Atlética Biopark',
+        price: 25.0,
+        stock: 15,
+        category: 'CANECAS',
+        image: 'assets/images/caneca_personalizada.jpeg',
+      ),
+    ];
+  }
+
   // Método para buscar um produto específico pelo ID
-  Future<Product?> getProduct(String id) async {
+  Future<ProductModel?> getProduct(String id) async {
     final baseUrl = getBaseUrl();
     try {
       final response = await http
@@ -77,7 +106,7 @@ class ProductService {
         final Map<String, dynamic> responseData = json.decode(response.body);
 
         if (responseData.containsKey('data')) {
-          return Product.fromJson(responseData['data']);
+          return ProductModel.fromJson(responseData['data']);
         } else {
           return null;
         }
@@ -91,7 +120,7 @@ class ProductService {
   }
 
   // Método para buscar produtos por categoria
-  Future<List<Product>> getProductsByCategory(String category) async {
+  Future<List<ProductModel>> getProductsByCategory(String category) async {
     final baseUrl = getBaseUrl();
     try {
       final response = await http
@@ -106,7 +135,7 @@ class ProductService {
 
         if (responseData.containsKey('data') && responseData['data'] is List) {
           final List<dynamic> productsData = responseData['data'];
-          return productsData.map((json) => Product.fromJson(json)).toList();
+          return productsData.map((json) => ProductModel.fromJson(json)).toList();
         } else {
           return [];
         }

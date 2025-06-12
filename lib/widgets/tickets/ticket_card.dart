@@ -135,11 +135,11 @@ Color getTicketColor(String status) {
     case 'valid':
       return AppColors.yellow;
     case 'used':
-      return AppColors.white;
-    case 'expired':
       return AppColors.yellow;
+    case 'expired':
+      return AppColors.white;
     case 'unpaid':
-      return AppColors.lightGrey;
+      return AppColors.white.withAlpha(180);
     default:
       return AppColors.blue;
   }
