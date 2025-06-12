@@ -8,7 +8,7 @@ class TrainingService {
     if (kIsWeb) {
       return 'http://localhost:3001/api';
     } else {
-      return 'http://192.168.1.2:3001/api';
+      return 'http://10.200.71.122:3001/api';
     }
   }
 
