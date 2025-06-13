@@ -347,12 +347,12 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   }
 }
 
-void showTrainingModal(BuildContext context, Training training, List<String> _subscribedIds) {
+void showTrainingModal(BuildContext context, Training training, List<String> subscribedIds) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withOpacity(0.5),
-    builder: (_) => TrainingModal(training: training, isSubscribed: _subscribedIds.contains(training.id)),
+    builder: (_) => TrainingModal(isSubscribed: subscribedIds.contains(training.id)),
   );
 }
