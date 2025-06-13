@@ -8,6 +8,8 @@ import 'package:app_atletica/widgets/forms/custom_text_field.dart';
 import 'package:app_atletica/widgets/forms/custom_text_box.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/services/news_service.dart';
+import 'package:app_atletica/models/news_model.dart';
 
 class NewsRegistrationForm extends StatefulWidget {
   const NewsRegistrationForm({super.key});
@@ -17,17 +19,50 @@ class NewsRegistrationForm extends StatefulWidget {
 }
 
 class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
-  File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
-    if (image != null) {
+  File? _imageFile;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedImage != null) {
       setState(() {
-        _imageUrl = File(image.path);
+        _imageFile = File(pickedImage.path);
       });
+    }
+  }
+
+  Future<void> _saveNews() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Cria objeto News sem enviar imagem
+    final news = News(
+      id: '',
+      title: _titleController.text,
+      date: _dateController.text,
+      description: _descriptionController.text,
+      imageUrl: null, // imagem não está sendo enviada aqui
+    );
+
+    final success = await NewsService().createNews(news);
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Notícia salva com sucesso')),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao salvar notícia')),
+      );
     }
   }
 
@@ -50,9 +85,7 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                       children: [
                         const SizedBox(height: 10),
                         const Center(
-                          child: CustomTitleForms(
-                            title: 'CADASTRO DE NOTÍCIA',
-                          ),
+                          child: CustomTitleForms(title: 'CADASTRO DE NOTÍCIA'),
                         ),
                         GestureDetector(
                           onTap: _pickImage,
@@ -65,60 +98,38 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                             child: SizedBox(
                               width: double.infinity,
                               height: 250,
-                              child: _imageUrl != null // <--- Alteração aqui
-                                  ? Image.file( // <--- Usa Image.file para arquivos locais
-                                      _imageUrl!,
+                              child: _imageFile != null
+                                  ? Image.file(
+                                      _imageFile!,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: AppColors.lightGrey,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.broken_image, // Ícone para erro de arquivo
-                                              size: 50,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      errorBuilder: (_, __, ___) => _errorImage(),
                                     )
-                                  : Image.network( // <--- Mantém Image.network para placeholder inicial
-                                      'https://via.placeholder.com/350x150', // Placeholder de rede
+                                  : Image.network(
+                                      'https://via.placeholder.com/350x150',
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: AppColors.lightGrey,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              size: 50,
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      errorBuilder: (_, __, ___) => _errorImage(),
                                     ),
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Título', icon: Icons.create),
+                        CustomTextField(
+                          label: 'Título',
+                          icon: Icons.create,
+                          controller: _titleController,
+                        ),
                         CustomTextField(
                           label: 'Data',
                           icon: Icons.calendar_today,
+                          controller: _dateController,
                         ),
-                        // O campo de localização foi removido conforme solicitado
                         const SizedBox(height: 15),
-                        CustomTextBox(),
+                        CustomTextBox(controller: _descriptionController),
                         const SizedBox(height: 25),
                         Center(
                           child: CustomButton(
                             text: 'Salvar',
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                // Lógica para salvar os dados
-                                Navigator.pop(context);
-                              }
-                            },
+                            onPressed: _saveNews,
                           ),
                         ),
                       ],
@@ -131,6 +142,15 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
         ),
       ),
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
+    );
+  }
+
+  Widget _errorImage() {
+    return Container(
+      color: AppColors.lightGrey,
+      child: const Center(
+        child: Icon(Icons.broken_image, size: 50, color: Colors.red),
+      ),
     );
   }
 }

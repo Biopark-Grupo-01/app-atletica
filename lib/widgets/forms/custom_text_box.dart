@@ -2,14 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 
 class CustomTextBox extends StatelessWidget {
-  const CustomTextBox({super.key});
+  final TextEditingController? controller;
+  final String? initialValue;
+  final String? Function(String?)? validator;
+  final void Function(String?)? onSaved;
+
+  const CustomTextBox({
+    super.key,
+    this.controller,
+    this.initialValue,
+    this.validator,
+    this.onSaved,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: [
+          children: const [
             SizedBox(width: 9),
             Icon(Icons.description, color: AppColors.white),
             SizedBox(width: 10),
@@ -19,11 +31,14 @@ class CustomTextBox extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         TextFormField(
-          controller: TextEditingController(),
+          controller: controller,
+          initialValue: controller == null ? initialValue : null,
+          validator: validator,
+          onSaved: onSaved,
           maxLines: 5,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: AppColors.white),
@@ -33,7 +48,7 @@ class CustomTextBox extends StatelessWidget {
             ),
             contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           ),
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ],
     );

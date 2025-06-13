@@ -1,20 +1,67 @@
-import 'dart:ui';
+import 'dart:convert';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class TelaNoticiasDetalhes extends StatelessWidget {
   const TelaNoticiasDetalhes({super.key});
+
+  // Função para buscar notícia pelo id
+  Future<Map<String, dynamic>> fetchNewsById(String id) async {
+    final url = Uri.parse('http://10.200.142.159:3001/api/news/$id'); // ajuste a URL do seu backend
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      // Supondo que o backend retorne um objeto da notícia diretamente em "data"
+      return jsonData['data'];
+    } else {
+      throw Exception('Falha ao carregar notícia');
+    }
+  }
+
+  // Verifica se é URL de imagem de rede
+  bool _isNetworkUrl(String path) {
+    return path.startsWith('http://') || path.startsWith('https://');
+  }
+
+  // Widget da imagem da notícia
+  Widget _buildNewsImage(String imageUrl) {
+    if (_isNetworkUrl(imageUrl)) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset(
+            "assets/images/placeholder.png",
+            fit: BoxFit.cover,
+          );
+        },
+      );
+    } else {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey,
+            child: const Center(
+              child: Icon(Icons.image_not_supported, size: 50, color: Colors.white),
+            ),
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Recebe os argumentos passados para esta tela
-    final Map<String, String>? newsItem =
-        ModalRoute.of(context)!.settings.arguments as Map<String, String>?;
+    // Espera receber o id da notícia na rota
+    final String? newsId = ModalRoute.of(context)!.settings.arguments as String?;
 
-    // Garante que newsItem não é nulo e extrai os dados
-    if (newsItem == null) {
+    if (newsId == null) {
       return Scaffold(
         backgroundColor: const Color(0xFF001835),
         appBar: AppBar(
@@ -27,190 +74,173 @@ class TelaNoticiasDetalhes extends StatelessWidget {
         ),
         body: const Center(
           child: Text(
-            'Erro: Item de notícia não encontrado.',
+            'Erro: ID da notícia não fornecido.',
             style: TextStyle(color: Colors.white),
           ),
         ),
       );
     }
 
-    final String imageUrl = newsItem['imageUrl'] ?? 'assets/images/placeholder.png';
-    final String title = newsItem['title'] ?? 'Título da Notícia Não Informado';
-    final String date = newsItem['date'] ?? 'Data Não Informada';
-    final String description = newsItem['description'] ?? 'Descrição da notícia não disponível.';
-
-    // Função auxiliar para verificar se a string é uma URL válida
-    bool _isNetworkUrl(String path) {
-      return path.startsWith('http://') || path.startsWith('https://');
-    }
-
-    Widget _buildNewsImage() {
-      if (_isNetworkUrl(imageUrl)) {
-        return Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            // Fallback para asset local se a URL de rede falhar
-            return Image.asset(
-              "assets/images/placeholder.png",
-              fit: BoxFit.cover,
-            );
-          },
-        );
-      } else {
-        return Image.asset(
-          imageUrl, // Isso cobrirá 'assets/images/placeholder.png' se imageUrl for isso
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            // Em caso de erro com o asset local (improvável, mas para segurança)
-            return Container(
-              color: Colors.grey,
-              child: const Center(
-                child: Icon(Icons.image_not_supported, size: 50, color: Colors.white),
-              ),
-            );
-          },
-        );
-      }
-    }
-
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: const Color(0xFF001835),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Imagem principal com o botão de voltar
-            Stack(
-              children: [
-                SizedBox(
-                  height: screenHeight * 0.3,
-                  width: double.infinity,
-                  child: _buildNewsImage(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: fetchNewsById(newsId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Erro ao carregar notícia: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.white),
                 ),
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 12,
-                  left: 12,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                'Notícia não encontrada.',
+                style: TextStyle(color: Colors.white),
+              ),
+            );
+          } else {
+            final newsItem = snapshot.data!;
+            final String imageUrl = newsItem['imageUrl'] ?? 'assets/images/placeholder.png';
+            final String title = newsItem['title'] ?? 'Título da Notícia Não Informado';
+            final String date = newsItem['date'] ?? 'Data Não Informada';
+            final String description = newsItem['description'] ?? 'Descrição da notícia não disponível.';
 
-            // Conteúdo da notícia
-            Padding(
-              padding: const EdgeInsets.all(16),
+            return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // Imagem principal com botão voltar
+                  Stack(
                     children: [
-                      const Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            date,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
+                      SizedBox(
+                        height: screenHeight * 0.3,
+                        width: double.infinity,
+                        child: _buildNewsImage(imageUrl),
+                      ),
+                      Positioned(
+                        top: MediaQuery.of(context).padding.top + 12,
+                        left: 12,
+                        child: GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
-                          const SizedBox(height: 2),
-                        ],
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 36), // Espaçamento antes da seção "Descrição da Notícia"
 
-                  // Descrição da Notícia
-                  _sectionTitle(Icons.notes, 'Descrição da Notícia'),
-                  const SizedBox(height: 16),
-                  Text(
-                    description,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 24), // Espaçamento antes da seção "Organizado por"
-
-                  // Informações do organizador
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Color.fromARGB(128, 52, 90, 167), width: 0.5),
-                        bottom: BorderSide(color: Color.fromARGB(128, 52, 90, 167), width: 0.5),
-                      ),
-                    ),
-                    child: Row(
+                  // Conteúdo da notícia
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipOval(
-                          child: Image.asset(
-                            "assets/images/emblema.png",
-                            width: 55,
-                            height: 55,
-                            fit: BoxFit.cover,
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(height: 16),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20),
+                            const SizedBox(width: 12),
+                            Text(
+                              date,
+                              style: const TextStyle(color: Colors.white, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 36),
+
+                        _sectionTitle(Icons.notes, 'Descrição da Notícia'),
+                        const SizedBox(height: 16),
+                        Text(
+                          description,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              top: BorderSide(color: Color.fromARGB(128, 52, 90, 167), width: 0.5),
+                              bottom: BorderSide(color: Color.fromARGB(128, 52, 90, 167), width: 0.5),
+                            ),
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                'Organizado por',
-                                style: TextStyle(color: Colors.white60, fontSize: 12),
-                              ),
-                              Text(
-                                'Associação Atlética Tigre Branco',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                              ClipOval(
+                                child: Image.asset(
+                                  "assets/images/emblema.png",
+                                  width: 55,
+                                  height: 55,
+                                  fit: BoxFit.cover,
                                 ),
-                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Organizado por',
+                                      style: TextStyle(color: Colors.white60, fontSize: 12),
+                                    ),
+                                    Text(
+                                      'Associação Atlética Tigre Branco',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
+                        const SizedBox(height: 72),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 72),
                 ],
               ),
-            ),
-          ],
-        ),
+            );
+          }
+        },
       ),
-      bottomNavigationBar: CustomBottomNavBar(currentIndex: 3),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 3),
     );
   }
 }
 
-// Função auxiliar para títulos de seção
 Widget _sectionTitle(IconData icon, String title) {
   return Row(
     children: [

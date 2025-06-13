@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const NewsScreen());
@@ -24,6 +26,19 @@ class NewsScreen extends StatelessWidget {
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  // Função para buscar notícias do backend
+  Future<List<News>> fetchNews() async {
+    final url = Uri.parse('http://10.200.142.159:3001/api/news'); // ajuste para seu backend
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((json) => News.fromJson(json)).toList();
+    } else {
+      throw Exception('Falha ao carregar notícias');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,26 +78,55 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              // News Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: _buildCard(
-                  'TÍTULO NOTÍCIA',
-                  'Data',
-                  'Descrição',
-                  const Color(0xFFFFD700),
-                ),
-              ),
-
-              // Event Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: _buildCard(
-                  'TÍTULO EVENTO',
-                  'Data',
-                  'Descrição',
-                  const Color(0xFFFFD700),
-                ),
+              // Lista de notícias carregada do backend
+              FutureBuilder<List<News>>(
+                future: fetchNews(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(color: Colors.white),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'Erro ao carregar notícias: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'Nenhuma notícia disponível',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  } else {
+                    final newsList = snapshot.data!;
+                    return ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: newsList.length,
+                      itemBuilder: (context, index) {
+                        final news = newsList[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: _buildCard(
+                            news.title,
+                            news.date,
+                            news.content,
+                            const Color(0xFFFFD700),
+                            news.imageUrl,
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ],
           ),
@@ -91,7 +135,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCard(String title, String metadata, String description, Color titleColor) {
+  Widget _buildCard(
+    String title,
+    String metadata,
+    String description,
+    Color titleColor, [
+    String? imageUrl,
+  ]) {
     return Container(
       width: double.infinity,
       height: 220,
@@ -109,7 +159,22 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.grey[200],
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                image: imageUrl != null
+                    ? DecorationImage(
+                        image: NetworkImage(imageUrl),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
               ),
+              child: imageUrl == null
+                  ? const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    )
+                  : null,
             ),
           ),
           Expanded(
@@ -141,6 +206,8 @@ class HomeScreen extends StatelessWidget {
                       color: Colors.black87,
                       fontSize: 14,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -148,6 +215,32 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class News {
+  final String id;
+  final String title;
+  final String date;
+  final String content;
+  final String? imageUrl;
+
+  News({
+    required this.id,
+    required this.title,
+    required this.date,
+    required this.content,
+    this.imageUrl,
+  });
+
+  factory News.fromJson(Map<String, dynamic> json) {
+    return News(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      date: json['date'] ?? '',
+      content: json['content'] ?? '',
+      imageUrl: json['imageUrl'],
     );
   }
 }
