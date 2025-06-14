@@ -14,14 +14,14 @@ class NewsScreen extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.robotoTextTheme(),
       ),
-      home: const HomeScreen(),
+      home: const NewsHomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class NewsHomeScreen extends StatelessWidget {
+  const NewsHomeScreen({super.key});
 
   // Função para buscar notícias do backend
   Future<List<News>> fetchNews() async {
