@@ -3,11 +3,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:app_atletica/models/news_model.dart';
+import 'package:app_atletica/models/news_event_model.dart';
+import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
 
-class NewsService {
+class EventsNewsService {
   // URLs dos endpoints
   static const String _newsEndpoint = '/api/news';
   static const String _eventsEndpoint = '/api/events';
@@ -57,7 +58,7 @@ class NewsService {
   // Método para buscar eventos reais do backend
   static Future<List<Map<String, dynamic>>> getEvents(BuildContext context) async {
     final baseUrl = getBaseUrl();
-    final endpoint = '/news'; // Endpoint específico para eventos
+    final endpoint = '/events'; // Endpoint específico para eventos
     
     print('Fazendo requisição para eventos: $baseUrl$endpoint');
     

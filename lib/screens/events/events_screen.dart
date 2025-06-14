@@ -36,7 +36,7 @@ class _EventsScreenState extends State<EventsScreen> {
       });
 
       // Carregando dados através do serviço atualizado
-      final data = await EventsNewsService.loadData(context);
+      final data = await NewsService.loadData(context);
 
       setState(() {
         // Convertendo para o tipo correto
