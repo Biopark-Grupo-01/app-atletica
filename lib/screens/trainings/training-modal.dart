@@ -2,15 +2,18 @@ import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/services/training_service.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TrainingModal extends StatefulWidget  {
   final Training training;
   final bool isSubscribed;
+  final void Function()? onClose;
 
   const TrainingModal({
     super.key,
     required this.training,
     this.isSubscribed = false,
+    this.onClose,
   });
 
   @override
@@ -36,6 +39,15 @@ class _TrainingModalState extends State<TrainingModal> {
       _loading = false;
       if (success) _subscribed = true;
     });
+  }
+
+   String formatDate(String rawDate) {
+    try {
+      final parsedDate = DateTime.parse(rawDate);
+      return DateFormat('dd/MM/yyyy').format(parsedDate);
+    } catch (e) {
+      return rawDate;
+    }
   }
 
   @override
@@ -77,11 +89,41 @@ class _TrainingModalState extends State<TrainingModal> {
                             fit: BoxFit.cover,
                           ),
                         ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, left: 2, right: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    formatDate(training.date),
+                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.place, color: Colors.white70, size: 18),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    training.place,
+                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
                         const SizedBox(height: 16),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            training.modality.toUpperCase(),
+                            training.title.toUpperCase(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,

@@ -34,20 +34,24 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   int _selectedTabIndex = 0;
   List<String> _selectedCategories = [];
 
+  final ScrollController _scrollController = ScrollController();
+
+
   @override
   void initState() {
     super.initState();
     _loadData();
   }
 
-  Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+  Future<void> _loadData({bool preserveScroll = false}) async {
+    if (!preserveScroll) {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+    }
 
     try {
-      // Substitua pelo ID real do usuário logado
       const userId = '3e66159f-efaa-4c74-8bce-51c1fef3622e';
 
       final subscribedIds = await _trainingService.getSubscribedTrainingIds(userId);
@@ -100,6 +104,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                     ),
                   )
                 : ListView(
+                    controller: _scrollController,
                     padding: EdgeInsets.zero,
                     children: [
                       Padding(
@@ -177,7 +182,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                     padding: const EdgeInsets.only(bottom: 16),
                                     child: GestureDetector(
                                       onTap: () {
-                                        showTrainingModal(context, event, _subscribedIds);
+                                        showTrainingModal(context, event, _subscribedIds, _loadData, _scrollController);
                                       },
                                       child: _buildEventCard(
                                         event.title,
@@ -347,12 +352,31 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   }
 }
 
-void showTrainingModal(BuildContext context, Training training, List<String> _subscribedIds) {
-  showModalBottomSheet(
+void showTrainingModal(
+  BuildContext context,
+  Training training,
+  List<String> _subscribedIds,
+  Future<void> Function({bool preserveScroll}) _loadData,
+  ScrollController _scrollController,
+) async {
+  final double currentScrollOffset = _scrollController.offset;
+
+  await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withOpacity(0.5),
-    builder: (_) => TrainingModal(training: training, isSubscribed: _subscribedIds.contains(training.id)),
-  );
+    builder: (_) => TrainingModal(
+      training: training,
+      isSubscribed: _subscribedIds.contains(training.id),
+      onClose: () async {
+        await _loadData(preserveScroll: true);
+      },
+    ),
+  ).then((_) async {
+    await _loadData(preserveScroll: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollController.jumpTo(currentScrollOffset);
+    });
+  });
 }
