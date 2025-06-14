@@ -9,7 +9,7 @@ import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import './mock_user_repository.dart';
-import './user_model.dart';
+import '../../models/user_model.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class EditProfileScreen extends StatefulWidget {

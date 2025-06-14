@@ -7,7 +7,6 @@ class EventItem extends StatelessWidget {
   final String location;
   final String title;
   final String description;
-  final bool hideLocationIcon;
 
   const EventItem({
     super.key,
@@ -16,7 +15,6 @@ class EventItem extends StatelessWidget {
     required this.location,
     required this.title,
     required this.description,
-    this.hideLocationIcon = false,
   });
 
   @override
@@ -65,14 +63,12 @@ class EventItem extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  if (!hideLocationIcon) ...[
-                    const Icon(
-                      Icons.location_on,
-                      size: 16,
-                      color: AppColors.lightGrey,
-                    ),
-                    const SizedBox(width: 2),
-                  ],
+                  const Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: AppColors.lightGrey,
+                  ),
+                  const SizedBox(width: 2),
                   Text(
                     location,
                     style: const TextStyle(

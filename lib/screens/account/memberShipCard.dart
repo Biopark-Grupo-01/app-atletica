@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app_atletica/screens/account/user_model.dart';
+import 'package:app_atletica/models/user_model.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 
 class MembershipCardScreen extends StatelessWidget {

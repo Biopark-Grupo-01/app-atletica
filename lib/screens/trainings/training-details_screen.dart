@@ -409,4 +409,3 @@ Widget _sectionTitle(IconData icon, String title) {
     ],
   );
 }
-

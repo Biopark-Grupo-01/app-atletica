@@ -1,10 +1,10 @@
+import 'package:app_atletica/services/news_service.dart';
+import 'package:app_atletica/widgets/news/news_item.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:app_atletica/theme/app_colors.dart';
-import 'package:app_atletica/services/events_news_service.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
-import 'package:app_atletica/widgets/news/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 
 class EventsScreen extends StatefulWidget {
@@ -15,11 +15,12 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  List<Map<String, String>> news = [];
-  List<Map<String, String>> events = [];
+  // Alterando para Map<String, dynamic> para compatibilidade com a API
+  List<Map<String, dynamic>> news = [];
+  List<Map<String, dynamic>> events = [];
   bool isLoading = true;
   String? error;
-  int _selectedTabIndex = 0; // 0 para EVENTOS, 1 para NOTÍCIAS
+  int _selectedTabIndex = 0;
 
   @override
   void initState() {
@@ -29,13 +30,18 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Future<void> _loadData() async {
     try {
+      setState(() {
+        isLoading = true;
+        error = null;
+      });
+
+      // Carregando dados através do serviço atualizado
       final data = await EventsNewsService.loadData(context);
-      final newsList = data['news'] ?? [];
-      final eventsList = data['events'] ?? [];
 
       setState(() {
-        news = newsList;
-        events = eventsList;
+        // Convertendo para o tipo correto
+        news = List<Map<String, dynamic>>.from(data['news'] ?? []);
+        events = List<Map<String, dynamic>>.from(data['events'] ?? []);
         isLoading = false;
       });
     } catch (e) {
@@ -43,16 +49,21 @@ class _EventsScreenState extends State<EventsScreen> {
         error = e.toString();
         isLoading = false;
       });
+      print('Erro ao carregar dados: $e');
     }
   }
 
-  DateTime _parseDate(String dateStr) {
+  DateTime _parseDate(String? dateStr) {
+    if (dateStr == null) return DateTime(2000);
     try {
       return DateFormat('dd/MM/yyyy').parse(dateStr);
     } catch (e) {
-      // Retorna uma data padrão em caso de erro na análise,
-      // para evitar quebras no sorting.
-      return DateTime(2000);
+      try {
+        // Tentativa alternativa de parsing (caso a data venha em outro formato do backend)
+        return DateTime.parse(dateStr);
+      } catch (e) {
+        return DateTime(2000);
+      }
     }
   }
 
@@ -61,14 +72,14 @@ class _EventsScreenState extends State<EventsScreen> {
     final currentList = _selectedTabIndex == 0 ? events : news;
     final sortedList = [...currentList];
     sortedList.sort((a, b) {
-      final dateA = _parseDate(a['date'] ?? '');
-      final dateB = _parseDate(b['date'] ?? '');
-      return dateB.compareTo(dateA); // Ordena da mais nova para a mais antiga
+      final dateA = _parseDate(a['date']?.toString());
+      final dateB = _parseDate(b['date']?.toString());
+      return dateB.compareTo(dateA);
     });
 
     return Scaffold(
       backgroundColor: AppColors.blue,
-      appBar: CustomAppBar(),
+      appBar: const CustomAppBar(),
       body: SafeArea(
         child: isLoading
             ? const Center(
@@ -76,9 +87,25 @@ class _EventsScreenState extends State<EventsScreen> {
               )
             : error != null
                 ? Center(
-                    child: Text(
-                      'Erro: $error',
-                      style: const TextStyle(color: AppColors.white),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Erro ao carregar dados:',
+                          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          error!,
+                          style: const TextStyle(color: AppColors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _loadData,
+                          child: const Text('Tentar novamente'),
+                        )
+                      ],
                     ),
                   )
                 : Padding(
@@ -95,59 +122,55 @@ class _EventsScreenState extends State<EventsScreen> {
                         ),
                         const SizedBox(height: 20),
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: sortedList.length,
-                            itemBuilder: (context, index) {
-                              final item = sortedList[index];
-                              return Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      // Lógica condicional para a navegação
-                                      if (_selectedTabIndex == 0) {
-                                        // Aba de EVENTOS selecionada
-                                        // Certifique-se de que '/trainingDetail' é a rota correta para detalhes de evento
-                                        // Se for um evento, talvez o nome da rota devesse ser algo como '/eventDetail'
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/trainingDetail', // Rota para detalhes de EVENTO
-                                          arguments: item,
-                                        );
-                                      } else {
-                                        // Aba de NOTÍCIAS selecionada
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/newsDetail', // Rota para detalhes de NOTÍCIA
-                                          arguments: item,
-                                        );
-                                      }
-                                    },
-                                    child: _selectedTabIndex == 0
-                                        ? EventItem(
-                                            imageUrl: item['imageUrl'] ?? '',
-                                            date: item['date'] ?? '',
-                                            location: item['location'] ?? '',
-                                            title: item['title'] ?? '',
-                                            description: item['description'] ?? '',
-                                          )
-                                        : NewsItem(
-                                            imageUrl: item['imageUrl'] ?? '',
-                                            date: item['date'] ?? '',
-                                            title: item['title'] ?? '',
-                                            description: item['description'] ?? '',
-                                          ),
+                          child: sortedList.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    _selectedTabIndex == 0 
+                                      ? 'Nenhum evento encontrado.' 
+                                      : 'Nenhuma notícia encontrada.',
+                                    style: const TextStyle(color: AppColors.white),
                                   ),
-                                  const SizedBox(height: 40),
-                                ],
-                              );
-                            },
-                          ),
+                                )
+                              : ListView.builder(
+                                  itemCount: sortedList.length,
+                                  itemBuilder: (context, index) {
+                                    final item = sortedList[index];
+                                    return Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/trainingDetail',
+                                              arguments: item,
+                                            );
+                                          },
+                                          child: _selectedTabIndex == 0
+                                              ? EventItem(
+                                                  imageUrl: item['imageUrl']?.toString() ?? '',
+                                                  date: item['date']?.toString() ?? '',
+                                                  location: item['location']?.toString() ?? '',
+                                                  title: item['title']?.toString() ?? '',
+                                                  description: item['description']?.toString() ?? '',
+                                                )
+                                              : NewsItem(
+                                                  imageUrl: item['imageUrl']?.toString() ?? '',
+                                                  date: item['date']?.toString() ?? '',
+                                                  title: item['title']?.toString() ?? '',
+                                                  description: item['description']?.toString() ?? '',
+                                                ),
+                                        ),
+                                        const SizedBox(height: 40),
+                                      ],
+                                    );
+                                  },
+                                ),
                         ),
                       ],
                     ),
                   ),
       ),
-      bottomNavigationBar: CustomBottomNavBar(
+      bottomNavigationBar: const CustomBottomNavBar(
         currentIndex: 3 
       ),
     );

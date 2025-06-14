@@ -6,6 +6,7 @@ class NewsItem extends StatelessWidget {
   final String date;
   final String title;
   final String description;
+  final bool hideLocationIcon;
 
   const NewsItem({
     super.key,
@@ -13,6 +14,7 @@ class NewsItem extends StatelessWidget {
     required this.date,
     required this.title,
     required this.description,
+    this.hideLocationIcon = false,
   });
 
   @override

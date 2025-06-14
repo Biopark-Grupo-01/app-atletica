@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:app_atletica/theme/app_colors.dart';
-import 'package:app_atletica/screens/account/user_model.dart';
+import 'package:app_atletica/models/user_model.dart';
 import 'package:app_atletica/widgets/menu_card.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/screens/account/edit_profile_screen.dart';

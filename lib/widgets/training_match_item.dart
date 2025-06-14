@@ -1,3 +1,4 @@
+import 'package:app_atletica/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class TrainingMatchItem extends StatelessWidget {
@@ -5,8 +6,8 @@ class TrainingMatchItem extends StatelessWidget {
   final String location;
   final String title;
   final String description;
-  final String category;  // Categoria
-  final String type;      // Tipo (TREINO ou AMISTOSO)
+  final String modality;  // Substitui category
+  final bool isMatch;     // Substitui type
 
   const TrainingMatchItem({
     super.key,
@@ -14,16 +15,16 @@ class TrainingMatchItem extends StatelessWidget {
     required this.description,
     required this.date,
     required this.location,
-    required this.category,
-    required this.type,
+    required this.modality,
+    required this.isMatch, // true para AMISTOSO, false para TREINO
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: AppColors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -31,9 +32,9 @@ class TrainingMatchItem extends StatelessWidget {
         children: [
           // Título
           Text(
-            type == 'TREINOS' ? 'Treino: $title' : 'Amistoso: $title',
+            isMatch ? 'Amistoso: $title' : 'Treino: $title',
             style: const TextStyle(
-              color: Color(0xFFFFD700),
+              color: AppColors.yellow,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -53,33 +54,32 @@ class TrainingMatchItem extends StatelessWidget {
           // Informações
           Row(
             children: [
-              const Icon(Icons.calendar_today, color: Colors.white, size: 16),
+              const Icon(Icons.calendar_today, color: AppColors.white, size: 16),
               const SizedBox(width: 6),
               Text(
                 date,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+                style: const TextStyle(color: AppColors.white, fontSize: 14),
               ),
               const SizedBox(width: 12),
-              const Icon(Icons.location_on, color: Colors.white, size: 16),
-              const SizedBox(width: 6),
-              Expanded(
+              const Icon(Icons.location_on, color: AppColors.white, size: 16),              const SizedBox(width: 6),
+              Flexible(
                 child: Text(
                   location,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: const TextStyle(color: AppColors.white, fontSize: 14),
                 ),
               ),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFD700),
+                  color: AppColors.yellow,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  category,
+                  modality.toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: AppColors.black,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
