@@ -65,6 +65,27 @@ class TrainingService {
     }
   }
 
+  Future<bool> unsubscribeFromTraining(String subscriptionId) async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/subscriptions/$subscriptionId'),
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao desinscrever: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao desinscrever: $e');
+      return false;
+    }
+  }
+
   Future<List<String>> getSubscribedTrainingIds(String userId) async {
     final baseUrl = getBaseUrl();
 
@@ -90,6 +111,24 @@ class TrainingService {
     }
   }
 
-
-
+  Future<List<Map<String, dynamic>>> getUserSubscriptions(String userId) async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/subscriptions?userId=$userId'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'];
+        // Retorna a lista de inscrições completas
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Erro ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro ao buscar inscrições: $e');
+      return [];
+    }
+  }
 }

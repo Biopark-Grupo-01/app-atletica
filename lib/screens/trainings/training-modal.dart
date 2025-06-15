@@ -7,12 +7,14 @@ import 'package:intl/intl.dart';
 class TrainingModal extends StatefulWidget  {
   final Training training;
   final bool isSubscribed;
+  final String? subscriptionId;
   final void Function()? onClose;
 
   const TrainingModal({
     super.key,
     required this.training,
     this.isSubscribed = false,
+    this.subscriptionId,
     this.onClose,
   });
 
@@ -38,6 +40,19 @@ class _TrainingModalState extends State<TrainingModal> {
     setState(() {
       _loading = false;
       if (success) _subscribed = true;
+    });
+  }
+
+  Future<void> _handleUnsubscribe() async {
+    setState(() => _loading = true);
+    if (widget.subscriptionId == null) {
+      setState(() { _loading = false; });
+      return;
+    }
+    final success = await _service.unsubscribeFromTraining(widget.subscriptionId!);
+    setState(() {
+      _loading = false;
+      if (success) _subscribed = false;
     });
   }
 
@@ -198,6 +213,26 @@ class _TrainingModalState extends State<TrainingModal> {
                             ),
                     ),
                   ),
+                  if (_subscribed) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 45,
+                      child: ElevatedButton(
+                        onPressed: _loading ? null : _handleUnsubscribe,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[400],
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: _loading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text('Desinscrever', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                 ],
               ),

@@ -5,6 +5,7 @@ import 'package:app_atletica/services/training_service.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 
 import 'package:intl/intl.dart';
 
@@ -28,6 +29,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   final TrainingService _trainingService = TrainingService();
   List<Training> _trainings = [];
   List<String> _subscribedIds = [];
+  List<Map<String, String>> _userSubscriptions = [];
   bool _isLoading = true;
   String? _error;
 
@@ -50,15 +52,16 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
         _error = null;
       });
     }
-
     try {
       const userId = '3e66159f-efaa-4c74-8bce-51c1fef3622e';
-
-      final subscribedIds = await _trainingService.getSubscribedTrainingIds(userId);
+      final userSubscriptions = await _trainingService.getUserSubscriptions(userId);
       final trainings = await _trainingService.getTrainings();
-
       setState(() {
-        _subscribedIds = subscribedIds;
+        _userSubscriptions = userSubscriptions.map((sub) => {
+          'trainingId': sub['training']['id'] as String,
+          'subscriptionId': sub['id'] as String,
+        }).toList();
+        _subscribedIds = _userSubscriptions.map((sub) => sub['trainingId']!).toList();
         _trainings = trainings;
         _isLoading = false;
       });
@@ -182,7 +185,15 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                     padding: const EdgeInsets.only(bottom: 16),
                                     child: GestureDetector(
                                       onTap: () {
-                                        showTrainingModal(context, event, _subscribedIds, _loadData, _scrollController);
+                                        final sub = _userSubscriptions.firstWhereOrNull((sub) => sub['trainingId'] == event.id);
+                                        showTrainingModal(
+                                          context,
+                                          event,
+                                          _subscribedIds,
+                                          _loadData,
+                                          _scrollController,
+                                          subscriptionId: sub != null ? sub['subscriptionId'] : null,
+                                        );
                                       },
                                       child: _buildEventCard(
                                         event.title,
@@ -358,9 +369,9 @@ void showTrainingModal(
   List<String> _subscribedIds,
   Future<void> Function({bool preserveScroll}) _loadData,
   ScrollController _scrollController,
+  {String? subscriptionId}
 ) async {
   final double currentScrollOffset = _scrollController.offset;
-
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -369,6 +380,7 @@ void showTrainingModal(
     builder: (_) => TrainingModal(
       training: training,
       isSubscribed: _subscribedIds.contains(training.id),
+      subscriptionId: subscriptionId,
       onClose: () async {
         await _loadData(preserveScroll: true);
       },
