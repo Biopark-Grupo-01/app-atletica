@@ -29,7 +29,8 @@ class _EventsScreenState extends State<EventsScreen> {
 
   Future<void> _loadData() async {
     try {
-      final data = await EventsNewsService.loadData(context);
+      final service = EventsNewsService();
+      final data = await service.loadData(context);
       final newsList = data['news'] ?? [];
       final eventsList = data['events'] ?? [];
 

@@ -1,33 +1,28 @@
-// import 'dart:convert';
+import 'dart:convert';
 import 'package:app_atletica/models/training_model.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/models/news_event_model.dart';
-import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
 
 class EventsNewsService {
-  static Future<Map<String, dynamic>> loadData(BuildContext context) async {
-    // Mock data for now
-    final news = [
-      {
-        'imageUrl': 'https://picsum.photos/300/150',
-        'date': '15/05/2025',
-        'location': 'Toledo',
-        'title': 'Acesso Rápido',
-        'description': 'Foi realizado alterações nos botões de acesso rápido',
-      },
-      {
-        'imageUrl': 'https://picsum.photos/301/150',
-        'date': '22/05/2025',
-        'location': 'Toledo',
-        'title': 'Notícia do Backend',
-        'description': 'Essa notícia veio da API.',
-      },
-    ];
+  // Endpoints e cache keys
+  static const String _newsEndpoint = '/news';
+  static const String _newsCache = 'news_cache';
+  static const String _eventsEndpoint = '/events';
+  static const String _trainingsEndpoint = '/trainings';
+
+  Future<Map<String, dynamic>> loadData(BuildContext context) async {
+    // Exemplo de retorno mockado
+    return {
+      'news': _getMockNews(),
+      'events': _getMockEvents(),
+      'trainings': _getMockTrainings(),
+    };
+  }
 
   // Método para carregar notícias com cache
-  static Future<List<NewsModel>> getNews(BuildContext context) async {
+  Future<List<NewsModel>> getNews(BuildContext context) async {
     try {
       if (ApiService.useMockData) {
         final mockData = _getMockNews();
@@ -123,7 +118,7 @@ class EventsNewsService {
     ];
 
   // Método para adicionar ou atualizar uma notícia
-  static Future<bool> saveNews(BuildContext context, NewsModel news) async {
+  Future<bool> saveNews(BuildContext context, NewsModel news) async {
     try {
       if (ApiService.useMockData) {
         // Simula um atraso e sucesso
@@ -148,7 +143,7 @@ class EventsNewsService {
   }
 
   // Método para adicionar ou atualizar um evento
-  static Future<bool> saveEvent(BuildContext context, EventModel event) async {
+  Future<bool> saveEvent(BuildContext context, EventModel event) async {
     try {
       if (ApiService.useMockData) {
         // Simula um atraso e sucesso
@@ -173,7 +168,7 @@ class EventsNewsService {
   }
 
   // Método para adicionar ou atualizar um treino
-  static Future<bool> saveTraining(BuildContext context, TrainingModel training) async {
+  Future<bool> saveTraining(BuildContext context, Training training) async {
     try {
       if (ApiService.useMockData) {
         // Simula um atraso e sucesso
@@ -184,9 +179,9 @@ class EventsNewsService {
         final method = training.id.isNotEmpty ? 'put' : 'post';
         
         if (method == 'put') {
-          await ApiService.put(context, endpoint, body: training.toJson());
+          await ApiService.put(context, endpoint, body: training.toMapForUI());
         } else {
-          await ApiService.post(context, endpoint, body: training.toJson());
+          await ApiService.post(context, endpoint, body: training.toMapForUI());
         }
         
         return true;
@@ -198,7 +193,7 @@ class EventsNewsService {
   }
 
   // Dados mockados para notícias
-  static List<NewsModel> _getMockNews() {
+  List<NewsModel> _getMockNews() {
     return [
       NewsModel(
         id: '1',
@@ -228,7 +223,7 @@ class EventsNewsService {
   }
 
   // Dados mockados para eventos
-  static List<EventModel> _getMockEvents() {
+  List<EventModel> _getMockEvents() {
     return [
       EventModel(
         id: '1',
@@ -258,43 +253,55 @@ class EventsNewsService {
   }
 
   // Dados mockados para treinos
-  static List<TrainingModel> _getMockTrainings() {
+  List<Training> _getMockTrainings() {
     return [
-      TrainingModel(
+      Training(
         id: '1',
-        type: 'TREINOS',
-        category: 'Basquete',
-        date: '03/05/2025',
-        location: 'Ginásio Central',
         title: 'Treino de Arremesso',
         description: 'Foco em fundamentos e agilidade.',
+        modality: 'Basquete',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Ginásio Central',
+        date: '03/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
       ),
-      TrainingModel(
+      Training(
         id: '2',
-        type: 'AMISTOSOS',
-        category: 'Futebol',
-        date: '05/05/2025',
-        location: 'Estádio Tigre',
         title: 'Amistoso com Raposa',
         description: 'Jogo preparatório para o torneio.',
+        modality: 'Futebol',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Estádio Tigre',
+        date: '05/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
       ),
-      TrainingModel(
+      Training(
         id: '3',
-        type: 'AMISTOSOS',
-        category: 'Futsal',
-        date: '10/06/2025',
-        location: 'Ginásio de Esportes',
-        title: 'Amistoso de Integração',
-        description: 'Jogo amistoso entre turmas do curso.',
+        title: 'Amistoso com Raposa',
+        description: 'Jogo preparatório para o torneio.',
+        modality: 'Futebol',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Estádio Tigre',
+        date: '05/05/2025',
+        time: '00:00:00',
+        isSubscribed: false,
       ),
-      TrainingModel(
+      Training(
         id: '4',
-        type: 'TREINOS',
-        category: 'Vôlei',
-        date: '12/06/2025',
-        location: 'Quadra Poliesportiva',
         title: 'Treino de Manchete',
         description: 'Aprimoramento de técnicas de defesa e recepção.',
+        modality: 'Vôlei',
+        coach: 'Não informado',
+        responsible: 'Não informado',
+        place: 'Quadra Poliesportiva',
+        date: '12/06/2025',
+        time: '00:00:00',
+        isSubscribed: false,
       ),
     ];
   }
