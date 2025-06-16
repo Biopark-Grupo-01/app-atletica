@@ -106,17 +106,6 @@ class AccountSettingsScreen extends StatelessWidget {
                                   },
                                 ),
                               ),
-                              // Positioned(
-                              //   bottom: 10,
-                              //   right: 0,
-                              //   child: IconButton(
-                              //     icon: const Icon(Icons.edit),
-                              //     color: AppColors.white,
-                              //     onPressed: () {
-                              //       Navigator.pushNamed(context, '/edit_profile');
-                              //     },
-                              //   ),
-                              // ),
                             ],
                           ),
                 ),
@@ -144,7 +133,7 @@ class AccountSettingsScreen extends StatelessWidget {
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
                     child: Column(
-                      spacing: 25,
+                      spacing: MediaQuery.of(context).size.height * 0.025,
                       children: [
                         MenuCard(
                           icon: FontAwesomeIcons.solidCircleUser,

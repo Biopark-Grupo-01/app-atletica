@@ -17,14 +17,14 @@ class MenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      height: 85,
+      height: MediaQuery.of(context).size.height * 0.1,
       decoration: BoxDecoration(
         color: AppColors.blue,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.yellow),
       ),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.yellow, size: 35),
+        leading: Icon(icon, color: AppColors.yellow),
         title: Text(
           title,
           style: const TextStyle(

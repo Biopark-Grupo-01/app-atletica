@@ -11,7 +11,6 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double iconSize = 30;
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: (index) {
@@ -30,23 +29,23 @@ class CustomBottomNavBar extends StatelessWidget {
       showUnselectedLabels: false, // remove o texto dos itens não selecionados
       items: [
         BottomNavigationBarItem(
-          icon: Icon(FontAwesomeIcons.house, size: iconSize),
+          icon: Icon(FontAwesomeIcons.house),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(FontAwesomeIcons.personRunning, size: iconSize),
+          icon: Icon(FontAwesomeIcons.personRunning),
           label: 'Treinos e Amistosos',
         ),
         BottomNavigationBarItem(
-          icon: Icon(FontAwesomeIcons.tag, size: iconSize),
+          icon: Icon(FontAwesomeIcons.tag),
           label: 'Loja',
         ),
         BottomNavigationBarItem(
-          icon: Icon(FontAwesomeIcons.calendarDay, size: iconSize),
+          icon: Icon(FontAwesomeIcons.calendarDay),
           label: 'Eventos e Notícias',
         ),
         BottomNavigationBarItem(
-          icon: Icon(FontAwesomeIcons.solidCircleUser, size: iconSize),
+          icon: Icon(FontAwesomeIcons.solidCircleUser),
           label: 'Perfil',
         ),
       ],
