@@ -24,9 +24,9 @@ class EventsNewsService {
     if (kIsWeb) {
       return 'http://127.0.0.1:3001/api';
     } else if (Platform.isAndroid) {
-      return 'http://192.168.3.108:3001/api';
+      return 'http://192.168.3.109:3001/api';
     } else {
-      return 'http://192.168.3.108:3001/api';
+      return 'http://192.168.3.109:3001/api';
     }
   }
 

@@ -12,10 +12,10 @@ class ProductService {
       return 'http://127.0.0.1:3001/api'; // Tentando com 127.0.0.1 em vez de localhost
     } else if (Platform.isAndroid) {
       // Para dispositivos Android (usando seu IP local)
-      return 'http://192.168.3.108:3001/api';
+      return 'http://192.168.3.109:3001/api';
     } else {
       // Para outros dispositivos móveis (mesmo IP)
-      return 'http://192.168.3.108:3001/api';
+      return 'http://192.168.3.109:3001/api';
     }
   }
 
