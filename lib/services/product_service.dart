@@ -11,11 +11,11 @@ class ProductService {
       // Para aplicações web, pode ser necessário usar um proxy CORS ou habilitar CORS no backend
       return 'http://127.0.0.1:3001/api'; // Tentando com 127.0.0.1 em vez de localhost
     } else if (Platform.isAndroid) {
-      // Para dispositivos Android (usando seu IP local)
-      return 'http://192.168.3.109:3001/api';
+      // Para emulador Android
+      return 'http://10.0.2.2:3001/api';
     } else {
-      // Para outros dispositivos móveis (mesmo IP)
-      return 'http://192.168.3.109:3001/api';
+      // Para dispositivos móveis, use o IP real da máquina na rede
+      return 'http://192.168.1.4:3001/api';
     }
   }
 

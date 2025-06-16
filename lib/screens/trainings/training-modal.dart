@@ -1,15 +1,21 @@
+import 'package:app_atletica/models/training_model.dart';
+import 'package:app_atletica/services/training_service.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class TrainingModal extends StatelessWidget {
+class TrainingModal extends StatefulWidget  {
+  final Training training;
   final bool isSubscribed;
   final String? subscriptionId;
   final void Function()? onClose;
 
   const TrainingModal({
-    super.key, 
-    this.isSubscribed = false
+    super.key,
+    required this.training,
+    this.isSubscribed = false,
+    this.subscriptionId,
+    this.onClose,
   });
 
   @override
@@ -37,13 +43,35 @@ class _TrainingModalState extends State<TrainingModal> {
     });
   }
 
+  Future<void> _handleUnsubscribe() async {
+    setState(() => _loading = true);
+    if (widget.subscriptionId == null) {
+      setState(() { _loading = false; });
+      return;
+    }
+    final success = await _service.unsubscribeFromTraining(widget.subscriptionId!);
+    setState(() {
+      _loading = false;
+      if (success) _subscribed = false;
+    });
+  }
+
+   String formatDate(String rawDate) {
+    try {
+      final parsedDate = DateTime.parse(rawDate);
+      return DateFormat('dd/MM/yyyy').format(parsedDate);
+    } catch (e) {
+      return rawDate;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final training = widget.training;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Stack(
       children: [
-        // Blur background
         Positioned.fill(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -51,7 +79,6 @@ class _TrainingModalState extends State<TrainingModal> {
           ),
         ),
 
-        // Modal content
         Center(
           child: Padding(
             padding: const EdgeInsets.all(45),
@@ -68,7 +95,6 @@ class _TrainingModalState extends State<TrainingModal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Training image
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
@@ -109,10 +135,10 @@ class _TrainingModalState extends State<TrainingModal> {
                         ),
 
                         const SizedBox(height: 16),
-                        const Align(
+                        Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            training.modality.toUpperCase(),
+                            training.title.toUpperCase(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -124,30 +150,30 @@ class _TrainingModalState extends State<TrainingModal> {
                         _infoSection(
                           icon: Icons.notes,
                           title: 'Descrição',
-                          content: const Text(
-                            'Treino preparatório para o campeonato',
-                            style: TextStyle(color: Colors.white70, fontSize: 14),
+                          content: Text(
+                            training.description,
+                            style: const TextStyle(color: Colors.white70, fontSize: 14),
                           ),
                         ),
                         const SizedBox(height: 16),
                         _infoSection(
                           icon: Icons.how_to_reg,
                           title: 'Técnico',
-                          content: const Text(
-                            'João Silva',
-                            style: TextStyle(color: Colors.white70),
+                          content: Text(
+                            training.coach,
+                            style: const TextStyle(color: Colors.white70),
                           ),
                         ),
                         const SizedBox(height: 16),
                         _infoSection(
-                          icon: Icons.person,
+                          icon: Icons.how_to_reg,
                           title: 'Responsável',
                           content: Text(
                             training.responsible,
                             style: const TextStyle(color: Colors.white70),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -155,13 +181,13 @@ class _TrainingModalState extends State<TrainingModal> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: isSubscribed ? null : () {},
+                      onPressed: _subscribed || _loading ? null : _handleSubscribe,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isSubscribed ? Colors.white24 : Colors.white,
-                        foregroundColor: isSubscribed ? Colors.white70 : Colors.black,
+                        backgroundColor: _subscribed ? Colors.white24 : Colors.white,
+                        foregroundColor: _subscribed ? Colors.white70 : Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
-                          side: isSubscribed
+                          side: _subscribed
                               ? const BorderSide(color: Colors.white54, width: 1.5)
                               : BorderSide.none,
                         ),
@@ -185,9 +211,28 @@ class _TrainingModalState extends State<TrainingModal> {
                                 ),
                               ],
                             ),
-
                     ),
                   ),
+                  if (_subscribed) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 45,
+                      child: ElevatedButton(
+                        onPressed: _loading ? null : _handleUnsubscribe,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red[400],
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: _loading
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Text('Desinscrever', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                 ],
               ),
@@ -195,7 +240,6 @@ class _TrainingModalState extends State<TrainingModal> {
           ),
         ),
 
-        // Close button
         Positioned(
           bottom: 30,
           left: 0,
@@ -227,32 +271,36 @@ class _TrainingModalState extends State<TrainingModal> {
       ],
     );
   }
+}
 
-  Widget _infoSection({
-    required IconData icon,
-    required String title,
-    required Widget content,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 4),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+
+
+
+
+Widget _infoSection({
+  required IconData icon,
+  required String title,
+  required Widget content,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        content,
-      ],
-    );
-  }
+          ),
+        ],
+      ),
+      const SizedBox(height: 4),
+      content,
+    ],
+  );
 }
