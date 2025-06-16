@@ -23,200 +23,214 @@ class AccountSettingsScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.blue,
           body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xff21396a), AppColors.blue],
-                    ),
-                  ),
-                  child:
-                      user == null
-                          ? const Center(child: CircularProgressIndicator())
-                          : Stack(
-                            children: [
-                              Positioned(
-                                bottom: 0,
-                                left: 16,
-                                right: 16,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+            child: SingleChildScrollView(
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xff21396a), AppColors.blue],
+                          ),
+                        ),
+                        child:
+                            user == null
+                                ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                                : Stack(
                                   children: [
-                                    CircleAvatar(
-                                      radius:
-                                          MediaQuery.of(context).size.height *
-                                          0.08,
-                                      backgroundImage: _getAvatarImage(
-                                        user.avatarUrl,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 16,
+                                      right: 16,
+                                      child: Row(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            user.name,
-                                            maxLines: 3,
-                                            // overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 26,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                          CircleAvatar(
+                                            radius:
+                                                MediaQuery.of(
+                                                  context,
+                                                ).size.height *
+                                                0.08,
+                                            backgroundImage: _getAvatarImage(
+                                              user.avatarUrl,
                                             ),
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            user.cpf ?? 'CPF não disponível',
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              color: Colors.white70,
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  user.name,
+                                                  maxLines: 3,
+                                                  // overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  user.cpf ??
+                                                      'CPF não disponível',
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    color: Colors.white70,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 0,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.logout),
+                                        color: AppColors.white,
+                                        onPressed: () async {
+                                          // Deslogar o usuário usando o Provider
+                                          await userProvider.logout();
+                                          if (context.mounted) {
+                                            Navigator.pushReplacementNamed(
+                                              context,
+                                              '/login',
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
-                              ),
-                              Positioned(
-                                top: 10,
-                                right: 0,
-                                child: IconButton(
-                                  icon: const Icon(Icons.logout),
-                                  color: AppColors.white,
-                                  onPressed: () async {
-                                    // Deslogar o usuário usando o Provider
-                                    await userProvider.logout();
-                                    if (context.mounted) {
-                                      Navigator.pushReplacementNamed(
-                                        context,
-                                        '/login',
-                                      );
-                                    }
-                                  },
-                                ),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        height: 100,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            buildClubeCheersCard(
+                              icon: Icons.event_available,
+                              title: "Eventos Inscritos",
+                              subtitle: "Eventos que você está inscrito",
+                            ),
+                            buildClubeCheersCard(
+                              icon: Icons.event_available,
+                              title: "Interesses",
+                              subtitle: "Notícias que você destacou",
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          spacing: MediaQuery.of(context).size.height * 0.025,
+                          children: [
+                            MenuCard(
+                              icon: FontAwesomeIcons.solidCircleUser,
+                              title: "Editar Perfil",
+                              subtitle: "Edite seu perfil",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const EditProfileScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            MenuCard(
+                              icon: Icons.confirmation_num,
+                              title: "Ingressos",
+                              subtitle: "Ingressos comprados",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => TicketsScreen(user: user!),
+                                  ),
+                                );
+                              },
+                            ),
+                            MenuCard(
+                              icon: Icons.bookmark,
+                              title: "Salvos",
+                              subtitle: "Itens que você salvou",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => TicketsScreen(user: user!),
+                                  ),
+                                );
+                              },
+                            ),
+                            MenuCard(
+                              icon: Icons.badge,
+                              title: "Carteirinha",
+                              subtitle: "Sua carteirinha de associação",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MembershipCardScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            if (!userProvider.isAdmin) ...[
+                              MenuCard(
+                                icon: Icons.support_agent,
+                                title: "Suporte",
+                                subtitle: "Fale com a atlética",
+                                onTap: () {},
                               ),
                             ],
-                          ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 100,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      buildClubeCheersCard(
-                        icon: Icons.event_available,
-                        title: "Eventos Inscritos",
-                        subtitle: "Eventos que você está inscrito",
-                      ),
-                      buildClubeCheersCard(
-                        icon: Icons.event_available,
-                        title: "Interesses",
-                        subtitle: "Notícias que você destacou",
+                            if (userProvider.isAdmin) ...[
+                              MenuCard(
+                                icon: FontAwesomeIcons.userTie,
+                                title: "Administração",
+                                subtitle: "Área do administrador",
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AdminArea(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      spacing: MediaQuery.of(context).size.height * 0.025,
-                      children: [
-                        MenuCard(
-                          icon: FontAwesomeIcons.solidCircleUser,
-                          title: "Editar Perfil",
-                          subtitle: "Edite seu perfil",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const EditProfileScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        MenuCard(
-                          icon: Icons.confirmation_num,
-                          title: "Ingressos",
-                          subtitle: "Ingressos comprados",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => TicketsScreen(user: user!),
-                              ),
-                            );
-                          },
-                        ),
-                        MenuCard(
-                          icon: Icons.bookmark,
-                          title: "Salvos",
-                          subtitle: "Itens que você salvou",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => TicketsScreen(user: user!),
-                              ),
-                            );
-                          },
-                        ),
-                        MenuCard(
-                          icon: Icons.badge,
-                          title: "Carteirinha",
-                          subtitle: "Sua carteirinha de associação",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MembershipCardScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        if (!userProvider.isAdmin) ...[
-                          MenuCard(
-                            icon: Icons.support_agent,
-                            title: "Suporte",
-                            subtitle: "Fale com a atlética",
-                            onTap: () {},
-                          ),
-                        ],
-                        if (userProvider.isAdmin) ...[
-                          MenuCard(
-                            icon: FontAwesomeIcons.userTie,
-                            title: "Administração",
-                            subtitle: "Área do administrador",
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AdminArea(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           bottomNavigationBar: const CustomBottomNavBar(currentIndex: 4),
