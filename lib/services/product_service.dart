@@ -15,7 +15,7 @@ class ProductService {
       return 'http://10.0.2.2:3001/api';
     } else {
       // Para dispositivos móveis, use o IP real da máquina na rede
-      return 'http://192.168.1.4:3001/api';
+      return 'http://192.168.3.109:3001/api'; // Updated to use the correct IP
     }
   }
 
@@ -49,7 +49,9 @@ class ProductService {
           print('Produtos recebidos da API: ${productsData.length}');
 
           // Mapeia os dados para objetos Product
-          return productsData.map((json) => ProductModel.fromJson(json)).toList();
+          return productsData
+              .map((json) => ProductModel.fromJson(json))
+              .toList();
         } else {
           print('Formato de resposta inesperado: ${response.body}');
           return [];
@@ -135,7 +137,9 @@ class ProductService {
 
         if (responseData.containsKey('data') && responseData['data'] is List) {
           final List<dynamic> productsData = responseData['data'];
-          return productsData.map((json) => ProductModel.fromJson(json)).toList();
+          return productsData
+              .map((json) => ProductModel.fromJson(json))
+              .toList();
         } else {
           return [];
         }

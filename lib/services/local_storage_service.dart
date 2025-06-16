@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Serviço para gerenciar o armazenamento e sincronização de dados locais
 class LocalStorageService {
   // Chaves para armazenamento local
-  static const String _keyNews = 'cached_news';
   static const String _keyEvents = 'cached_events';
   static const String _keyTrainings = 'cached_trainings';
   static const String _keyProducts = 'cached_products';
@@ -78,7 +77,6 @@ class LocalStorageService {
   static Future<bool> clearAllCache() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_keyNews);
       await prefs.remove(_keyEvents);
       await prefs.remove(_keyTrainings);
       await prefs.remove(_keyProducts);
@@ -92,16 +90,6 @@ class LocalStorageService {
   }
   
   // Métodos específicos para cada tipo de dado
-  
-  // Notícias
-  static Future<bool> cacheNews(List<dynamic> news) async {
-    return saveData(_keyNews, news);
-  }
-  
-  static Future<List<dynamic>?> getCachedNews() async {
-    final data = await getData(_keyNews);
-    return data != null ? List<dynamic>.from(data) : null;
-  }
   
   // Eventos
   static Future<bool> cacheEvents(List<dynamic> events) async {

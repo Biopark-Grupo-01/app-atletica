@@ -8,7 +8,7 @@ class TrainingService {
     if (kIsWeb) {
       return 'http://localhost:3001/api';
     } else {
-      return 'http://192.168.1.4:3001/api';
+      return 'http://192.168.3.109:3001/api'; // Updated to use the correct IP
     }
   }
 
@@ -16,7 +16,10 @@ class TrainingService {
     final baseUrl = getBaseUrl();
     try {
       final response = await http
-          .get(Uri.parse('$baseUrl/trainings'), headers: {'Accept': 'application/json'})
+          .get(
+            Uri.parse('$baseUrl/trainings'),
+            headers: {'Accept': 'application/json'},
+          )
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
@@ -47,10 +50,7 @@ class TrainingService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: json.encode({
-          'trainingId': trainingId,
-          'userId': userId,
-        }),
+        body: json.encode({'trainingId': trainingId, 'userId': userId}),
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -70,9 +70,7 @@ class TrainingService {
     try {
       final response = await http.delete(
         Uri.parse('$baseUrl/subscriptions/$subscriptionId'),
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers: {'Accept': 'application/json'},
       );
       if (response.statusCode == 200 || response.statusCode == 204) {
         return true;
@@ -90,10 +88,12 @@ class TrainingService {
     final baseUrl = getBaseUrl();
 
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/subscriptions?userId=$userId'),
-        headers: {'Accept': 'application/json'},
-      ).timeout(const Duration(seconds: 15));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/subscriptions?userId=$userId'),
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
@@ -114,10 +114,12 @@ class TrainingService {
   Future<List<Map<String, dynamic>>> getUserSubscriptions(String userId) async {
     final baseUrl = getBaseUrl();
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/subscriptions?userId=$userId'),
-        headers: {'Accept': 'application/json'},
-      ).timeout(const Duration(seconds: 15));
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/subscriptions?userId=$userId'),
+            headers: {'Accept': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<dynamic> data = responseData['data'];
