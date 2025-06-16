@@ -363,32 +363,12 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
   }
 }
 
-void showTrainingModal(
-  BuildContext context,
-  Training training,
-  List<String> _subscribedIds,
-  Future<void> Function({bool preserveScroll}) _loadData,
-  ScrollController _scrollController,
-  {String? subscriptionId}
-) async {
-  final double currentScrollOffset = _scrollController.offset;
-  await showModalBottomSheet(
+void showTrainingModal(BuildContext context, Training training, List<String> subscribedIds) {
+  showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withOpacity(0.5),
-    builder: (_) => TrainingModal(
-      training: training,
-      isSubscribed: _subscribedIds.contains(training.id),
-      subscriptionId: subscriptionId,
-      onClose: () async {
-        await _loadData(preserveScroll: true);
-      },
-    ),
-  ).then((_) async {
-    await _loadData(preserveScroll: true);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.jumpTo(currentScrollOffset);
-    });
-  });
+    builder: (_) => TrainingModal(isSubscribed: subscribedIds.contains(training.id)),
+  );
 }
