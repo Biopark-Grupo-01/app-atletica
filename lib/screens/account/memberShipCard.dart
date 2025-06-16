@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 class MembershipCardScreen extends StatelessWidget {
   const MembershipCardScreen({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     // Consumindo o Provider para garantir a reconstrução do widget quando o usuário mudar
@@ -16,26 +16,27 @@ class MembershipCardScreen extends StatelessWidget {
       builder: (context, userProvider, _) {
         // Verifica se há um usuário logado
         final currentUser = userProvider.currentUser;
-        
+
         return Scaffold(
           appBar: CustomAppBar(showBackButton: true),
           body: SafeArea(
             child: Column(
               children: [
                 Expanded(
-                  child: currentUser != null 
-                    ? _buildMembershipCard(context, currentUser) 
-                    : _buildNoCardMessage(context),
+                  child:
+                      currentUser != null
+                          ? _buildMembershipCard(context, currentUser)
+                          : _buildNoCardMessage(context),
                 ),
               ],
             ),
           ),
           bottomNavigationBar: const CustomBottomNavBar(currentIndex: 4),
         );
-      }
+      },
     );
   }
-  
+
   // Widget que mostra o cartão do associado quando o usuário está logado
   Widget _buildMembershipCard(BuildContext context, UserModel user) {
     return Padding(
@@ -44,43 +45,46 @@ class MembershipCardScreen extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.white, width: 1),
+          border: Border.all(color: AppColors.white, width: 0.5),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              user.name,
-              style: const TextStyle(
-                color: AppColors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                user.name,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            CircleAvatar(
-              radius: MediaQuery.of(context).size.height * 0.09,
-              backgroundImage: _getAvatarImage(user.avatarUrl),
-            ),
-            _buildInfoRow(
-              'Matrícula:',
-              user.registration?.toString() ?? 'Não informado',
-            ),
-            _buildInfoRow('CPF:', user.cpf ?? 'Não informado'),
-            _buildInfoRow('E-mail:', user.email),
-            _buildInfoRow('Validade:', user.validUntil ?? '31/12/2025'),
-            Column(
-              children: [
-                const Text(
-                  'Associação Tigre Branco - 2025',
-                  style: TextStyle(color: AppColors.white, fontSize: 14),
-                ),
-                const Text(
-                  '(01/01/2025 - 31/12/2025)',
-                  style: TextStyle(color: AppColors.white, fontSize: 12),
-                ),
-              ],
-            ),
-          ],
+              CircleAvatar(
+                radius: MediaQuery.of(context).size.height * 0.09,
+                backgroundImage: _getAvatarImage(user.avatarUrl),
+              ),
+              _buildInfoRow(
+                'Matrícula:',
+                user.registration?.toString() ?? 'Não informado',
+              ),
+              _buildInfoRow('CPF:', user.cpf ?? 'Não informado'),
+              _buildInfoRow('E-mail:', user.email),
+              _buildInfoRow('Validade:', user.validUntil ?? '31/12/2025'),
+              Column(
+                children: [
+                  const Text(
+                    'Associação Tigre Branco - 2025',
+                    style: TextStyle(color: AppColors.white, fontSize: 14),
+                  ),
+                  const Text(
+                    '(01/01/2025 - 31/12/2025)',
+                    style: TextStyle(color: AppColors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -133,7 +137,7 @@ class MembershipCardScreen extends StatelessWidget {
     if (avatarUrl == null || avatarUrl.isEmpty) {
       return const AssetImage('assets/images/selfieCarteirinha.png');
     }
-    
+
     if (avatarUrl.startsWith('http')) {
       return NetworkImage(avatarUrl);
     } else {
@@ -149,7 +153,7 @@ class MembershipCardScreen extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -157,7 +161,7 @@ class MembershipCardScreen extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, color: Colors.white),
+            style: const TextStyle(fontSize: 16, color: Colors.white),
           ),
         ],
       ),
