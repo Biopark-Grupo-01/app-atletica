@@ -8,7 +8,7 @@ class TrainingService {
     if (kIsWeb) {
       return 'http://localhost:3001/api';
     } else {
-      return 'http://192.168.1.4:3001/api';
+      return 'http://192.168.1.3:3001/api';
     }
   }
 
@@ -128,6 +128,26 @@ class TrainingService {
       }
     } catch (e) {
       print('Erro ao buscar inscrições: $e');
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getTrainingModalities() async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/training-modalities'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'];
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Erro ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro ao buscar modalidades: $e');
       return [];
     }
   }

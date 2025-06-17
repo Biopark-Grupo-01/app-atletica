@@ -17,15 +17,6 @@ class TrainingsScreen extends StatefulWidget {
 }
 
 class _TrainingsScreenState extends State<TrainingsScreen> {
-  final List<Map<String, dynamic>> sports = [
-    {'label': 'Futebol', 'icon': Icons.sports_soccer, 'category': 'FUTEBOL'},
-    {'label': 'Vôlei', 'icon': Icons.sports_volleyball, 'category': 'VOLEI'},
-    {'label': 'Tênis', 'icon': Icons.sports_tennis, 'category': 'TENIS'},
-    {'label': 'Basquete', 'icon': Icons.sports_basketball, 'category': 'BASQUETE'},
-    {'label': 'Handebol', 'icon': Icons.sports_handball, 'category': 'HANDEBOL'},
-    {'label': 'Natação', 'icon': Icons.pool, 'category': 'NATACAO'},
-  ];
-
   final TrainingService _trainingService = TrainingService();
   List<Training> _trainings = [];
   List<String> _subscribedIds = [];
@@ -38,11 +29,13 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   final ScrollController _scrollController = ScrollController();
 
+  List<Map<String, dynamic>> _modalities = [];
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _loadModalities();
   }
 
   Future<void> _loadData({bool preserveScroll = false}) async {
@@ -71,6 +64,13 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _loadModalities() async {
+    final modalities = await _trainingService.getTrainingModalities();
+    setState(() {
+      _modalities = modalities;
+    });
   }
 
   String formatDate(String rawDate) {
@@ -117,12 +117,12 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             padding: const EdgeInsets.only(left: 16),
-                            itemCount: sports.length,
+                            itemCount: _modalities.length,
                             separatorBuilder: (context, index) => const SizedBox(width: 20),
                             itemBuilder: (context, index) {
-                              final sport = sports[index];
-                              final isLast = index == sports.length - 1;
-                              final isSelected = _selectedCategories.contains(sport['category']);
+                              final modality = _modalities[index];
+                              final isLast = index == _modalities.length - 1;
+                              final isSelected = _selectedCategories.contains(modality['name'].toString().toUpperCase());
 
                               return Padding(
                                 padding: EdgeInsets.only(right: isLast ? 16 : 0),
@@ -132,7 +132,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                     onTap: () {
                                       setState(() {
-                                        final category = sport['category'];
+                                        final category = modality['name'].toString().toUpperCase();
                                         if (_selectedCategories.contains(category)) {
                                           _selectedCategories.remove(category);
                                         } else {
@@ -141,8 +141,8 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                       });
                                     },
                                     child: _buildSportIcon(
-                                      sport['label'],
-                                      sport['icon'],
+                                      modality['name'] ?? '',
+                                      modality['icon'] ?? '',
                                       isSelected: isSelected,
                                     ),
                                   ),
@@ -218,7 +218,19 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     );
   }
 
-  Widget _buildSportIcon(String label, IconData icon, {bool isSelected = false}) {
+  Widget _buildSportIcon(String label, String iconName, {bool isSelected = false}) {
+    // Mapeamento manual para os ícones do Material Icons
+    const iconMap = {
+      'sports_soccer': Icons.sports_soccer,
+      'sports_volleyball': Icons.sports_volleyball,
+      'sports_tennis': Icons.sports_tennis,
+      'sports_basketball': Icons.sports_basketball,
+      'sports_handball': Icons.sports_handball,
+      'pool': Icons.pool,
+      'golf_course': Icons.golf_course,
+      // Adicione outros ícones conforme necessário
+    };
+    final iconData = iconMap[iconName] ?? Icons.sports;
     return Column(
       children: [
         Container(
@@ -235,7 +247,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
-            icon,
+            iconData,
             size: 30,
             color: isSelected ? Colors.black : Colors.white,
           ),
