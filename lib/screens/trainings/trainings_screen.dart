@@ -6,7 +6,6 @@ import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-
 import 'package:intl/intl.dart';
 
 class TrainingsScreen extends StatefulWidget {
@@ -228,8 +227,23 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       'sports_handball': Icons.sports_handball,
       'pool': Icons.pool,
       'golf_course': Icons.golf_course,
-      // Adicione outros ícones conforme necessário
+      'directions_run': Icons.directions_run,
+      'fitness_center': Icons.fitness_center,
+      'kayaking': Icons.kayaking,
+      'kitesurfing': Icons.kitesurfing,
+      'paragliding': Icons.paragliding,
+      'rowing': Icons.rowing,
+      'scoreboard': Icons.scoreboard,
+      'scuba_diving': Icons.scuba_diving,
+      'skateboarding': Icons.skateboarding,
+      'sledding': Icons.sledding,
+      'snowboarding': Icons.snowboarding,
+      'sports': Icons.sports,
+      'sports_mma': Icons.sports_mma,
+      'stadium': Icons.stadium,
+      'surfing': Icons.surfing,
     };
+
     final iconData = iconMap[iconName] ?? Icons.sports;
     return Column(
       children: [

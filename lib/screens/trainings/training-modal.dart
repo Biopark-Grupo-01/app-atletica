@@ -92,88 +92,90 @@ class _TrainingModalState extends State<TrainingModal> {
               child: Column(
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            "assets/images/cartao.png",
-                            height: 180,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12, left: 2, right: 2),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    formatDate(training.date),
-                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(Icons.place, color: Colors.white70, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    training.place,
-                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            training.title.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/images/cartao.png",
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        _infoSection(
-                          icon: Icons.notes,
-                          title: 'Descrição',
-                          content: Text(
-                            training.description,
-                            style: const TextStyle(color: Colors.white70, fontSize: 14),
+
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12, left: 2, right: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      formatDate(training.date),
+                                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.place, color: Colors.white70, size: 18),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      training.place,
+                                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        _infoSection(
-                          icon: Icons.how_to_reg,
-                          title: 'Técnico',
-                          content: Text(
-                            training.coach,
-                            style: const TextStyle(color: Colors.white70),
+
+                          const SizedBox(height: 16),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              training.title.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        _infoSection(
-                          icon: Icons.how_to_reg,
-                          title: 'Responsável',
-                          content: Text(
-                            training.responsible,
-                            style: const TextStyle(color: Colors.white70),
+                          const SizedBox(height: 12),
+                          _infoSection(
+                            icon: Icons.notes,
+                            title: 'Descrição',
+                            content: Text(
+                              training.description,
+                              style: const TextStyle(color: Colors.white70, fontSize: 14),
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          _infoSection(
+                            icon: Icons.how_to_reg,
+                            title: 'Técnico',
+                            content: Text(
+                              training.coach,
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _infoSection(
+                            icon: Icons.how_to_reg,
+                            title: 'Responsável',
+                            content: Text(
+                              training.responsible,
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -229,7 +231,7 @@ class _TrainingModalState extends State<TrainingModal> {
                         ),
                         child: _loading
                             ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text('Desinscrever', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                            : const Text('Cancelar Inscrição', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       ),
                     ),
                   ],
