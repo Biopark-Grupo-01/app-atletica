@@ -13,44 +13,67 @@ class EventsNewsService {
   static const String _trainingsEndpoint = '/trainings';
 
   Future<Map<String, dynamic>> loadData(BuildContext context) async {
-    // Exemplo de retorno mockado
-    return {
-      'news': _getMockNews(),
-      'events': _getMockEvents(),
-      'trainings': _getMockTrainings(),
-    };
+    try {
+      // Obtém eventos e treinos
+      final eventsList = _getMockEvents();
+      final trainingsList = _getMockTrainings();
+      
+      // Converte eventos para Map<String, String>
+      final formattedEvents = eventsList.map((event) => {
+        'id': event.id,
+        'imageUrl': event.imageUrl ?? '',
+        'date': event.date,
+        'location': event.location,
+        'title': event.title,
+        'description': event.description ?? '',
+      }).toList();
+      
+      // Retorna os dados no formato esperado
+      return {
+        'events': formattedEvents,
+        'trainings': trainingsList,
+        'news': [], // Lista vazia para news já que foi removida
+      };
+    } catch (e) {
+      print('Erro ao carregar dados: $e');
+      return {
+        'events': <Map<String, String>>[],
+        'trainings': <Training>[],
+        'news': <Map<String, String>>[],
+      };
+    }
   }
 
-  // Método para carregar notícias com cache
-  Future<List<NewsModel>> getNews(BuildContext context) async {
+  // Método para carregar eventos com cache
+  Future<List<EventModel>> getEvents(BuildContext context) async {
     try {
       if (ApiService.useMockData) {
-        final mockData = _getMockNews();
+        final mockData = _getMockEvents();
         // Salva os dados mockados no cache também
-        await LocalStorageService.cacheNews(mockData.map((e) => e.toJson()).toList());
+        await LocalStorageService.cacheEvents(mockData.map((e) => e.toJson()).toList());
         return mockData;
       } else {
         // Usa o sistema de cache do ApiService
         final response = await ApiService.get(
           context, 
-          _newsEndpoint,
+          _eventsEndpoint,
           useCache: true,
           cacheKey: _newsCache,
         );
         final List<dynamic> data = json.decode(response.body);
-        return data.map((item) => NewsModel.fromJson(item)).toList();
+        return data.map((item) => EventModel.fromJson(item)).toList();
       }
     } catch (e) {
-      print('Erro ao carregar notícias: $e');
+      print('Erro ao carregar eventos: $e');
       
       // Tenta obter dados do cache
-      final cachedData = await LocalStorageService.getCachedNews();
+      final cachedData = await LocalStorageService.getCachedEvents();
       if (cachedData != null) {
-        return cachedData.map((item) => NewsModel.fromJson(item)).toList();
+        return cachedData.map((item) => EventModel.fromJson(item)).toList();
       }
       
       // Se não há cache, retorna dados mockados
-      return _getMockNews();
+      return _getMockEvents();
     }
   }
 
@@ -117,31 +140,6 @@ class EventsNewsService {
       },
     ];
 
-  // Método para adicionar ou atualizar uma notícia
-  Future<bool> saveNews(BuildContext context, NewsModel news) async {
-    try {
-      if (ApiService.useMockData) {
-        // Simula um atraso e sucesso
-        await Future.delayed(Duration(seconds: 1));
-        return true;
-      } else {
-        final endpoint = news.id.isNotEmpty ? '$_newsEndpoint/${news.id}' : _newsEndpoint;
-        final method = news.id.isNotEmpty ? 'put' : 'post';
-        
-        if (method == 'put') {
-          await ApiService.put(context, endpoint, body: news.toJson());
-        } else {
-          await ApiService.post(context, endpoint, body: news.toJson());
-        }
-        
-        return true;
-      }
-    } catch (e) {
-      print('Erro ao salvar notícia: $e');
-      return false;
-    }
-  }
-
   // Método para adicionar ou atualizar um evento
   Future<bool> saveEvent(BuildContext context, EventModel event) async {
     try {
@@ -192,34 +190,22 @@ class EventsNewsService {
     }
   }
 
-  // Dados mockados para notícias
-  List<NewsModel> _getMockNews() {
-    return [
-      NewsModel(
-        id: '1',
-        imageUrl: 'https://picsum.photos/300/150',
-        date: '15/05/2025',
-        location: 'Toledo',
-        title: 'Acesso Rápido',
-        description: 'Foi realizado alterações nos botões de acesso rápido',
-      ),
-      NewsModel(
-        id: '2',
-        imageUrl: 'https://picsum.photos/301/150',
-        date: '22/05/2025',
-        location: 'Toledo',
-        title: 'Notícia do Backend',
-        description: 'Essa notícia veio da API.',
-      ),
-      NewsModel(
-        id: '3',
-        imageUrl: 'https://picsum.photos/304/150',
-        date: '04/06/2025',
-        location: 'Toledo',
-        title: 'Nova Integração',
-        description: 'Sistema integrado com back-end para comunicação mais efetiva.',
-      ),
-    ];
+  // Método para obter eventos como uma lista de Map<String, String>
+  Future<List<Map<String, String>>> getEventsAsDisplayMap(BuildContext context) async {
+    try {
+      final eventsList = await getEvents(context);
+      return eventsList.map((event) => {
+        'id': event.id,
+        'imageUrl': event.imageUrl ?? '',
+        'date': event.date,
+        'location': event.location,
+        'title': event.title,
+        'description': event.description ?? '',
+      }).toList();
+    } catch (e) {
+      print('Erro ao converter eventos para DisplayMap: $e');
+      return [];
+    }
   }
 
   // Dados mockados para eventos

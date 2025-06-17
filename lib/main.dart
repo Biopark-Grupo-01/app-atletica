@@ -16,7 +16,6 @@ import 'package:app_atletica/screens/login/register_screen.dart';
 import 'package:app_atletica/screens/home/home_screen.dart';
 import 'package:app_atletica/screens/events/events_screen.dart';
 import 'package:app_atletica/screens/forms/event_registration.dart';
-import 'package:app_atletica/screens/forms/news_registration.dart';
 import 'package:app_atletica/screens/forms/product_registration.dart';
 import 'package:provider/provider.dart';
 import 'package:app_atletica/providers/user_provider.dart';
@@ -122,7 +121,6 @@ class MyApp extends StatelessWidget {
 
             // Rotas de administrador
             '/event_registration': (context) => EventRegistrationForm(),
-            '/news_registration': (context) => NewsRegistrationForm(),
             '/product_registration': (context) => ProductRegistrationForm(),
             '/trainings_registration': (context) => TrainingsRegistrationForm(),
           }, // Observador de navegação para verificar autenticação
