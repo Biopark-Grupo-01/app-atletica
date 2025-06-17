@@ -133,4 +133,24 @@ class TrainingService {
       return [];
     }
   }
+
+  Future<List<Map<String, dynamic>>> getTrainingModalities() async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/training-modalities'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'];
+        return data.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Erro ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro ao buscar modalidades: $e');
+      return [];
+    }
+  }
 }

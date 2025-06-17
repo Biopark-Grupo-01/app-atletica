@@ -206,7 +206,7 @@ class StoreService {
         name: 'Boné Oficial',
         category: 'ROUPAS',
         price: 40.00,
-        image: 'assets/images/bone.jpeg',
+        image: 'assets/images/bone.png',
         description: 'Boné oficial com logo bordado',
         stock: 20,
       ),

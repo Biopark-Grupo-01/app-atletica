@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
         print('Estado de login: ${userProvider.isLoggedIn}');
         // Define a rota inicial com base no estado de login
         final String initialRoute =
-            userProvider.isLoggedIn ? '/home' : '/login';
+            userProvider.isLoggedIn ? '/events' : '/events';
         print(
           'Estado de login: ${userProvider.isLoggedIn}, Rota inicial: $initialRoute',
         );

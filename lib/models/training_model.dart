@@ -28,7 +28,7 @@ class Training {
       id: json['id'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      modality: json['modality'] ?? '',
+      modality: json['trainingModality']?['name'] ?? '', // Corrigido para buscar modalidade do backend
       coach: json['coach'] ?? '',
       responsible: json['responsible'] ?? '',
       place: json['place'] ?? '',
