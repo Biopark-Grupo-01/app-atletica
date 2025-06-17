@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_atletica/services/events_news_service.dart';
 
 void main() {
   runApp(const NewsScreen());
@@ -22,70 +23,114 @@ class NewsScreen extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Map<String, String>>> _eventsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventsFuture = EventsNewsService().getEventsAsDisplayMap(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.black,
-                child: const Center(
-                  child: Text(
-                    'A.A.A.B.E',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+        child: FutureBuilder<List<Map<String, String>>>(
+          future: _eventsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Não foi possível carregar os dados. Tente novamente.',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _eventsFuture = EventsNewsService().getEventsAsDisplayMap(context);
+                        });
+                      },
+                      child: const Text('Tentar Novamente'),
+                    ),
+                  ],
                 ),
-              ),
-
-              // Section Title
-              const Padding(
-                padding: EdgeInsets.all(16),
+              );
+            } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+              return const Center(
                 child: Text(
-                  'EVENTOS E NOTÍCIAS',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  'Não há novos eventos.',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-              ),
-
-              // News Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: _buildCard(
-                  'TÍTULO NOTÍCIA',
-                  'Data • Local',
-                  'Descrição',
-                  const Color(0xFFFFD700),
+              );
+            } else if (snapshot.hasData) {
+              final eventsList = snapshot.data!;
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      color: Colors.black,
+                      child: const Center(
+                        child: Text(
+                          'A.A.A.B.E',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'EVENTOS',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    ...eventsList.map((event) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: _buildCard(
+                            event['title'] ?? '',
+                            '${event['date']} • ${event['location']}',
+                            event['description'] ?? '',
+                            const Color(0xFFFFD700),
+                          ),
+                        )),
+                  ],
                 ),
-              ),
-
-              // Event Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: _buildCard(
-                  'TÍTULO EVENTO',
-                  'Data • Local',
-                  'Descrição',
-                  const Color(0xFFFFD700),
+              );
+            } else {
+              return const Center(
+                child: Text(
+                  'Nenhum dado disponível.',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-              ),
-            ],
-          ),
+              );
+            }
+          },
         ),
       ),
     );
