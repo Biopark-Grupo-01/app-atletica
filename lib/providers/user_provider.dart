@@ -14,6 +14,7 @@ class UserProvider extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   bool get isAdmin => _currentUser?.role == 'ADMIN';  UserProvider() {
     // Inicialização padrão, chama _loadUser
+    mockLoginUser(); // Simula usuário logado automaticamente ao iniciar
   }
   
   /// Inicializa o provider de forma assíncrona e retorna quando concluído
@@ -165,6 +166,22 @@ class UserProvider extends ChangeNotifier {
   // Limpar mensagem de erro
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  // Método para simular um usuário logado (apenas para testes)
+  void mockLoginUser() {
+    _currentUser = UserModel(
+      id: '1',
+      name: 'Usuário Teste',
+      email: 'teste@email.com',
+      cpf: '123.456.789-00',
+      avatarUrl: '',
+      role: 'ADMIN',
+      registration: 12345,
+      validUntil: '2025-12-31',
+    );
+    _isLoggedIn = true;
     notifyListeners();
   }
 }

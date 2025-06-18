@@ -1,3 +1,4 @@
+import 'package:app_atletica/models/match_model.dart';
 import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/services/training_service.dart';
 import 'dart:ui';
@@ -5,18 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TrainingModal extends StatefulWidget  {
-  final Training training;
+  final Training? training;
+  final Match? match;
   final bool isSubscribed;
   final String? subscriptionId;
   final void Function()? onClose;
 
   const TrainingModal({
     super.key,
-    required this.training,
+    this.training,
+    this.match,
     this.isSubscribed = false,
     this.subscriptionId,
     this.onClose,
-  });
+  }) : assert(training != null || match != null);
 
   @override
   State<TrainingModal> createState() => _TrainingModalState();
@@ -36,7 +39,7 @@ class _TrainingModalState extends State<TrainingModal> {
 
   Future<void> _handleSubscribe() async {
     setState(() => _loading = true);
-    final success = await _service.subscribeToTraining(widget.training.id, '3e66159f-efaa-4c74-8bce-51c1fef3622e');
+    final success = await _service.subscribeToTraining(widget.training!.id, '3e66159f-efaa-4c74-8bce-51c1fef3622e');
     setState(() {
       _loading = false;
       if (success) _subscribed = true;
@@ -67,7 +70,7 @@ class _TrainingModalState extends State<TrainingModal> {
 
   @override
   Widget build(BuildContext context) {
-    final training = widget.training;
+    final isTraining = widget.training != null;
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Stack(
@@ -78,7 +81,6 @@ class _TrainingModalState extends State<TrainingModal> {
             child: Container(color: Colors.transparent),
           ),
         ),
-
         Center(
           child: Padding(
             padding: const EdgeInsets.all(45),
@@ -92,154 +94,180 @@ class _TrainingModalState extends State<TrainingModal> {
               child: Column(
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            "assets/images/cartao.png",
-                            height: 180,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12, left: 2, right: 2),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    formatDate(training.date),
-                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(Icons.place, color: Colors.white70, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    training.place,
-                                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            training.title.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/images/cartao.png",
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        _infoSection(
-                          icon: Icons.notes,
-                          title: 'Descrição',
-                          content: Text(
-                            training.description,
-                            style: const TextStyle(color: Colors.white70, fontSize: 14),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _infoSection(
-                          icon: Icons.how_to_reg,
-                          title: 'Técnico',
-                          content: Text(
-                            training.coach,
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _infoSection(
-                          icon: Icons.how_to_reg,
-                          title: 'Responsável',
-                          content: Text(
-                            training.responsible,
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _subscribed || _loading ? null : _handleSubscribe,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _subscribed ? Colors.white24 : Colors.white,
-                        foregroundColor: _subscribed ? Colors.white70 : Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: _subscribed
-                              ? const BorderSide(color: Colors.white54, width: 1.5)
-                              : BorderSide.none,
-                        ),
-                      ),
-                      child: _loading
-                          ? const CircularProgressIndicator()
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12, left: 2, right: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                if (_subscribed) ...[
-                                  const Icon(Icons.check_circle_outline, color: Colors.white70),
-                                  const SizedBox(width: 8),
-                                ],
+                                const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
+                                const SizedBox(width: 6),
                                 Text(
-                                  _subscribed ? 'Inscrição Concluída' : 'Se Inscrever',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: _subscribed ? Colors.white70 : Colors.black,
-                                  ),
+                                  isTraining
+                                      ? "${formatDate(widget.training!.date)} • ${widget.training!.time}"
+                                      : "${formatDate(widget.match!.date)} • ${widget.match!.time}",
+                                  style: const TextStyle(color: Colors.white70, fontSize: 13),
                                 ),
                               ],
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              isTraining ? widget.training!.title.toUpperCase() : widget.match!.title.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          if (isTraining)
+                            _infoSection(
+                              icon: Icons.how_to_reg,
+                              title: 'Técnico',
+                              content: Text(
+                                (widget.training!.coach.isNotEmpty)
+                                    ? widget.training!.coach
+                                    : 'A definir...',
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          if (isTraining) const SizedBox(height: 16),
+                          _infoSection(
+                            icon: Icons.how_to_reg,
+                            title: 'Responsável',
+                            content: Text(
+                              (isTraining ? widget.training!.responsible : widget.match!.responsible).isNotEmpty
+                                  ? (isTraining ? widget.training!.responsible : widget.match!.responsible)
+                                  : 'A definir...',
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _infoSection(
+                            icon: Icons.place,
+                            title: 'Local',
+                            content: Text(
+                              isTraining ? widget.training!.place : widget.match!.place,
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _infoSection(
+                            icon: Icons.notes,
+                            title: 'Descrição',
+                            content: Text(
+                              (isTraining ? widget.training!.description : widget.match!.description).isNotEmpty
+                                  ? (isTraining ? widget.training!.description : widget.match!.description)
+                                  : 'A definir...',
+                              style: const TextStyle(color: Colors.white70, fontSize: 14),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  if (_subscribed) ...[
-                    const SizedBox(height: 12),
+                  if (isTraining) ...[
+                    const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
-                      height: 45,
+                      height: 50,
                       child: ElevatedButton(
-                        onPressed: _loading ? null : _handleUnsubscribe,
+                        onPressed: _subscribed || _loading ? null : _handleSubscribe,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[400],
-                          foregroundColor: Colors.white,
+                          backgroundColor: _subscribed ? Colors.white24 : Colors.white,
+                          foregroundColor: _subscribed ? Colors.white70 : Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
+                            side: _subscribed
+                                ? const BorderSide(color: Colors.white54, width: 1.5)
+                                : BorderSide.none,
                           ),
                         ),
                         child: _loading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text('Desinscrever', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                            ? const CircularProgressIndicator()
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (_subscribed) ...[
+                                    const Icon(Icons.check_circle_outline, color: Colors.white70),
+                                    const SizedBox(width: 8),
+                                  ],
+                                  Text(
+                                    _subscribed ? 'Inscrição Concluída' : 'Se Inscrever',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: _subscribed ? Colors.white70 : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
                       ),
                     ),
+                    if (_subscribed) ...[
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: _loading ? null : _handleUnsubscribe,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red[400],
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: _loading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : const Text('Cancelar Inscrição', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
                   ],
-                  const SizedBox(height: 16),
+                  if (!isTraining) ...[
+                    const SizedBox(height: 32),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'Para participar deste amistoso, entre em contato com o responsável.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                 ],
               ),
             ),
           ),
         ),
-
         Positioned(
           bottom: 30,
           left: 0,

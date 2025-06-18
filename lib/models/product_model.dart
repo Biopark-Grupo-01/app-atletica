@@ -35,6 +35,7 @@ class ProductModel {
   final double price;
   final int stock;
   final String? category;
+  final String? categoryId;
   final String? image;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -46,6 +47,7 @@ class ProductModel {
     required this.price,
     required this.stock,
     this.category,
+    this.categoryId,
     this.image,
     this.createdAt,
     this.updatedAt,
@@ -54,10 +56,9 @@ class ProductModel {
   Map<String, String> toJson() {
     return {
       'name': name,
-      // Se não tiver categoria, usa 'OUTROS' como padrão
       'category': category ?? 'OUTROS',
+      'category_id': categoryId ?? '',
       'price': price.toStringAsFixed(2).replaceAll('.', ','),
-      // Se não tiver imagem, usa brasao.png como padrão
       'image':
           image != null && image!.startsWith('http')
               ? image!
@@ -70,21 +71,20 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      description: json['description'],
-      // Converte preço de string para double
-      price:
-          json['price'] != null
-              ? double.tryParse(json['price'].toString()) ?? 0.0
-              : 0.0,
-      stock: json['stock'] ?? 0,
-      category: json['category'],
-      image: json['image'],
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      description: json['description']?.toString(),
+      price: json['price'] != null
+          ? double.tryParse(json['price'].toString()) ?? 0.0
+          : 0.0,
+      stock: json['stock'] != null ? int.tryParse(json['stock'].toString()) ?? 0 : 0,
+      category: json['category']?.toString() ?? '',
+      categoryId: (json['category_id'] ?? json['categoryId'])?.toString() ?? '',
+      image: json['image']?.toString(),
       createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+          json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
       updatedAt:
-          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+          json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt'].toString()) : null,
     );
   }
 }

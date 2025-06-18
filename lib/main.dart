@@ -20,6 +20,7 @@ import 'package:app_atletica/screens/forms/product_registration.dart';
 import 'package:provider/provider.dart';
 import 'package:app_atletica/providers/user_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:app_atletica/utils/error_handler.dart';
 
@@ -85,7 +86,7 @@ class MyApp extends StatelessWidget {
         print('Estado de login: ${userProvider.isLoggedIn}');
         // Define a rota inicial com base no estado de login
         final String initialRoute =
-            userProvider.isLoggedIn ? '/home' : '/login';
+            userProvider.isLoggedIn ? '/events' : '/events';
         print(
           'Estado de login: ${userProvider.isLoggedIn}, Rota inicial: $initialRoute',
         );
@@ -97,6 +98,14 @@ class MyApp extends StatelessWidget {
             primaryColor: AppColors.yellow,
           ),
           debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('pt', 'BR'),
+          ],
           initialRoute: initialRoute,
           routes: {
             // Rotas públicas (sem autenticação)

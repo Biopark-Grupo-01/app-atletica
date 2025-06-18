@@ -1,12 +1,13 @@
+import 'package:app_atletica/models/match_model.dart';
 import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/screens/trainings/expandable_text.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
+import 'package:app_atletica/services/match_service.dart';
 import 'package:app_atletica/services/training_service.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-
 import 'package:intl/intl.dart';
 
 class TrainingsScreen extends StatefulWidget {
@@ -17,17 +18,10 @@ class TrainingsScreen extends StatefulWidget {
 }
 
 class _TrainingsScreenState extends State<TrainingsScreen> {
-  final List<Map<String, dynamic>> sports = [
-    {'label': 'Futebol', 'icon': Icons.sports_soccer, 'category': 'FUTEBOL'},
-    {'label': 'Vôlei', 'icon': Icons.sports_volleyball, 'category': 'VOLEI'},
-    {'label': 'Tênis', 'icon': Icons.sports_tennis, 'category': 'TENIS'},
-    {'label': 'Basquete', 'icon': Icons.sports_basketball, 'category': 'BASQUETE'},
-    {'label': 'Handebol', 'icon': Icons.sports_handball, 'category': 'HANDEBOL'},
-    {'label': 'Natação', 'icon': Icons.pool, 'category': 'NATACAO'},
-  ];
-
   final TrainingService _trainingService = TrainingService();
+  final MatchService _matchService = MatchService();
   List<Training> _trainings = [];
+  List<Match> _matches = [];
   List<String> _subscribedIds = [];
   List<Map<String, String>> _userSubscriptions = [];
   bool _isLoading = true;
@@ -38,11 +32,13 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   final ScrollController _scrollController = ScrollController();
 
+  List<Map<String, dynamic>> _modalities = [];
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _loadModalities();
   }
 
   Future<void> _loadData({bool preserveScroll = false}) async {
@@ -54,23 +50,38 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     }
     try {
       const userId = '3e66159f-efaa-4c74-8bce-51c1fef3622e';
-      final userSubscriptions = await _trainingService.getUserSubscriptions(userId);
-      final trainings = await _trainingService.getTrainings();
-      setState(() {
-        _userSubscriptions = userSubscriptions.map((sub) => {
-          'trainingId': sub['training']['id'] as String,
-          'subscriptionId': sub['id'] as String,
-        }).toList();
-        _subscribedIds = _userSubscriptions.map((sub) => sub['trainingId']!).toList();
-        _trainings = trainings;
-        _isLoading = false;
-      });
+      if (_selectedTabIndex == 1) {
+        final userSubscriptions = await _trainingService.getUserSubscriptions(userId);
+        final trainings = await _trainingService.getTrainings();
+        setState(() {
+          _userSubscriptions = userSubscriptions.map((sub) => {
+            'trainingId': sub['training']['id'] as String,
+            'subscriptionId': sub['id'] as String,
+          }).toList();
+          _subscribedIds = _userSubscriptions.map((sub) => sub['trainingId']!).toList();
+          _trainings = trainings;
+          _isLoading = false;
+        });
+      } else {
+        final matches = await _matchService.getMatches();
+        setState(() {
+          _matches = matches;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       setState(() {
         _error = 'Erro ao carregar os eventos: $e';
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _loadModalities() async {
+    final modalities = await _trainingService.getTrainingModalities();
+    setState(() {
+      _modalities = modalities;
+    });
   }
 
   String formatDate(String rawDate) {
@@ -84,111 +95,120 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredEvents = _trainings.where((event) {
-      final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(event.modality.toUpperCase());
-      return matchesCategory;
-    }).toList();
+    final filteredEvents = _selectedTabIndex == 1
+        ? _trainings.where((event) {
+            final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(event.modality.toUpperCase());
+            return matchesCategory;
+          }).toList()
+        : _matches.where((event) {
+            final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(event.modality.toUpperCase());
+            return matchesCategory;
+          }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFF001835),
       appBar: CustomAppBar(),
       body: SafeArea(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
-            : _error != null
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Text(
-                        _error!,
-                        style: const TextStyle(color: Colors.white, fontSize: 16),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  )
-                : ListView(
-                    controller: _scrollController,
-                    padding: EdgeInsets.zero,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16, bottom: 16),
-                        child: SizedBox(
-                          height: 100,
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.only(left: 16),
-                            itemCount: sports.length,
-                            separatorBuilder: (context, index) => const SizedBox(width: 20),
-                            itemBuilder: (context, index) {
-                              final sport = sports[index];
-                              final isLast = index == sports.length - 1;
-                              final isSelected = _selectedCategories.contains(sport['category']);
+        child: ListView(
+          controller: _scrollController,
+          padding: EdgeInsets.zero,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 16, bottom: 16),
+              child: SizedBox(
+                height: 100,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 16),
+                  itemCount: _modalities.length,
+                  separatorBuilder: (context, index) => const SizedBox(width: 20),
+                  itemBuilder: (context, index) {
+                    final modality = _modalities[index];
+                    final isLast = index == _modalities.length - 1;
+                    final isSelected = _selectedCategories.contains(modality['name'].toString().toUpperCase());
 
-                              return Padding(
-                                padding: EdgeInsets.only(right: isLast ? 16 : 0),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(12),
-                                    onTap: () {
-                                      setState(() {
-                                        final category = sport['category'];
-                                        if (_selectedCategories.contains(category)) {
-                                          _selectedCategories.remove(category);
-                                        } else {
-                                          _selectedCategories.add(category);
-                                        }
-                                      });
-                                    },
-                                    child: _buildSportIcon(
-                                      sport['label'],
-                                      sport['icon'],
-                                      isSelected: isSelected,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
+                    return Padding(
+                      padding: EdgeInsets.only(right: isLast ? 16 : 0),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            setState(() {
+                              final category = modality['name'].toString().toUpperCase();
+                              if (_selectedCategories.contains(category)) {
+                                _selectedCategories.remove(category);
+                              } else {
+                                _selectedCategories.add(category);
+                              }
+                            });
+                          },
+                          child: _buildSportIcon(
+                            modality['name'] ?? '',
+                            modality['icon'] ?? '',
+                            isSelected: isSelected,
                           ),
                         ),
                       ),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
-                          children: [
-                            Expanded(child: _buildTab('AMISTOSOS', 0)),
-                            const SizedBox(width: 16),
-                            Expanded(child: _buildTab('TREINOS', 1)),
-                          ],
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(child: _buildTab('AMISTOSOS', 0)),
+                  const SizedBox(width: 16),
+                  Expanded(child: _buildTab('TREINOS', 1)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _error != null
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-
-                      const SizedBox(height: 16),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: filteredEvents.isEmpty
-                            ? Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32),
-                                  child: Text(
-                                    'Nenhum valor encontrado.',
-                                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                                    textAlign: TextAlign.center,
-                                  ),
+                    )
+                  : _isLoading
+                      ? SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: CircularProgressIndicator(color: Color(0xFFFFD700)),
+                          ),
+                        )
+                      : filteredEvents.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(32),
+                                child: Text(
+                                  'Nenhum valor encontrado.',
+                                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                                  textAlign: TextAlign.center,
                                 ),
-                              )
-                            : Column(
-                                children: filteredEvents.map((event) {
+                              ),
+                            )
+                          : Column(
+                              children: filteredEvents.map((event) {
+                                if (_selectedTabIndex == 1) {
+                                  final training = event as Training;
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 16),
                                     child: GestureDetector(
                                       onTap: () {
-                                        final sub = _userSubscriptions.firstWhereOrNull((sub) => sub['trainingId'] == event.id);
+                                        final sub = _userSubscriptions.firstWhereOrNull((sub) => sub['trainingId'] == training.id);
                                         showTrainingModal(
                                           context,
-                                          event,
+                                          training,
                                           _subscribedIds,
                                           _loadData,
                                           _scrollController,
@@ -196,29 +216,73 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                         );
                                       },
                                       child: _buildEventCard(
-                                        event.title,
-                                        event.description,
-                                        formatDate(event.date),
-                                        event.place,
-                                        event.modality.toUpperCase(),
-                                        // event.isSubscribed,
-                                        _subscribedIds.contains(event.id)
+                                        training.title,
+                                        training.description,
+                                        formatDate(training.date),
+                                        training.place,
+                                        training.modality.toUpperCase(),
+                                        _subscribedIds.contains(training.id)
                                       ),
                                     ),
                                   );
-                                }).toList(),
-                              ),
-                      ),
-
-                      const SizedBox(height: 16),
-                    ],
-                  ),
+                                } else {
+                                  final match = event as Match;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 16),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showMatchModal(context, match);
+                                      },
+                                      child: _buildEventCard(
+                                        match.title,
+                                        match.description,
+                                        formatDate(match.date),
+                                        match.place,
+                                        match.modality.toUpperCase(),
+                                        false,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }).toList(),
+                            ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 1),
     );
   }
 
-  Widget _buildSportIcon(String label, IconData icon, {bool isSelected = false}) {
+  Widget _buildSportIcon(String label, String iconName, {bool isSelected = false}) {
+    // Mapeamento manual para os ícones do Material Icons
+    const iconMap = {
+      'sports_soccer': Icons.sports_soccer,
+      'sports_volleyball': Icons.sports_volleyball,
+      'sports_tennis': Icons.sports_tennis,
+      'sports_basketball': Icons.sports_basketball,
+      'sports_handball': Icons.sports_handball,
+      'pool': Icons.pool,
+      'golf_course': Icons.golf_course,
+      'directions_run': Icons.directions_run,
+      'fitness_center': Icons.fitness_center,
+      'kayaking': Icons.kayaking,
+      'kitesurfing': Icons.kitesurfing,
+      'paragliding': Icons.paragliding,
+      'rowing': Icons.rowing,
+      'scoreboard': Icons.scoreboard,
+      'scuba_diving': Icons.scuba_diving,
+      'skateboarding': Icons.skateboarding,
+      'sledding': Icons.sledding,
+      'snowboarding': Icons.snowboarding,
+      'sports': Icons.sports,
+      'sports_mma': Icons.sports_mma,
+      'stadium': Icons.stadium,
+      'surfing': Icons.surfing,
+    };
+
+    final iconData = iconMap[iconName] ?? Icons.sports;
     return Column(
       children: [
         Container(
@@ -235,7 +299,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
-            icon,
+            iconData,
             size: 30,
             color: isSelected ? Colors.black : Colors.white,
           ),
@@ -262,6 +326,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
             setState(() {
               _selectedTabIndex = index;
             });
+            _loadData();
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -391,4 +456,14 @@ void showTrainingModal(
       _scrollController.jumpTo(currentScrollOffset);
     });
   });
+}
+
+void showMatchModal(BuildContext context, Match match) async {
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(0.5),
+    builder: (_) => TrainingModal(match: match),
+  );
 }

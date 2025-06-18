@@ -9,6 +9,7 @@ import 'package:app_atletica/widgets/forms/custom_text_field.dart';
 import 'package:app_atletica/widgets/forms/custom_text_box.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/services/store_service.dart';
 
 class ProductRegistrationForm extends StatefulWidget {
   const ProductRegistrationForm({super.key});
@@ -22,34 +23,30 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
   File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
 
-  final List<DropdownMenuItem<String>> category = [
-    const DropdownMenuItem(value: 'Caneca', child: Text('Caneca')),
-    const DropdownMenuItem(
-      value: 'Camiseta Masculina',
-      child: Text('Camiseta Masculina'),
-    ),
-    const DropdownMenuItem(
-      value: 'Camiseta Feminina',
-      child: Text('Camiseta Feminina'),
-    ),
-    const DropdownMenuItem(
-      value: 'Chaveiro Tigre',
-      child: Text('Chaveiro Tigre'),
-    ),
-    const DropdownMenuItem(
-      value: 'Tatuagem Temporaria',
-      child: Text('Tatuagem Temporária'),
-    ),
-    const DropdownMenuItem(
-      value: 'Caneca Personalizada',
-      child: Text('Caneca Personalizada'),
-    ),
-    const DropdownMenuItem(
-      value: 'Caneca Estampada Premium',
-      child: Text('Caneca Estampada Premium'),
-    ),
-    const DropdownMenuItem(value: 'Bone Oficial', child: Text('Boné Oficial')),
-  ];
+  List<Map<String, dynamic>> _categories = [];
+  bool _loadingCategories = true;
+  String? _selectedCategoryId;
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    setState(() {
+      _loadingCategories = true;
+    });
+    final categories = await StoreService.getCategories(context);
+    setState(() {
+      _categories = categories;
+      _loadingCategories = false;
+    });
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -117,26 +114,79 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        CustomTextField(label: 'Nome', icon: Icons.create),
                         CustomTextField(
-                          label: 'Valor',
+                          label: 'Nome',
+                          icon: Icons.create,
+                          controller: _nameController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                        ),
+                        CustomTextField(
+                          label: 'Preço',
                           icon: Icons.attach_money,
+                          controller: _priceController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            if (double.tryParse(value.replaceAll(',', '.')) == null) {
+                              return 'Digite um valor válido';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 15),
-                        CustomDropdown(
-                          label: 'Categoria',
-                          icon: Icons.interests,
-                          items: category,
-                        ),
+                        _loadingCategories
+                            ? const Center(child: CircularProgressIndicator())
+                            : CustomDropdown(
+                                label: 'Categoria',
+                                icon: Icons.category,
+                                items: _categories
+                                    .map((cat) => DropdownMenuItem<String>(
+                                          value: cat['id'],
+                                          child: Text(cat['name'] ?? ''),
+                                        ))
+                                    .toList(),
+                                value: _selectedCategoryId,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedCategoryId = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Campo obrigatório';
+                                  }
+                                  return null;
+                                },
+                              ),
                         const SizedBox(height: 15),
-                        CustomTextBox(),
+                        CustomTextBox(
+                          controller: _descriptionController,
+                        ),
                         const SizedBox(height: 25),
                         Center(
                           child: CustomButton(
                             text: 'Salvar',
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                Navigator.pop(context);
+                                final success = await StoreService.createProduct(
+                                  name: _nameController.text,
+                                  description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
+                                  price: double.parse(_priceController.text.replaceAll(',', '.')),
+                                  categoryId: _selectedCategoryId!,
+                                );
+                                if (success) {
+                                  Navigator.pop(context);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Erro ao criar produto.')),
+                                  );
+                                }
                               }
                             },
                           ),

@@ -2,53 +2,52 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/models/product_model.dart';
 import 'package:app_atletica/services/api_service.dart';
+import 'package:http/http.dart' as http;
 
 class StoreService {
-  static const String _productsEndpoint = '/products';
-  static const String _categoriesEndpoint = '/product-categories';
+  static const String _productsEndpoint = '/api/products';
 
-  static Future<List<ProductCategory>> getCategories(BuildContext context) async {
+  static Future<List<Map<String, dynamic>>> getCategories(BuildContext context) async {
+    final baseUrl = getBaseUrl();
     try {
-      if (ApiService.useMockData) {
-        return _getMockCategories();
+      final response = await http.get(
+        Uri.parse('$baseUrl/product-categories'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'];
+        return data.cast<Map<String, dynamic>>();
       } else {
-        final response = await ApiService.get(context, _categoriesEndpoint);
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((item) => ProductCategory.fromJson(item)).toList();
+        throw Exception('Erro ${response.statusCode}');
       }
     } catch (e) {
       print('Erro ao carregar categorias: $e');
-      // Em caso de erro, retorna dados mockados
-      return _getMockCategories();
+      return [];
     }
   }
 
   static Future<List<ProductModel>> getProducts(BuildContext context, {String? category}) async {
+    final baseUrl = getBaseUrl();
     try {
-      if (ApiService.useMockData) {
-        final products = _getMockProducts();
-        if (category != null) {
-          return products.where((product) => product.category == category).toList();
-        }
-        return products;
-      } else {
-        Map<String, dynamic>? queryParams;
-        if (category != null) {
-          queryParams = {'category': category};
-        }
-        
-        final response = await ApiService.get(context, _productsEndpoint, queryParams: queryParams);
-        final List<dynamic> data = json.decode(response.body);
+      String url = '$baseUrl/products';
+      if (category != null) {
+        url += '?category=$category';
+      }
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Accept': 'application/json'},
+      ).timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'];
         return data.map((item) => ProductModel.fromJson(item)).toList();
+      } else {
+        throw Exception('Erro ${response.statusCode}');
       }
     } catch (e) {
       print('Erro ao carregar produtos: $e');
-      // Em caso de erro, retorna dados mockados
-      final products = _getMockProducts();
-      if (category != null) {
-        return products.where((product) => product.category == category).toList();
-      }
-      return products;
+      return [];
     }
   }
 
@@ -109,29 +108,38 @@ class StoreService {
     }
   }
 
+  static String getBaseUrl() {
+    // if (ApiService.useMockData) {
+    //   return 'http://localhost:3001/api';
+    // } else {
+    //   return 'http://192.168.1.3:3001/api'; // Altere conforme necessário para produção
+    // }
+    return 'http://192.168.1.3:3001/api'; // Altere conforme necessário para produção
+  }
+
   // Dados mockados para categorias
   static List<ProductCategory> _getMockCategories() {
     return [
-      ProductCategory(
-        id: 'CANECAS',
-        name: 'Canecas',
-        icon: 'local_drink',
-      ),
-      ProductCategory(
-        id: 'ROUPAS',
-        name: 'Roupas',
-        icon: 'checkroom',
-      ),
-      ProductCategory(
-        id: 'CHAVEIROS',
-        name: 'Chaveiros',
-        icon: 'key',
-      ),
-      ProductCategory(
-        id: 'TATUAGENS',
-        name: 'Tatuagens',
-        icon: 'brush',
-      ),
+      // ProductCategory(
+      //   id: 'CANECAS',
+      //   name: 'Canecas',
+      //   icon: 'local_drink',
+      // ),
+      // ProductCategory(
+      //   id: 'ROUPAS',
+      //   name: 'Roupas',
+      //   icon: 'checkroom',
+      // ),
+      // ProductCategory(
+      //   id: 'CHAVEIROS',
+      //   name: 'Chaveiros',
+      //   icon: 'key',
+      // ),
+      // ProductCategory(
+      //   id: 'TATUAGENS',
+      //   name: 'Tatuagens',
+      //   icon: 'brush',
+      // ),
     ];
   }
 
@@ -206,10 +214,44 @@ class StoreService {
         name: 'Boné Oficial',
         category: 'ROUPAS',
         price: 40.00,
-        image: 'assets/images/bone.jpeg',
+        image: 'assets/images/bone.png',
         description: 'Boné oficial com logo bordado',
         stock: 20,
       ),
     ];
+  }
+
+  static Future<bool> createProduct({
+    required String name,
+    String? description,
+    required double price,
+    required String categoryId,
+  }) async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/products'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'name': name,
+          'description': description,
+          'price': price,
+          'categoryId': categoryId,
+          'stock': 10, 
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro ao criar produto: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar produto: $e');
+      return false;
+    }
   }
 }
