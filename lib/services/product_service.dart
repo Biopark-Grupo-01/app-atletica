@@ -15,7 +15,7 @@ class ProductService {
       return 'http://10.0.2.2:3001/api';
     } else {
       // Para dispositivos móveis, use o IP real da máquina na rede
-      return 'http://192.168.3.109:3001/api'; // Updated to use the correct IP
+      return 'http://192.168.1.3:3001/api'; // Updated to use the correct IP
     }
   }
 

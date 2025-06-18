@@ -36,4 +36,43 @@ class MatchService {
       return [];
     }
   }
+
+  Future<bool> createMatch({
+    required String title,
+    required String description,
+    required String place,
+    required String startDate,
+    required String startTime,
+    required String responsible,
+    required String trainingModalityId,
+  }) async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/matches'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'place': place,
+          'start_date': startDate,
+          'start_time': startTime,
+          'responsible': responsible,
+          'trainingModalityId': trainingModalityId,
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro ao criar amistoso: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar amistoso: $e');
+      return false;
+    }
+  }
 }
