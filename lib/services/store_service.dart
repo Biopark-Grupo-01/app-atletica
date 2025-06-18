@@ -220,4 +220,38 @@ class StoreService {
       ),
     ];
   }
+
+  static Future<bool> createProduct({
+    required String name,
+    String? description,
+    required double price,
+    required String categoryId,
+  }) async {
+    final baseUrl = getBaseUrl();
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/products'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'name': name,
+          'description': description,
+          'price': price,
+          'categoryId': categoryId,
+          'stock': 10, 
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro ao criar produto: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar produto: $e');
+      return false;
+    }
+  }
 }
