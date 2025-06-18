@@ -5,6 +5,7 @@ import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/services/product_service.dart';
+import 'package:app_atletica/services/store_service.dart';
 
 class StoreScreen extends StatefulWidget {
   const StoreScreen({super.key});
@@ -19,12 +20,9 @@ class _StoreScreenState extends State<StoreScreen> {
   bool _isLoading = true;
   String? _error;
 
-  final List<Map<String, dynamic>> storeCategories = [
-    {'label': 'Canecas', 'icon': Icons.local_drink, 'category': 'CANECAS'},
-    {'label': 'Roupas', 'icon': Icons.checkroom, 'category': 'ROUPAS'},
-    {'label': 'Chaveiros', 'icon': Icons.key, 'category': 'CHAVEIROS'},
-    {'label': 'Tatuagens', 'icon': Icons.brush, 'category': 'TATUAGENS'},
-  ];
+  List<Map<String, dynamic>> _categories = [];
+  bool _isLoadingCategories = true;
+  String? _categoriesError;
 
   List<String> _selectedCategories = [];
   final TextEditingController _searchController = TextEditingController();
@@ -33,10 +31,32 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   void initState() {
     super.initState();
+    _loadCategories();
     _loadProducts();
     _searchController.addListener(() {
       setState(() {});
     });
+  }
+
+  Future<void> _loadCategories() async {
+    setState(() {
+      _isLoadingCategories = true;
+      _categoriesError = null;
+    });
+
+    try {
+      final categories = await StoreService.getCategories(context);
+      setState(() {
+        _categories = categories;
+        _isLoadingCategories = false;
+      });
+      print('Categorias carregadas: ${_categories}');
+    } catch (e) {
+      setState(() {
+        _categoriesError = 'Não foi possível carregar as categorias: $e';
+        _isLoadingCategories = false;
+      });
+    }
   }
 
   Future<void> _loadProducts() async {
@@ -47,6 +67,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
     try {
       final products = await _productService.getProducts();
+      // print('Produtos carregados: ${products}');
       setState(() {
         _products = products;
         _isLoading = false;
@@ -69,11 +90,14 @@ class _StoreScreenState extends State<StoreScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      final String? categoria =
-          ModalRoute.of(context)?.settings.arguments as String?;
-      if (categoria != null && !_selectedCategories.contains(categoria)) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      String? categoriaId;
+      if (args is String) {
+        categoriaId = args;
+      }
+      if (categoriaId != null && !_selectedCategories.contains(categoriaId)) {
         setState(() {
-          _selectedCategories.add(categoria);
+          _selectedCategories.add(categoriaId!);
           _initialized = true;
         });
       }
@@ -83,7 +107,13 @@ class _StoreScreenState extends State<StoreScreen> {
   // Método para converter os produtos da API para o formato da UI
   List<Map<String, String>> _getProductsForUI() {
     if (_products.isNotEmpty) {
-      return _products.map((product) => product.toJson()).toList();
+      return _products.map((product) {
+        final map = product.toJson();
+        debugPrint('Convertendo produtos para UI: $map');
+        // Garante que o campo category_id esteja presente para o filtro
+        map['category_id'] = product.categoryId ?? '';
+        return map;
+      }).toList();
     } else {
       return [];
     }
@@ -92,17 +122,14 @@ class _StoreScreenState extends State<StoreScreen> {
   @override
   Widget build(BuildContext context) {
     final allProductsForUI = _getProductsForUI();
+    // print('Produtos para UI: $allProductsForUI');
 
-    final filteredProducts =
-        allProductsForUI.where((product) {
-          final matchesCategory =
-              _selectedCategories.isEmpty ||
-              _selectedCategories.contains(product['category']);
-          final matchesSearch = product['name']!.toLowerCase().contains(
-            _searchController.text.toLowerCase(),
-          );
-          return matchesCategory && matchesSearch;
-        }).toList();
+    final filteredProducts = allProductsForUI.where((product) {
+      final productCategoryId = product['category_id'] ?? '';
+      final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(productCategoryId);
+      final matchesSearch = (product['name'] ?? '').toLowerCase().contains(_searchController.text.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.blue,
@@ -141,48 +168,57 @@ class _StoreScreenState extends State<StoreScreen> {
                     const SizedBox(height: 16),
 
                     // Categories horizontal list
-                    SizedBox(
-                      height: 100,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.only(left: 0),
-                        itemCount: storeCategories.length,
-                        separatorBuilder:
-                            (context, index) => const SizedBox(width: 20),
-                        itemBuilder: (context, index) {
-                          final category = storeCategories[index];
-                          final isLast = index == storeCategories.length - 1;
-                          final isSelected = _selectedCategories.contains(
-                            category['category'],
-                          );
+                    if (_isLoadingCategories)
+                      const Center(
+                        child: CircularProgressIndicator(color: AppColors.yellow),
+                      )
+                    else if (_categoriesError != null)
+                      Center(
+                        child: Text(
+                          _categoriesError!,
+                          style: const TextStyle(color: AppColors.white),
+                        ),
+                      )
+                    else
+                      SizedBox(
+                        height: 100,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.only(left: 0),
+                          itemCount: _categories.length,
+                          separatorBuilder:
+                              (context, index) => const SizedBox(width: 20),
+                          itemBuilder: (context, index) {
+                            final category = _categories[index];
+                            final isLast = index == _categories.length - 1;
+                            final isSelected = _selectedCategories.contains(category['id']);
 
-                          return Padding(
-                            padding: EdgeInsets.only(right: isLast ? 16 : 0),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(12),
-                                onTap: () {
-                                  setState(() {
-                                    final cat = category['category'];
-                                    if (_selectedCategories.contains(cat)) {
-                                      _selectedCategories.remove(cat);
-                                    } else {
-                                      _selectedCategories.add(cat);
-                                    }
-                                  });
-                                },
-                                child: _buildCategoryIcon(
-                                  category['label'],
-                                  category['icon'],
-                                  isSelected: isSelected,
+                            return Padding(
+                              padding: EdgeInsets.only(right: isLast ? 16 : 0),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () {
+                                    setState(() {
+                                      if (_selectedCategories.contains(category['id'])) {
+                                        _selectedCategories.remove(category['id']);
+                                      } else {
+                                        _selectedCategories.add(category['id']);
+                                      }
+                                    });
+                                  },
+                                  child: _buildCategoryIcon(
+                                    category['name'],
+                                    _getIconData(category['icon'] ?? 'category'),
+                                    isSelected: isSelected,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
 
                     const SizedBox(height: 16),
 
@@ -207,21 +243,26 @@ class _StoreScreenState extends State<StoreScreen> {
                           padding: const EdgeInsets.only(bottom: 15),
                           child: GestureDetector(
                             onTap: () {
+                              // Busca o nome da categoria pelo id
+                              final categoryName = _categories.firstWhere(
+                                (cat) => cat['id'] == product['category_id'],
+                                orElse: () => {'name': ''},
+                              )['name'] ?? '';
                               Navigator.pushNamed(
                                 context,
                                 '/productDetail',
-                                arguments: product,
+                                arguments: {
+                                  ...product,
+                                  'category_id': product['category_id'],
+                                  'category': categoryName,
+                                },
                               );
                             },
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                return _buildHorizontalProductCard(
-                                  product['name']!,
-                                  product['price']!,
-                                  product['image']!,
-                                  constraints.maxWidth,
-                                );
-                              },
+                            child: _buildHorizontalProductCard(
+                              product['name'] ?? '',
+                              product['price'] ?? '',
+                              product['image'] ?? '',
+                              MediaQuery.of(context).size.width - 32,
                             ),
                           ),
                         );
@@ -231,6 +272,23 @@ class _StoreScreenState extends State<StoreScreen> {
       ),
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 2),
     );
+  }
+
+  IconData _getIconData(String? iconName) {
+    switch (iconName) {
+      case 'checkroom':
+        return Icons.checkroom;
+      case 'local_cafe':
+        return Icons.local_cafe;
+      case 'sports_baseball':
+        return Icons.sports_baseball;
+      case 'emoji_objects':
+        return Icons.emoji_objects;
+      case 'ac_unit':
+        return Icons.ac_unit;
+      default:
+        return Icons.category;
+    }
   }
 
   Widget _buildCategoryIcon(
