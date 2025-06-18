@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 
 class CustomTextBox extends StatelessWidget {
-  const CustomTextBox({super.key});
+  final TextEditingController? controller;
+  const CustomTextBox({super.key, this.controller});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -21,7 +22,7 @@ class CustomTextBox extends StatelessWidget {
         ),
         SizedBox(height: 10),
         TextFormField(
-          controller: TextEditingController(),
+          controller: controller,
           maxLines: 5,
           decoration: InputDecoration(
             border: OutlineInputBorder(),

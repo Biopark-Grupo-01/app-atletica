@@ -136,21 +136,14 @@ class _TrainingModalState extends State<TrainingModal> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          _infoSection(
-                            icon: Icons.notes,
-                            title: 'Descrição',
-                            content: Text(
-                              isTraining ? widget.training!.description : widget.match!.description,
-                              style: const TextStyle(color: Colors.white70, fontSize: 14),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
                           if (isTraining)
                             _infoSection(
                               icon: Icons.how_to_reg,
                               title: 'Técnico',
                               content: Text(
-                                widget.training!.coach,
+                                (widget.training!.coach.isNotEmpty)
+                                    ? widget.training!.coach
+                                    : 'A definir...',
                                 style: const TextStyle(color: Colors.white70),
                               ),
                             ),
@@ -159,7 +152,9 @@ class _TrainingModalState extends State<TrainingModal> {
                             icon: Icons.how_to_reg,
                             title: 'Responsável',
                             content: Text(
-                              isTraining ? widget.training!.responsible : widget.match!.responsible,
+                              (isTraining ? widget.training!.responsible : widget.match!.responsible).isNotEmpty
+                                  ? (isTraining ? widget.training!.responsible : widget.match!.responsible)
+                                  : 'A definir...',
                               style: const TextStyle(color: Colors.white70),
                             ),
                           ),
@@ -170,6 +165,17 @@ class _TrainingModalState extends State<TrainingModal> {
                             content: Text(
                               isTraining ? widget.training!.place : widget.match!.place,
                               style: const TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _infoSection(
+                            icon: Icons.notes,
+                            title: 'Descrição',
+                            content: Text(
+                              (isTraining ? widget.training!.description : widget.match!.description).isNotEmpty
+                                  ? (isTraining ? widget.training!.description : widget.match!.description)
+                                  : 'A definir...',
+                              style: const TextStyle(color: Colors.white70, fontSize: 14),
                             ),
                           ),
                         ],

@@ -118,26 +118,26 @@ class EventsNewsService {
 
 
     final List<Map<String, dynamic>> storeCategories = [
-      {
-        'label': 'Canecas', 
-        'icon': Icons.local_drink, 
-        'category': 'CANECAS'
-      },
-      {
-        'label': 'Roupas', 
-        'icon': Icons.checkroom, 
-        'category': 'ROUPAS'
-      },
-      {
-        'label': 'Chaveiros', 
-        'icon': Icons.key, 
-        'category': 'CHAVEIROS'
-      },
-      {
-        'label': 'Tatuagens', 
-        'icon': Icons.brush, 
-        'category': 'TATUAGENS'
-      },
+      // {
+      //   'label': 'Canecas', 
+      //   'icon': Icons.local_drink, 
+      //   'category': 'CANECAS'
+      // },
+      // {
+      //   'label': 'Roupas', 
+      //   'icon': Icons.checkroom, 
+      //   'category': 'ROUPAS'
+      // },
+      // {
+      //   'label': 'Chaveiros', 
+      //   'icon': Icons.key, 
+      //   'category': 'CHAVEIROS'
+      // },
+      // {
+      //   'label': 'Tatuagens', 
+      //   'icon': Icons.brush, 
+      //   'category': 'TATUAGENS'
+      // },
     ];
 
   // Método para adicionar ou atualizar um evento

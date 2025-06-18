@@ -23,23 +23,23 @@ class AccountSettingsScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.blue,
           body: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xff21396a), AppColors.blue],
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xff21396a), AppColors.blue],
+                      ),
                     ),
-                  ),
-                  child:
-                      user == null
-                          ? const Center(child: CircularProgressIndicator())
-                          : Stack(
+                    child: user == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : Stack(
                             children: [
                               Positioned(
                                 bottom: 0,
@@ -119,32 +119,30 @@ class AccountSettingsScreen extends StatelessWidget {
                               // ),
                             ],
                           ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 100,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      buildClubeCheersCard(
-                        icon: Icons.event_available,
-                        title: "Eventos Inscritos",
-                        subtitle: "Eventos que você está inscrito",
-                      ),
-                      buildClubeCheersCard(
-                        icon: Icons.event_available,
-                        title: "Interesses",
-                        subtitle: "Notícias que você destacou",
-                      ),
-                    ],
                   ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    height: 100,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      children: [
+                        buildClubeCheersCard(
+                          icon: Icons.event_available,
+                          title: "Eventos Inscritos",
+                          subtitle: "Eventos que você está inscrito",
+                        ),
+                        buildClubeCheersCard(
+                          icon: Icons.event_available,
+                          title: "Interesses",
+                          subtitle: "Notícias que você destacou",
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
-                      spacing: 25,
                       children: [
                         MenuCard(
                           icon: FontAwesomeIcons.solidCircleUser,
@@ -159,6 +157,7 @@ class AccountSettingsScreen extends StatelessWidget {
                             );
                           },
                         ),
+                        const SizedBox(height: 20),
                         MenuCard(
                           icon: Icons.confirmation_num,
                           title: "Ingressos",
@@ -167,12 +166,12 @@ class AccountSettingsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (context) => TicketsScreen(user: user!),
+                                builder: (context) => TicketsScreen(user: user!),
                               ),
                             );
                           },
                         ),
+                        const SizedBox(height: 20),
                         MenuCard(
                           icon: Icons.bookmark,
                           title: "Salvos",
@@ -181,12 +180,12 @@ class AccountSettingsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder:
-                                    (context) => TicketsScreen(user: user!),
+                                builder: (context) => TicketsScreen(user: user!),
                               ),
                             );
                           },
                         ),
+                        const SizedBox(height: 20),
                         MenuCard(
                           icon: Icons.badge,
                           title: "Carteirinha",
@@ -201,6 +200,7 @@ class AccountSettingsScreen extends StatelessWidget {
                           },
                         ),
                         if (!userProvider.isAdmin) ...[
+                          const SizedBox(height: 20),
                           MenuCard(
                             icon: Icons.support_agent,
                             title: "Suporte",
@@ -209,6 +209,7 @@ class AccountSettingsScreen extends StatelessWidget {
                           ),
                         ],
                         if (userProvider.isAdmin) ...[
+                          const SizedBox(height: 20),
                           MenuCard(
                             icon: FontAwesomeIcons.userTie,
                             title: "Administração",
@@ -226,8 +227,8 @@ class AccountSettingsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           bottomNavigationBar: const CustomBottomNavBar(currentIndex: 4),

@@ -20,6 +20,7 @@ import 'package:app_atletica/screens/forms/product_registration.dart';
 import 'package:provider/provider.dart';
 import 'package:app_atletica/providers/user_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:app_atletica/utils/error_handler.dart';
 
@@ -97,6 +98,14 @@ class MyApp extends StatelessWidget {
             primaryColor: AppColors.yellow,
           ),
           debugShowCheckedModeBanner: false,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('pt', 'BR'),
+          ],
           initialRoute: initialRoute,
           routes: {
             // Rotas públicas (sem autenticação)

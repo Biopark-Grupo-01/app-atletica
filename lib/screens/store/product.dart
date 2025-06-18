@@ -140,11 +140,11 @@ class _ProductScreenState extends State<ProductScreen> {
                 Navigator.pushNamed(
                   context,
                   '/store',
-                  arguments: product['category'],
+                  arguments: product['category_id'],
                 );
               },
               child: Text(
-                'Categoria: ${product['category']}',
+                'Categoria: ${product['category'].toString().toUpperCase()}',
                 style: TextStyle(
                   color: Color.fromARGB(230, 255, 255, 255),
                   decoration: TextDecoration.underline,
