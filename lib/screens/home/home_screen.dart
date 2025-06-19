@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         error = null;
       });
       
-      final data = await NewsService.loadData(context);
+      final data = await NewsService.loadData();
       
       // Convertendo os dados dinâmicos para String para compatibilidade com o CarouselItem
       final newsList = (data['news'] as List<dynamic>? ?? []).map((item) {

@@ -146,7 +146,7 @@ class UsersListState extends State<UsersList> {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (_) => MembershipCardScreen(user: user),
+                                        (_) => MembershipCardScreen(),
                                   ),
                                 );
                               },
@@ -160,7 +160,7 @@ class UsersListState extends State<UsersList> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => TicketsScreen(user: user),
+                                  builder: (_) => TicketsScreen(),
                                 ),
                               );
                             },

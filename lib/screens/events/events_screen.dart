@@ -15,7 +15,6 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  // Alterando para Map<String, dynamic> para compatibilidade com a API
   List<Map<String, dynamic>> news = [];
   List<Map<String, dynamic>> events = [];
   bool isLoading = true;
@@ -35,11 +34,9 @@ class _EventsScreenState extends State<EventsScreen> {
         error = null;
       });
 
-      // Carregando dados através do serviço atualizado
-      final data = await NewsService.loadData(context);
+      final data = await NewsService.loadData();
 
       setState(() {
-        // Convertendo para o tipo correto
         news = List<Map<String, dynamic>>.from(data['news'] ?? []);
         events = List<Map<String, dynamic>>.from(data['events'] ?? []);
         isLoading = false;
@@ -59,7 +56,6 @@ class _EventsScreenState extends State<EventsScreen> {
       return DateFormat('dd/MM/yyyy').parse(dateStr);
     } catch (e) {
       try {
-        // Tentativa alternativa de parsing (caso a data venha em outro formato do backend)
         return DateTime.parse(dateStr);
       } catch (e) {
         return DateTime(2000);
@@ -90,9 +86,9 @@ class _EventsScreenState extends State<EventsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           'Erro ao carregar dados:',
-                          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -125,9 +121,9 @@ class _EventsScreenState extends State<EventsScreen> {
                           child: sortedList.isEmpty
                               ? Center(
                                   child: Text(
-                                    _selectedTabIndex == 0 
-                                      ? 'Nenhum evento encontrado.' 
-                                      : 'Nenhuma notícia encontrada.',
+                                    _selectedTabIndex == 0
+                                        ? 'Nenhum evento encontrado.'
+                                        : 'Nenhuma notícia encontrada.',
                                     style: const TextStyle(color: AppColors.white),
                                   ),
                                 )
@@ -139,9 +135,12 @@ class _EventsScreenState extends State<EventsScreen> {
                                       children: [
                                         GestureDetector(
                                           onTap: () {
+                                            final routeName = _selectedTabIndex == 0
+                                                ? '/trainingDetail'
+                                                : '/newsDetail';
                                             Navigator.pushNamed(
                                               context,
-                                              '/trainingDetail',
+                                              routeName,
                                               arguments: item,
                                             );
                                           },
@@ -170,9 +169,7 @@ class _EventsScreenState extends State<EventsScreen> {
                     ),
                   ),
       ),
-      bottomNavigationBar: const CustomBottomNavBar(
-        currentIndex: 3 
-      ),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 3),
     );
   }
 

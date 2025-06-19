@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:app_atletica/models/news_event_model.dart';
+import 'package:app_atletica/models/event_model.dart';
 import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';

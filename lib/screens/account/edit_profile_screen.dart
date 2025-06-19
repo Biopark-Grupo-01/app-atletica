@@ -7,10 +7,10 @@ import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import './mock_user_repository.dart';
 import '../../models/user_model.dart';
+import 'package:app_atletica/providers/user_provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -20,7 +20,6 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final userRepo = MockUserRepository();
   final nameController = TextEditingController();
   final cpfController = TextEditingController();
   final phoneController = TextEditingController();
@@ -46,6 +45,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       });
     }
   }
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -54,37 +54,86 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    final user = await userRepo.getUser();
-    if (user != null) {
-      setState(() {
+    setState(() {
+      isLoading = true;
+    });
+    
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = userProvider.currentUser;
+      
+      if (user != null) {
         nameController.text = user.name;
-        cpfController.text = user.cpf!;
+        cpfController.text = user.cpf ?? '';
         emailController.text = user.email;
-        avatarUrl = user.avatarUrl!;
-        // phoneController.text = user.phone;
-        // birthDateController.text = user.birthDate;
+        avatarUrl = user.avatarUrl ?? '';
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao carregar dados: $e"))
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
       });
     }
   }
 
   Future<void> _saveProfile() async {
-    final updatedUser = UserModel(
-      id: "1", // mockado
-      name: nameController.text.trim(),
-      cpf: cpfController.text.trim(),
-      email: emailController.text.trim(),
-      avatarUrl: avatarUrl,
-      // phone: phoneController.text.trim(),
-      // birthDate: birthDateController.text.trim(),
-    );
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.currentUser;
+    
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nenhum usuário logado!"))
+      );
+      return;
+    }
+    
+    setState(() {
+      isLoading = true;
+    });
+    
+    try {
+      final updatedUser = UserModel(
+        id: currentUser.id,
+        name: nameController.text.trim(),
+        cpf: cpfController.text.trim(),
+        email: emailController.text.trim(),
+        avatarUrl: avatarUrl,
+        role: currentUser.role,
+        registration: currentUser.registration,
+        validUntil: currentUser.validUntil,
+      );
 
-    await userRepo.updateUser(updatedUser);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Perfil atualizado com sucesso!")),
-    );
-
-    Navigator.pop(context);
+      // Atualizando o usuário usando o provider
+      final success = await userProvider.updateProfile(updatedUser);
+      
+      if (success) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Perfil atualizado com sucesso!"))
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Erro ao atualizar: ${userProvider.errorMessage ?? 'Erro desconhecido'}"))
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao atualizar perfil: $e"))
+        );
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -122,14 +171,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: _imageFile != null
                                   ? Image.file(_imageFile!, fit: BoxFit.cover)
                                   : (avatarUrl.isNotEmpty
-                                      ? Image.network(avatarUrl, fit: BoxFit.cover)
-                                      : Image.asset('assets/images/aaabe.png', fit: BoxFit.cover)),
+                                      ? Image(
+                                          image: avatarUrl.startsWith('http')
+                                              ? NetworkImage(avatarUrl)
+                                              : AssetImage(avatarUrl) as ImageProvider,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Image(
+                                          image: AssetImage("assets/images/emblema.png"),
+                                          fit: BoxFit.cover,
+                                        )),
                             ),
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        
                         CustomTextFieldProfile(
                           controller: nameController,
                           label: 'Nome: ',

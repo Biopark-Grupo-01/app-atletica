@@ -3,8 +3,8 @@ import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class TelaNoticiasDetalhes extends StatelessWidget {
-  const TelaNoticiasDetalhes({super.key});
+class NewsDetailsScreen extends StatelessWidget {
+  const NewsDetailsScreen({super.key});
 
   // Função para buscar notícia pelo id
   Future<Map<String, dynamic>> fetchNewsById(String id) async {
@@ -13,19 +13,16 @@ class TelaNoticiasDetalhes extends StatelessWidget {
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      // Supondo que o backend retorne um objeto da notícia diretamente em "data"
       return jsonData['data'];
     } else {
       throw Exception('Falha ao carregar notícia');
     }
   }
 
-  // Verifica se é URL de imagem de rede
   bool _isNetworkUrl(String path) {
     return path.startsWith('http://') || path.startsWith('https://');
   }
 
-  // Widget da imagem da notícia
   Widget _buildNewsImage(String imageUrl) {
     if (_isNetworkUrl(imageUrl)) {
       return Image.network(
@@ -58,8 +55,8 @@ class TelaNoticiasDetalhes extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Espera receber o id da notícia na rota
-    final String? newsId = ModalRoute.of(context)!.settings.arguments as String?;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final String? newsId = args is String ? args : null;
 
     if (newsId == null) {
       return Scaffold(
@@ -117,7 +114,6 @@ class TelaNoticiasDetalhes extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Imagem principal com botão voltar
                   Stack(
                     children: [
                       SizedBox(
@@ -146,8 +142,6 @@ class TelaNoticiasDetalhes extends StatelessWidget {
                       ),
                     ],
                   ),
-
-                  // Conteúdo da notícia
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -163,7 +157,6 @@ class TelaNoticiasDetalhes extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(Icons.calendar_today_outlined, color: Colors.white, size: 20),
                             const SizedBox(width: 12),
@@ -174,16 +167,13 @@ class TelaNoticiasDetalhes extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 36),
-
                         _sectionTitle(Icons.notes, 'Descrição da Notícia'),
                         const SizedBox(height: 16),
                         Text(
                           description,
                           style: const TextStyle(color: Colors.white70, fontSize: 14),
                         ),
-
                         const SizedBox(height: 24),
-
                         Container(
                           padding: const EdgeInsets.symmetric(vertical: 24),
                           decoration: const BoxDecoration(

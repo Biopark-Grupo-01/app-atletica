@@ -4,12 +4,11 @@ import 'package:app_atletica/screens/forms/trainings_registration.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';
 import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
-import 'package:app_atletica/screens/news/news_screen.dart';
+import 'package:app_atletica/screens/news/news_details.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
 import 'package:app_atletica/screens/trainings/training-details_screen.dart';
 import 'package:app_atletica/screens/trainings/trainings_screen.dart';
-import 'package:app_atletica/services/news_service.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/screens/login/login_screen.dart';
@@ -112,7 +111,7 @@ class MyApp extends StatelessWidget {
 
             // Rotas protegidas por autenticação
             '/events': (context) => EventsScreen(),
-            '/news': (context) => NewsScreen(),
+            '/newsDetail': (context) => NewsDetailsScreen(),
             '/trainings': (context) => TrainingsScreen(),
             '/trainingDetail': (context) => TreinoDetalhesScreen(),
             '/store': (context) => StoreScreen(),

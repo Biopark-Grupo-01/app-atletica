@@ -26,4 +26,3 @@ class MockUserRepository {
     _user = user;
   }
 }
-
