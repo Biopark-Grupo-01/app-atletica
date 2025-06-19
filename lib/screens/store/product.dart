@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/models/product_model.dart';
+import 'package:app_atletica/services/store_service.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});
@@ -15,6 +17,26 @@ class _ProductScreenState extends State<ProductScreen> {
   String selectedModel = 'PP';
   int selectedQuantity = 1;
   final PageController _pageController = PageController();
+
+  List<ProductModel> _moreProducts = [];
+  bool _loadingMoreProducts = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMoreProducts();
+  }
+
+  Future<void> _loadMoreProducts() async {
+    setState(() {
+      _loadingMoreProducts = true;
+    });
+    final products = (await StoreService.getProducts(context)).take(5).toList();
+    setState(() {
+      _moreProducts = products;
+      _loadingMoreProducts = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -395,7 +417,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
             // Mais produtos
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Mais produtos disponíveis na loja',
               style: TextStyle(
                 color: Colors.white,
@@ -403,31 +425,30 @@ class _ProductScreenState extends State<ProductScreen> {
                 fontWeight: FontWeight.normal,
               ),
             ),
-
             const SizedBox(height: 12),
-
             SizedBox(
               height: 180,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildProductCard(
-                    image: 'assets/images/camisetaa_masculina.png',
-                    title: 'Camiseta Masculina',
-                    product: product,
-                  ),
-                  _buildProductCard(
-                    image: 'assets/images/camiseta_feminina_1.png',
-                    title: 'Camiseta Feminina',
-                    product: product,
-                  ),
-                  _buildProductCard(
-                    image: 'assets/images/caneca_oficial.png',
-                    title: 'Caneca Oficial',
-                    product: product,
-                  ),
-                ],
-              ),
+              child: _loadingMoreProducts
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: _moreProducts
+                          .where((p) => p.id != product['id'])
+                          .map((p) => _buildProductCard(
+                                image: p.image ?? 'assets/images/brasao.png',
+                                title: p.name,
+                                product: {
+                                  'id': p.id,
+                                  'name': p.name,
+                                  'description': p.description,
+                                  'price': p.price.toStringAsFixed(2),
+                                  'image': p.image ?? 'assets/images/brasao.png',
+                                  'category_id': p.categoryId,
+                                  'category': product['category'],
+                                },
+                              ))
+                          .toList(),
+                    ),
             ),
           ],
         ),
@@ -454,12 +475,21 @@ class _ProductScreenState extends State<ProductScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                image,
-                width: 140,
-                height: 120,
-                fit: BoxFit.cover,
-              ),
+              child: image.startsWith('http')
+                  ? Image.network(
+                      image,
+                      width: 140,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
+                    )
+                  : Image.asset(
+                      image,
+                      width: 140,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
+                    ),
             ),
             const SizedBox(height: 8),
             Text(
