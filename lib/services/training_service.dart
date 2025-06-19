@@ -1,19 +1,11 @@
+import 'package:app_atletica/services/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:app_atletica/models/training_model.dart';
 
 class TrainingService {
-  static String getBaseUrl() {
-    if (kIsWeb) {
-      return 'http://localhost:3001/api';
-    } else {
-      return 'http://192.168.1.3:3001/api'; // Updated to use the correct IP
-    }
-  }
-
   Future<List<Training>> getTrainings() async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http
           .get(
@@ -41,7 +33,7 @@ class TrainingService {
   }
 
   Future<bool> subscribeToTraining(String trainingId, String userId) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
 
     try {
       final response = await http.post(
@@ -66,7 +58,7 @@ class TrainingService {
   }
 
   Future<bool> unsubscribeFromTraining(String subscriptionId) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http.delete(
         Uri.parse('$baseUrl/subscriptions/$subscriptionId'),
@@ -85,7 +77,7 @@ class TrainingService {
   }
 
   Future<List<String>> getSubscribedTrainingIds(String userId) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
 
     try {
       final response = await http
@@ -112,7 +104,7 @@ class TrainingService {
   }
 
   Future<List<Map<String, dynamic>>> getUserSubscriptions(String userId) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http
           .get(
@@ -135,7 +127,7 @@ class TrainingService {
   }
 
   Future<List<Map<String, dynamic>>> getTrainingModalities() async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/training-modalities'),
@@ -164,7 +156,7 @@ class TrainingService {
     required String responsible,
     required String trainingModalityId,
   }) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/trainings'),
