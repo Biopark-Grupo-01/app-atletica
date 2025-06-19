@@ -1,30 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:app_atletica/services/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:app_atletica/models/product_model.dart';
 
 class ProductService {
-  // URL base da API - adaptando para diferentes ambientes
-  static String getBaseUrl() {
-    // if (kIsWeb) {
-    //   // Para aplicações web, pode ser necessário usar um proxy CORS ou habilitar CORS no backend
-    //   return 'http://127.0.0.1:3001/api'; // Tentando com 127.0.0.1 em vez de localhost
-    // } else if (Platform.isAndroid) {
-    //   // Para emulador Android
-    //   return 'http://10.0.2.2:3001/api';
-    // } else {
-    //   // Para dispositivos móveis, use o IP real da máquina na rede
-    //   return 'http://192.168.1.3:3001/api'; // Updated to use the correct IP
-    // }
-
-      return 'http://192.168.1.3:3001/api'; // Updated to use the correct IP
-
-  }
-
   // Método para buscar todos os produtos
   Future<List<ProductModel>> getProducts() async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       print('Fazendo requisição para: $baseUrl/products');
 
@@ -98,7 +80,7 @@ class ProductService {
 
   // Método para buscar um produto específico pelo ID
   Future<ProductModel?> getProduct(String id) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http
           .get(
@@ -126,7 +108,7 @@ class ProductService {
 
   // Método para buscar produtos por categoria
   Future<List<ProductModel>> getProductsByCategory(String category) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http
           .get(

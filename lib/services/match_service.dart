@@ -1,19 +1,11 @@
 import 'dart:convert';
+import 'package:app_atletica/services/api_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:app_atletica/models/match_model.dart';
-import 'package:flutter/foundation.dart';
 
 class MatchService {
-  static String getBaseUrl() {
-    if (kIsWeb) {
-      return 'http://localhost:3001/api';
-    } else {
-      return 'http://192.168.1.3:3001/api';
-    }
-  }
-
   Future<List<Match>> getMatches() async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http
           .get(Uri.parse('$baseUrl/matches'), headers: {'Accept': 'application/json'})
@@ -46,7 +38,7 @@ class MatchService {
     required String responsible,
     required String trainingModalityId,
   }) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/matches'),

@@ -11,23 +11,11 @@ enum ApiEnvironment {
 }
 
 class ApiService {
-  // Configure aqui a URL base para desenvolvimento e produção
-  static const Map<ApiEnvironment, String> _baseUrls = {
-    ApiEnvironment.development: 'localhost:8080/api',
-    ApiEnvironment.production: 'api.atletica.com/api',
-  };
-
-  // Ambiente atual (baseado na configuração do aplicativo)
-  static ApiEnvironment get _currentEnvironment => 
-      AppConfig.environment == Environment.production 
-          ? ApiEnvironment.production 
-          : ApiEnvironment.development;
-  
   // Flag para usar dados mockados (baseado na configuração do aplicativo)
   static bool get useMockData => AppConfig.useMockData;
   
   // URL base atual baseada no ambiente
-  static String get baseUrl => _baseUrls[_currentEnvironment]!;
+  static String get baseUrl => AppConfig.apiUrl;
   
   // Duração máxima para cache de dados
   static const Duration _maxCacheAge = Duration(hours: 1);
@@ -46,6 +34,7 @@ class ApiService {
 
     return headers;
   }
+
   // GET request com suporte a cache
   static Future<http.Response> get(
     BuildContext context,

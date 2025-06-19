@@ -1,8 +1,8 @@
 // Configurações do ambiente da aplicação
 class AppConfig {
   // URLs de API
-  static const String devApiUrl = 'localhost:8080';
-  static const String prodApiUrl = 'api.atletica.com';
+  static const String devApiUrl = 'localhost:3001/api';
+  static const String prodApiUrl = 'api.atletica.com/api';
   
   // Flag para usar dados mockados mesmo em ambiente de produção (para testes)
   static const bool useMockData = false;
