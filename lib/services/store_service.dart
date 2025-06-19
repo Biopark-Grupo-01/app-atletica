@@ -5,10 +5,8 @@ import 'package:app_atletica/services/api_service.dart';
 import 'package:http/http.dart' as http;
 
 class StoreService {
-  static const String _productsEndpoint = '/api/products';
-
   static Future<List<Map<String, dynamic>>> getCategories(BuildContext context) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/product-categories'),
@@ -28,7 +26,7 @@ class StoreService {
   }
 
   static Future<List<ProductModel>> getProducts(BuildContext context, {String? category}) async {
-    final baseUrl = getBaseUrl();
+    final baseUrl = ApiService.baseUrl;
     try {
       String url = '$baseUrl/products';
       if (category != null) {
@@ -51,95 +49,63 @@ class StoreService {
     }
   }
 
-  // Método para obter detalhes de um produto específico
-  static Future<ProductModel?> getProduct(BuildContext context, String productId) async {
+  static Future<bool> createProduct({
+    required String name,
+    String? description,
+    required double price,
+    required String categoryId,
+  }) async {
+    final baseUrl = ApiService.baseUrl;
     try {
-      if (ApiService.useMockData) {
-        final products = _getMockProducts();
-        return products.firstWhere((product) => product.id == productId);
-      } else {
-        final response = await ApiService.get(context, '$_productsEndpoint/$productId');
-        return ProductModel.fromJson(json.decode(response.body));
-      }
-    } catch (e) {
-      print('Erro ao carregar detalhes do produto: $e');
-      return null;
-    }
-  }
-
-  // Método para adicionar ou atualizar um produto
-  static Future<bool> saveProduct(BuildContext context, ProductModel product) async {
-    try {
-      if (ApiService.useMockData) {
-        // Simula um atraso e sucesso
-        await Future.delayed(Duration(seconds: 1));
+      final response = await http.post(
+        Uri.parse('$baseUrl/products'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'name': name,
+          'description': description,
+          'price': price,
+          'categoryId': categoryId,
+          'stock': 10, 
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
         return true;
       } else {
-        final endpoint = product.id.isNotEmpty ? '$_productsEndpoint/${product.id}' : _productsEndpoint;
-        final method = product.id.isNotEmpty ? 'put' : 'post';
-        
-        if (method == 'put') {
-          await ApiService.put(context, endpoint, body: product.toJson());
-        } else {
-          await ApiService.post(context, endpoint, body: product.toJson());
-        }
-        
-        return true;
+        print('Erro ao criar produto: ${response.statusCode}');
+        return false;
       }
     } catch (e) {
-      print('Erro ao salvar produto: $e');
+      print('Erro ao criar produto: $e');
       return false;
     }
-  }
-
-  static Future<bool> deleteProduct(BuildContext context, String productId) async {
-    try {
-      if (ApiService.useMockData) {
-        // Simula um atraso e sucesso
-        await Future.delayed(Duration(seconds: 1));
-        return true;
-      } else {
-        await ApiService.delete(context, '$_productsEndpoint/$productId');
-        return true;
-      }
-    } catch (e) {
-      print('Erro ao excluir produto: $e');
-      return false;
-    }
-  }
-
-  static String getBaseUrl() {
-    // if (ApiService.useMockData) {
-    //   return 'http://localhost:3001/api';
-    // } else {
-    //   return 'http://192.168.1.3:3001/api'; // Altere conforme necessário para produção
-    // }
-    return 'http://192.168.1.3:3001/api'; // Altere conforme necessário para produção
   }
 
   // Dados mockados para categorias
   static List<ProductCategory> _getMockCategories() {
     return [
-      // ProductCategory(
-      //   id: 'CANECAS',
-      //   name: 'Canecas',
-      //   icon: 'local_drink',
-      // ),
-      // ProductCategory(
-      //   id: 'ROUPAS',
-      //   name: 'Roupas',
-      //   icon: 'checkroom',
-      // ),
-      // ProductCategory(
-      //   id: 'CHAVEIROS',
-      //   name: 'Chaveiros',
-      //   icon: 'key',
-      // ),
-      // ProductCategory(
-      //   id: 'TATUAGENS',
-      //   name: 'Tatuagens',
-      //   icon: 'brush',
-      // ),
+      ProductCategory(
+        id: 'CANECAS',
+        name: 'Canecas',
+        icon: 'local_drink',
+      ),
+      ProductCategory(
+        id: 'ROUPAS',
+        name: 'Roupas',
+        icon: 'checkroom',
+      ),
+      ProductCategory(
+        id: 'CHAVEIROS',
+        name: 'Chaveiros',
+        icon: 'key',
+      ),
+      ProductCategory(
+        id: 'TATUAGENS',
+        name: 'Tatuagens',
+        icon: 'brush',
+      ),
     ];
   }
 
@@ -219,39 +185,5 @@ class StoreService {
         stock: 20,
       ),
     ];
-  }
-
-  static Future<bool> createProduct({
-    required String name,
-    String? description,
-    required double price,
-    required String categoryId,
-  }) async {
-    final baseUrl = getBaseUrl();
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/products'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode({
-          'name': name,
-          'description': description,
-          'price': price,
-          'categoryId': categoryId,
-          'stock': 10, 
-        }),
-      );
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        return true;
-      } else {
-        print('Erro ao criar produto: ${response.statusCode}');
-        return false;
-      }
-    } catch (e) {
-      print('Erro ao criar produto: $e');
-      return false;
-    }
   }
 }
