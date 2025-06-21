@@ -6,6 +6,7 @@ import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/account/tickets.dart';
 import 'package:app_atletica/screens/store/store_screen.dart';
 import 'package:app_atletica/screens/store/product.dart';
+import 'package:app_atletica/screens/trainings/subscribed_trainings_screen.dart';
 import 'package:app_atletica/screens/trainings/training-details_screen.dart';
 import 'package:app_atletica/screens/trainings/trainings_screen.dart';
 import 'package:flutter/material.dart';
@@ -122,6 +123,7 @@ class MyApp extends StatelessWidget {
             '/trainingDetail': (context) => TreinoDetalhesScreen(),
             '/store': (context) => StoreScreen(),
             '/productDetail': (context) => ProductScreen(),
+            '/subscribedTrainings': (context) => SubscribedTrainingsScreen(),
             '/profile': (context) => AccountSettingsScreen(),
             '/edit_profile': (context) => EditProfileScreen(),
             '/tickets': (context) => const TicketsScreen(),

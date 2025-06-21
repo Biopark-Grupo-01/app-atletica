@@ -74,344 +74,349 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('pt', 'BR'),
-      ],
-      home: Scaffold(
-        backgroundColor: AppColors.blue,
-        appBar: CustomAppBar(showBackButton: true),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          Center(
-                            child: const CustomTitleForms(
-                              title: 'CADASTRO DE TREINOS E AMISTOSOS',
-                            ),
+    // Removido MaterialApp para evitar banner de debug
+    return Scaffold(
+      backgroundColor: AppColors.blue,
+      appBar: CustomAppBar(showBackButton: true),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+                        Center(
+                          child: const CustomTitleForms(
+                            title: 'CADASTRO DE TREINOS E AMISTOSOS',
                           ),
-                          const SizedBox(height: 20),
-                          GestureDetector(
-                            onTap: _pickImage,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 250,
-                                child: Image.network(
-                                  _imageUrl != null
-                                      ? _imageUrl!.path
-                                      : 'https://via.placeholder.com/350x150',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: AppColors.lightGrey,
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.image_not_supported,
-                                          size: 50,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.white,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          CustomTextField(
-                            label: 'Título',
-                            icon: Icons.create,
-                            controller: _titleController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obrigatório';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _dateController,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              labelText: 'Data',
-                              prefixIcon: Icon(Icons.calendar_today, color: AppColors.white),
-                              labelStyle: TextStyle(color: AppColors.white),
-                              border: OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.white),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.yellow, width: 2),
-                              ),
-                            ),
-                            style: TextStyle(color: AppColors.white),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obrigatório';
-                              }
-                              return null;
-                            },
-                            onTap: () async {
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              DateTime? picked = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2100),
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: ColorScheme.light(
-                                        primary: AppColors.yellow,
-                                        onPrimary: Colors.black,
-                                        onSurface: AppColors.blue,
+                            clipBehavior: Clip.antiAlias,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 250,
+                              child: Image.network(
+                                _imageUrl != null
+                                    ? _imageUrl!.path
+                                    : 'https://via.placeholder.com/350x150',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: AppColors.lightGrey,
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        size: 50,
                                       ),
                                     ),
-                                    child: child!,
                                   );
                                 },
-                              );
-                              if (picked != null) {
-                                _dateController.text = "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _timeController,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              labelText: 'Horário',
-                              prefixIcon: Icon(Icons.access_time, color: AppColors.white),
-                              labelStyle: TextStyle(color: AppColors.white),
-                              border: OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.white),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.yellow, width: 2),
                               ),
                             ),
-                            style: TextStyle(color: AppColors.white),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obrigatório';
-                              }
-                              return null;
-                            },
-                            onTap: () async {
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              TimeOfDay? picked = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                                builder: (context, child) {
-                                  return Theme(
-                                    data: Theme.of(context).copyWith(
-                                      colorScheme: ColorScheme.light(
-                                        primary: AppColors.yellow,
-                                        onPrimary: Colors.black,
-                                        onSurface: AppColors.blue,
-                                      ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        CustomTextField(
+                          label: 'Título',
+                          icon: Icons.create,
+                          controller: _titleController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _dateController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText: 'Data',
+                            prefixIcon: Icon(Icons.calendar_today, color: AppColors.white),
+                            labelStyle: TextStyle(color: AppColors.white),
+                            border: OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellow, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(color: AppColors.white),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime(2100),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: ColorScheme.light(
+                                      primary: AppColors.yellow,
+                                      onPrimary: Colors.black,
+                                      onSurface: AppColors.blue,
                                     ),
-                                    child: child!,
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (picked != null) {
+                              _dateController.text = "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _timeController,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            labelText: 'Horário',
+                            prefixIcon: Icon(Icons.access_time, color: AppColors.white),
+                            labelStyle: TextStyle(color: AppColors.white),
+                            border: OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellow, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(color: AppColors.white),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                          onTap: () async {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            TimeOfDay? picked = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: ColorScheme.light(
+                                      primary: AppColors.yellow,
+                                      onPrimary: Colors.black,
+                                      onSurface: AppColors.blue,
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (picked != null) {
+                              _timeController.text = picked.format(context);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _placeController,
+                          decoration: InputDecoration(
+                            labelText: 'Local',
+                            prefixIcon: Icon(Icons.location_on, color: AppColors.white),
+                            labelStyle: TextStyle(color: AppColors.white),
+                            border: OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellow, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(color: AppColors.white),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        CustomDropdown(
+                          label: 'Tipo',
+                          icon: Icons.interests,
+                          items: type,
+                          value: _selectedType,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedType = value;
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        Opacity(
+                          opacity: _selectedType == 'Treinos' ? 1.0 : 0.5,
+                          child: TextFormField(
+                            controller: _coachController,
+                            enabled: _selectedType == 'Treinos',
+                            decoration: InputDecoration(
+                              labelText: 'Técnico',
+                              prefixIcon: Icon(Icons.person, color: AppColors.white),
+                              labelStyle: TextStyle(color: AppColors.white),
+                              border: OutlineInputBorder(),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: _selectedType == 'Treinos' ? AppColors.white : Colors.grey),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.yellow, width: 2),
+                              ),
+                              fillColor: _selectedType == 'Treinos' ? Colors.transparent : Colors.grey.withOpacity(0.15),
+                              filled: true,
+                            ),
+                            style: TextStyle(color: _selectedType == 'Treinos' ? AppColors.white : Colors.grey),
+                            readOnly: _selectedType != 'Treinos',
+                            cursorColor: _selectedType == 'Treinos' ? AppColors.yellow : Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        TextFormField(
+                          controller: _responsibleController,
+                          decoration: InputDecoration(
+                            labelText: 'Responsável',
+                            prefixIcon: Icon(Icons.how_to_reg, color: AppColors.white),
+                            labelStyle: TextStyle(color: AppColors.white),
+                            border: OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.white),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellow, width: 2),
+                            ),
+                          ),
+                          style: TextStyle(color: AppColors.white),
+                        ),
+                        const SizedBox(height: 24),
+                        CustomDropdown(
+                          label: 'Esporte',
+                          icon: Icons.sports_baseball,
+                          items: _loadingModalities
+                              ? [const DropdownMenuItem<String>(value: '', child: Text('Carregando...'))]
+                              : _modalities
+                                  .map((mod) => DropdownMenuItem<String>(
+                                        value: mod['name'] ?? '',
+                                        child: Text(mod['name'] ?? ''),
+                                      ))
+                                  .toList(),
+                          value: _selectedSport,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedSport = value;
+                              _selectedModalityId = _modalities.firstWhere((mod) => mod['name'] == value, orElse: () => {})['id'];
+                            });
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        CustomTextBox(controller: _descriptionController),
+                        const SizedBox(height: 32),
+                        Center(
+                          child: CustomButton(
+                            text: 'Salvar',
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                if (_selectedType == 'Treinos') {
+                                  final service = TrainingService();
+                                  final success = await service.createTraining(
+                                    title: _titleController.text,
+                                    description: _descriptionController.text,
+                                    place: _placeController.text,
+                                    startDate: _dateController.text.split('/').reversed.join('-'),
+                                    startTime: _timeController.text.padLeft(8, '0'),
+                                    coach: _coachController.text,
+                                    responsible: _responsibleController.text,
+                                    trainingModalityId: _selectedModalityId ?? '',
                                   );
-                                },
-                              );
-                              if (picked != null) {
-                                _timeController.text = picked.format(context);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _placeController,
-                            decoration: InputDecoration(
-                              labelText: 'Local',
-                              prefixIcon: Icon(Icons.location_on, color: AppColors.white),
-                              labelStyle: TextStyle(color: AppColors.white),
-                              border: OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.white),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.yellow, width: 2),
-                              ),
-                            ),
-                            style: TextStyle(color: AppColors.white),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obrigatório';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          CustomDropdown(
-                            label: 'Tipo',
-                            icon: Icons.interests,
-                            items: type,
-                            value: _selectedType,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedType = value;
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obrigatório';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          Opacity(
-                            opacity: _selectedType == 'Treinos' ? 1.0 : 0.5,
-                            child: TextFormField(
-                              controller: _coachController,
-                              enabled: _selectedType == 'Treinos',
-                              decoration: InputDecoration(
-                                labelText: 'Técnico',
-                                prefixIcon: Icon(Icons.person, color: AppColors.white),
-                                labelStyle: TextStyle(color: AppColors.white),
-                                border: OutlineInputBorder(),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: _selectedType == 'Treinos' ? AppColors.white : Colors.grey),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: AppColors.yellow, width: 2),
-                                ),
-                                fillColor: _selectedType == 'Treinos' ? Colors.transparent : Colors.grey.withOpacity(0.15),
-                                filled: true,
-                              ),
-                              style: TextStyle(color: _selectedType == 'Treinos' ? AppColors.white : Colors.grey),
-                              readOnly: _selectedType != 'Treinos',
-                              cursorColor: _selectedType == 'Treinos' ? AppColors.yellow : Colors.grey,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          TextFormField(
-                            controller: _responsibleController,
-                            decoration: InputDecoration(
-                              labelText: 'Responsável',
-                              prefixIcon: Icon(Icons.how_to_reg, color: AppColors.white),
-                              labelStyle: TextStyle(color: AppColors.white),
-                              border: OutlineInputBorder(),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.white),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: AppColors.yellow, width: 2),
-                              ),
-                            ),
-                            style: TextStyle(color: AppColors.white),
-                          ),
-                          const SizedBox(height: 24),
-                          CustomDropdown(
-                            label: 'Esporte',
-                            icon: Icons.sports_baseball,
-                            items: _loadingModalities
-                                ? [const DropdownMenuItem<String>(value: '', child: Text('Carregando...'))]
-                                : _modalities
-                                    .map((mod) => DropdownMenuItem<String>(
-                                          value: mod['name'] ?? '',
-                                          child: Text(mod['name'] ?? ''),
-                                        ))
-                                    .toList(),
-                            value: _selectedSport,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedSport = value;
-                                _selectedModalityId = _modalities.firstWhere((mod) => mod['name'] == value, orElse: () => {})['id'];
-                              });
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Campo obrigatório';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          CustomTextBox(controller: _descriptionController),
-                          const SizedBox(height: 32),
-                          Center(
-                            child: CustomButton(
-                              text: 'Salvar',
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  if (_selectedType == 'Treinos') {
-                                    final service = TrainingService();
-                                    final success = await service.createTraining(
-                                      title: _titleController.text,
-                                      description: _descriptionController.text,
-                                      place: _placeController.text,
-                                      startDate: _dateController.text.split('/').reversed.join('-'),
-                                      startTime: _timeController.text.padLeft(8, '0'),
-                                      coach: _coachController.text,
-                                      responsible: _responsibleController.text,
-                                      trainingModalityId: _selectedModalityId ?? '',
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Treino cadastrado com sucesso!'),
+                                        backgroundColor: Colors.green,
+                                      ),
                                     );
-                                    if (success) {
-                                      Navigator.pop(context);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Erro ao criar treino.')),
-                                      );
-                                    }
-                                  } else if (_selectedType == 'Amistosos') {
-                                    final service = MatchService();
-                                    final success = await service.createMatch(
-                                      title: _titleController.text,
-                                      description: _descriptionController.text,
-                                      place: _placeController.text,
-                                      startDate: _dateController.text.split('/').reversed.join('-'),
-                                      startTime: _timeController.text.padLeft(8, '0'),
-                                      responsible: _responsibleController.text,
-                                      trainingModalityId: _selectedModalityId ?? '',
+                                    await Future.delayed(const Duration(milliseconds: 800));
+                                    Navigator.pop(context);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Erro ao criar treino.')),
                                     );
-                                    if (success) {
-                                      Navigator.pop(context);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Erro ao criar amistoso.')),
-                                      );
-                                    }
+                                  }
+                                } else if (_selectedType == 'Amistosos') {
+                                  final service = MatchService();
+                                  final success = await service.createMatch(
+                                    title: _titleController.text,
+                                    description: _descriptionController.text,
+                                    place: _placeController.text,
+                                    startDate: _dateController.text.split('/').reversed.join('-'),
+                                    startTime: _timeController.text.padLeft(8, '0'),
+                                    responsible: _responsibleController.text,
+                                    trainingModalityId: _selectedModalityId ?? '',
+                                  );
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Amistoso cadastrado com sucesso!'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                    await Future.delayed(const Duration(milliseconds: 800));
+                                    Navigator.pop(context);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Erro ao criar amistoso.')),
+                                    );
                                   }
                                 }
-                              },
-                            ),
+                              }
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
       ),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }

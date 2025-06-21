@@ -98,10 +98,22 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     final filteredEvents = _selectedTabIndex == 1
         ? _trainings.where((event) {
             final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(event.modality.toUpperCase());
+            try {
+              final eventDate = DateTime.parse(event.date);
+              if (eventDate.isBefore(DateTime.now())) return false;
+            } catch (_) {
+              return false;
+            }
             return matchesCategory;
           }).toList()
         : _matches.where((event) {
             final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(event.modality.toUpperCase());
+            try {
+              final eventDate = DateTime.parse(event.date);
+              if (eventDate.isBefore(DateTime.now())) return false;
+            } catch (_) {
+              return false;
+            }
             return matchesCategory;
           }).toList();
 

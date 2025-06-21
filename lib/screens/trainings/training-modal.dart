@@ -72,6 +72,13 @@ class _TrainingModalState extends State<TrainingModal> {
   Widget build(BuildContext context) {
     final isTraining = widget.training != null;
     final screenHeight = MediaQuery.of(context).size.height;
+    bool disableUnsubscribe = false;
+    if (isTraining && _subscribed) {
+      try {
+        final trainingDate = DateTime.parse(widget.training!.date);
+        disableUnsubscribe = trainingDate.isBefore(DateTime.now());
+      } catch (_) {}
+    }
 
     return Stack(
       children: [
@@ -226,17 +233,22 @@ class _TrainingModalState extends State<TrainingModal> {
                         width: double.infinity,
                         height: 45,
                         child: ElevatedButton(
-                          onPressed: _loading ? null : _handleUnsubscribe,
+                          onPressed: (_loading || disableUnsubscribe) ? null : _handleUnsubscribe,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red[400],
+                            backgroundColor: Colors.red[400], // quando habilitado
+                            disabledBackgroundColor: const Color.fromARGB(149, 239, 83, 80),
                             foregroundColor: Colors.white,
+                            disabledForegroundColor: Colors.white70,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
                           child: _loading
                               ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text('Cancelar Inscrição', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                              : const Text(
+                                  'Cancelar Inscrição',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                ),
                         ),
                       ),
                     ],
