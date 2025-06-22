@@ -29,7 +29,7 @@ class MenuCard extends StatelessWidget {
           title,
           style: const TextStyle(
             color: AppColors.white,
-            fontSize: 22,
+            fontSize: 20,
           ),
         ),
         subtitle: Text(
