@@ -130,8 +130,14 @@ class AccountSettingsScreen extends StatelessWidget {
                           children: [
                             buildClubeCheersCard(
                               icon: Icons.event_available,
-                              title: "Eventos Inscritos",
-                              subtitle: "Eventos que você está inscrito",
+                              title: "Treinos Inscritos",
+                              subtitle: "Treinos que você está inscrito",
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/subscribedTrainings',
+                                );
+                              },
                             ),
                             buildClubeCheersCard(
                               icon: Icons.event_available,
@@ -258,33 +264,37 @@ Widget buildClubeCheersCard({
   required String title,
   required String subtitle,
   Color backgroundColor = const Color.fromARGB(128, 52, 90, 167),
+  VoidCallback? onTap,
 }) {
-  return Container(
-    width: 200,
-    margin: const EdgeInsets.only(right: 12),
-    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-    decoration: BoxDecoration(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(8),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.3),
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: Colors.white, size: 35),
-        const SizedBox(height: 4),
-        Text(title, style: const TextStyle(color: Colors.white, fontSize: 14)),
-        Text(
-          subtitle,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
-        ),
-      ],
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: 200,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.white, size: 35),
+          const SizedBox(height: 4),
+          Text(title, style: const TextStyle(color: Colors.white, fontSize: 14)),
+          Text(
+            subtitle,
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+        ],
+      ),
     ),
   );
 }
