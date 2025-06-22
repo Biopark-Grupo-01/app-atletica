@@ -1,5 +1,6 @@
 import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
+import 'package:app_atletica/widgets/custom_square_button.dart';
 import 'package:app_atletica/widgets/training_match_item.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/services/events_news_service.dart';
@@ -10,6 +11,7 @@ import 'package:app_atletica/widgets/home/carousel_item.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -62,9 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: AppColors.yellow,
-          ),
+          CircularProgressIndicator(color: AppColors.yellow),
           SizedBox(height: 16),
           Text(
             'Carregando dados...',
@@ -87,11 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              color: Colors.red,
-              size: 60,
-            ),
+            Icon(Icons.error_outline, color: Colors.red, size: 60),
             SizedBox(height: 16),
             Text(
               error ?? 'Ocorreu um erro inesperado',
@@ -112,9 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Text(
                 'Tentar Novamente',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -151,37 +145,74 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CustomSquareButton(
+                  icon: FontAwesomeIcons.ticket,
+                  offsetXFactor: -0.033,
+                  offsetYFactor: 0.0015,
+                  color: AppColors.yellow,
+                  label: 'Ingressos',
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/tickets');
+                  },
+                ),
+                CustomSquareButton(
+                  icon: FontAwesomeIcons.idCard,
+                  offsetXFactor: -0.033,
+                  offsetYFactor: 0.0015,
+                  color: AppColors.white,
+                  label: 'Carteirinha',
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/membership');
+                  },
+                ),
+                CustomSquareButton(
+                  icon: Icons.support_agent_rounded,
+                  label: 'Suporte',
+                  color: AppColors.yellow,
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/home');
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
             CustomTitle(title: 'EVENTOS'),
             events.isNotEmpty
-              ? CarouselItem(
+                ? CarouselItem(
                   items: events,
                   useCarousel: true,
-                  itemBuilder: (item) => EventItem(
-                    imageUrl: item['imageUrl'] ?? '',
-                    date: item['date'] ?? '',
-                    location: item['location'] ?? '',
-                    title: item['title'] ?? '',
-                    description: item['description'] ?? '',
-                  ),
+                  itemBuilder:
+                      (item) => EventItem(
+                        imageUrl: item['imageUrl'] ?? '',
+                        date: item['date'] ?? '',
+                        location: item['location'] ?? '',
+                        title: item['title'] ?? '',
+                        description: item['description'] ?? '',
+                      ),
                 )
-              : _buildEmptySection('Nenhum evento disponível no momento'),
+                : _buildEmptySection('Nenhum evento disponível no momento'),
             CustomTitle(title: 'NOTÍCIAS'),
             news.isNotEmpty
-              ? CarouselItem(
+                ? CarouselItem(
                   items: news,
                   useCarousel: true,
-                  itemBuilder: (item) => NewsItem(
-                    imageUrl: item['imageUrl'] ?? '',
-                    date: item['date'] ?? '',
-                    location: item['location'] ?? '',
-                    title: item['title'] ?? '',
-                    description: item['description'] ?? '',
-                  ),
+                  itemBuilder:
+                      (item) => NewsItem(
+                        imageUrl: item['imageUrl'] ?? '',
+                        date: item['date'] ?? '',
+                        location: item['location'] ?? '',
+                        title: item['title'] ?? '',
+                        description: item['description'] ?? '',
+                      ),
                 )
-              : _buildEmptySection('Nenhuma notícia disponível no momento'),
+                : _buildEmptySection('Nenhuma notícia disponível no momento'),
             CustomTitle(title: 'TREINOS E AMISTOSOS'),
             trainings.isNotEmpty
-              ? ListView.builder(
+                ? ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: trainings.length,
@@ -205,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 )
-              : _buildEmptySection('Nenhum treino disponível no momento'),
+                : _buildEmptySection('Nenhum treino disponível no momento'),
           ],
         ),
       ),
@@ -231,7 +262,7 @@ void openWhatsApp(String phoneNumber, {String? text}) async {
   }
 
   // if (await launch(url)) {
-    await launchUrl(Uri.parse(url));
+  await launchUrl(Uri.parse(url));
   // } else {
   //   // Não há suporte para este tipo de URL
   // }

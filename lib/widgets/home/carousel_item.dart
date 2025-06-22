@@ -15,13 +15,16 @@ class CarouselItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final carouselHeight = screenHeight * 0.6;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (useCarousel)
           CarouselSlider(
             options: CarouselOptions(
-              height: 410,
+              height: carouselHeight,
               enlargeCenterPage: true,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 5),
