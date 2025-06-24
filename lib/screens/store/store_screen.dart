@@ -124,12 +124,17 @@ class _StoreScreenState extends State<StoreScreen> {
     final allProductsForUI = _getProductsForUI();
     // print('Produtos para UI: $allProductsForUI');
 
-    final filteredProducts = allProductsForUI.where((product) {
-      final productCategoryId = product['category_id'] ?? '';
-      final matchesCategory = _selectedCategories.isEmpty || _selectedCategories.contains(productCategoryId);
-      final matchesSearch = (product['name'] ?? '').toLowerCase().contains(_searchController.text.toLowerCase());
-      return matchesCategory && matchesSearch;
-    }).toList();
+    final filteredProducts =
+        allProductsForUI.where((product) {
+          final productCategoryId = product['category_id'] ?? '';
+          final matchesCategory =
+              _selectedCategories.isEmpty ||
+              _selectedCategories.contains(productCategoryId);
+          final matchesSearch = (product['name'] ?? '').toLowerCase().contains(
+            _searchController.text.toLowerCase(),
+          );
+          return matchesCategory && matchesSearch;
+        }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.blue,
@@ -166,59 +171,73 @@ class _StoreScreenState extends State<StoreScreen> {
                       controller: _searchController,
                     ),
                     const SizedBox(height: 16),
+                    if (_categories.isNotEmpty)
+                      // Categories horizontal list
+                      if (_isLoadingCategories)
+                        const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.yellow,
+                          ),
+                        )
+                      else if (_categoriesError != null)
+                        Center(
+                          child: Text(
+                            _categoriesError!,
+                            style: const TextStyle(color: AppColors.white),
+                          ),
+                        )
+                      else
+                        SizedBox(
+                          height: 100,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.only(left: 0),
+                            itemCount: _categories.length,
+                            separatorBuilder:
+                                (context, index) => const SizedBox(width: 20),
+                            itemBuilder: (context, index) {
+                              final category = _categories[index];
+                              final isLast = index == _categories.length - 1;
+                              final isSelected = _selectedCategories.contains(
+                                category['id'],
+                              );
 
-                    // Categories horizontal list
-                    if (_isLoadingCategories)
-                      const Center(
-                        child: CircularProgressIndicator(color: AppColors.yellow),
-                      )
-                    else if (_categoriesError != null)
-                      Center(
-                        child: Text(
-                          _categoriesError!,
-                          style: const TextStyle(color: AppColors.white),
-                        ),
-                      )
-                    else
-                      SizedBox(
-                        height: 100,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.only(left: 0),
-                          itemCount: _categories.length,
-                          separatorBuilder:
-                              (context, index) => const SizedBox(width: 20),
-                          itemBuilder: (context, index) {
-                            final category = _categories[index];
-                            final isLast = index == _categories.length - 1;
-                            final isSelected = _selectedCategories.contains(category['id']);
-
-                            return Padding(
-                              padding: EdgeInsets.only(right: isLast ? 16 : 0),
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(12),
-                                  onTap: () {
-                                    setState(() {
-                                      if (_selectedCategories.contains(category['id'])) {
-                                        _selectedCategories.remove(category['id']);
-                                      } else {
-                                        _selectedCategories.add(category['id']);
-                                      }
-                                    });
-                                  },
-                                  child: _buildCategoryIcon(
-                                    category['name'],
-                                    _getIconData(category['icon'] ?? 'category'),
-                                    isSelected: isSelected,
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  right: isLast ? 16 : 0,
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: () {
+                                      setState(() {
+                                        if (_selectedCategories.contains(
+                                          category['id'],
+                                        )) {
+                                          _selectedCategories.remove(
+                                            category['id'],
+                                          );
+                                        } else {
+                                          _selectedCategories.add(
+                                            category['id'],
+                                          );
+                                        }
+                                      });
+                                    },
+                                    child: _buildCategoryIcon(
+                                      category['name'],
+                                      _getIconData(
+                                        category['icon'] ?? 'category',
+                                      ),
+                                      isSelected: isSelected,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
-                      ),
 
                     const SizedBox(height: 16),
 
@@ -244,10 +263,13 @@ class _StoreScreenState extends State<StoreScreen> {
                           child: GestureDetector(
                             onTap: () {
                               // Busca o nome da categoria pelo id
-                              final categoryName = _categories.firstWhere(
-                                (cat) => cat['id'] == product['category_id'],
-                                orElse: () => {'name': ''},
-                              )['name'] ?? '';
+                              final categoryName =
+                                  _categories.firstWhere(
+                                    (cat) =>
+                                        cat['id'] == product['category_id'],
+                                    orElse: () => {'name': ''},
+                                  )['name'] ??
+                                  '';
                               Navigator.pushNamed(
                                 context,
                                 '/productDetail',
