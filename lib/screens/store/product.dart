@@ -1,3 +1,5 @@
+import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -45,18 +47,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF091B40),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF091B40),
-        title: const Text(
-          'Produto',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: CustomAppBar(showBackButton: true,),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
@@ -116,7 +107,7 @@ class _ProductScreenState extends State<ProductScreen> {
                               (context, error, stackTrace) => const Center(
                                 child: Icon(
                                   Icons.broken_image,
-                                  color: Colors.white,
+                                  color: AppColors.white,
                                   size: 80,
                                 ),
                               ),
@@ -134,8 +125,8 @@ class _ProductScreenState extends State<ProductScreen> {
                   controller: _pageController,
                   count: 2,
                   effect: ExpandingDotsEffect(
-                    activeDotColor: Colors.white,
-                    dotColor: Colors.grey,
+                    activeDotColor: AppColors.white,
+                    dotColor: AppColors.lightGrey,
                     dotHeight: 8,
                     dotWidth: 8,
                     spacing: 8,
@@ -149,7 +140,7 @@ class _ProductScreenState extends State<ProductScreen> {
             Text(
               product['name'],
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -157,23 +148,24 @@ class _ProductScreenState extends State<ProductScreen> {
             const SizedBox(height: 4),
 
             // Link clicável
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/store',
-                  arguments: product['category_id'],
-                );
-              },
-              child: Text(
-                'Categoria: ${product['category'].toString().toUpperCase()}',
-                style: TextStyle(
-                  color: Color.fromARGB(230, 255, 255, 255),
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.bold,
+            if (product['category'].isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/store',
+                    arguments: product['category_id'],
+                  );
+                },
+                child: Text(
+                  'Categoria: ${product['category'].toString().toUpperCase()}',
+                  style: TextStyle(
+                    color: Color.fromARGB(230, 255, 255, 255),
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
 
             const SizedBox(height: 24),
 
@@ -181,7 +173,7 @@ class _ProductScreenState extends State<ProductScreen> {
             const Text(
               'A partir de',
               style: TextStyle(
-                color: Color.fromARGB(255, 255, 255, 255),
+                color: AppColors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -213,19 +205,19 @@ class _ProductScreenState extends State<ProductScreen> {
 
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(128, 52, 90, 167),
+                      color: AppColors.lightBlue,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xff3e6cc9)),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: DropdownButton<String>(
-                      dropdownColor: const Color.fromARGB(255, 52, 90, 167),
+                      dropdownColor: AppColors.lightBlue,
                       value: selectedModel,
                       isExpanded: true,
                       underline: const SizedBox(),
                       icon: const Icon(
                         Icons.arrow_drop_down,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                       items:
                           ['PP', 'P', 'M', 'G', 'GG']
@@ -234,7 +226,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                   value: size,
                                   child: Text(
                                     '$size (R\$${product['price']})',
-                                    style: const TextStyle(color: Colors.white),
+                                    style: const TextStyle(
+                                      color: AppColors.white,
+                                    ),
                                   ),
                                 ),
                               )
@@ -258,7 +252,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 const Text(
                   'Quantidade',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: AppColors.lightGrey,
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
                   ),
@@ -280,7 +274,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     underline: const SizedBox(),
                     icon: const Icon(
                       Icons.arrow_drop_down,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                     items:
                         List.generate(10, (index) => index + 1)
@@ -289,7 +283,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                 value: qty,
                                 child: Text(
                                   '$qty',
-                                  style: const TextStyle(color: Colors.white),
+                                  style: const TextStyle(
+                                    color: AppColors.white,
+                                  ),
                                 ),
                               ),
                             )
@@ -428,27 +424,33 @@ class _ProductScreenState extends State<ProductScreen> {
             const SizedBox(height: 12),
             SizedBox(
               height: 180,
-              child: _loadingMoreProducts
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: _moreProducts
-                          .where((p) => p.id != product['id'])
-                          .map((p) => _buildProductCard(
-                                image: p.image ?? 'assets/images/brasao.png',
-                                title: p.name,
-                                product: {
-                                  'id': p.id,
-                                  'name': p.name,
-                                  'description': p.description,
-                                  'price': p.price.toStringAsFixed(2),
-                                  'image': p.image ?? 'assets/images/brasao.png',
-                                  'category_id': p.categoryId,
-                                  'category': product['category'],
-                                },
-                              ))
-                          .toList(),
-                    ),
+              child:
+                  _loadingMoreProducts
+                      ? const Center(child: CircularProgressIndicator())
+                      : ListView(
+                        scrollDirection: Axis.horizontal,
+                        children:
+                            _moreProducts
+                                .where((p) => p.id != product['id'])
+                                .map(
+                                  (p) => _buildProductCard(
+                                    image:
+                                        p.image ?? 'assets/images/brasao.png',
+                                    title: p.name,
+                                    product: {
+                                      'id': p.id,
+                                      'name': p.name,
+                                      'description': p.description,
+                                      'price': p.price.toStringAsFixed(2),
+                                      'image':
+                                          p.image ?? 'assets/images/brasao.png',
+                                      'category_id': p.categoryId,
+                                      'category': product['category'],
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                      ),
             ),
           ],
         ),
@@ -475,21 +477,30 @@ class _ProductScreenState extends State<ProductScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: image.startsWith('http')
-                  ? Image.network(
-                      image,
-                      width: 140,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
-                    )
-                  : Image.asset(
-                      image,
-                      width: 140,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
-                    ),
+              child:
+                  image.startsWith('http')
+                      ? Image.network(
+                        image,
+                        width: 140,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white,
+                            ),
+                      )
+                      : Image.asset(
+                        image,
+                        width: 140,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              color: Colors.white,
+                            ),
+                      ),
             ),
             const SizedBox(height: 8),
             Text(
