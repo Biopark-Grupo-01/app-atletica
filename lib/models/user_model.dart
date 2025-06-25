@@ -39,7 +39,7 @@ class UserModel {
       email: json['email'] ?? '',
       cpf: json['cpf'],
       avatarUrl: json['avatarUrl'],
-      role: json['role'],
+      role: json['role'] is Map ? json['role']['name'] : json['role'],
       registration: json['registration'] is int 
         ? json['registration'] 
         : int.tryParse(json['registration']?.toString() ?? ''),

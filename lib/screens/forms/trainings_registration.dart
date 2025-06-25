@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:app_atletica/widgets/forms/custom_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';

@@ -9,6 +9,8 @@ import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/admin/admin_area.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:app_atletica/services/firebase_auth_service.dart';
+import 'package:flutter/foundation.dart';
 
 class AccountSettingsScreen extends StatelessWidget {
   const AccountSettingsScreen({super.key});
@@ -19,6 +21,11 @@ class AccountSettingsScreen extends StatelessWidget {
     return Consumer<UserProvider>(
       builder: (context, userProvider, _) {
         final user = userProvider.currentUser;
+
+        // Se não há usuário logado, não renderiza nada - deixa o AuthWrapper gerenciar
+        if (user == null) {
+          return const SizedBox.shrink();
+        }
 
         return Scaffold(
           backgroundColor: AppColors.blue,
@@ -42,12 +49,7 @@ class AccountSettingsScreen extends StatelessWidget {
                             colors: [Color(0xff21396a), AppColors.blue],
                           ),
                         ),
-                        child:
-                            user == null
-                                ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                                : Stack(
+                        child: Stack(
                                   children: [
                                     Positioned(
                                       bottom: 0,
@@ -102,21 +104,58 @@ class AccountSettingsScreen extends StatelessWidget {
                                     ),
                                     Positioned(
                                       top: 10,
-                                      right: 0,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.logout),
-                                        color: AppColors.white,
-                                        onPressed: () async {
-                                          // Deslogar o usuário usando o Provider
-                                          await userProvider.logout();
-                                          if (context.mounted) {
-                                            Navigator.pushReplacementNamed(
-                                              context,
-                                              '/login',
-                                            );
-                                          }
-                                        },
-                                      ),
+                                      right: 0,                      child: IconButton(
+                        icon: const Icon(Icons.logout),
+                        color: AppColors.white,
+                        onPressed: () async {
+                          try {
+                            final firebaseAuthService = Provider.of<FirebaseAuthService>(context, listen: false);
+                            
+                            // Mostra loading durante logout
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => Center(
+                                child: CircularProgressIndicator(color: AppColors.yellow),
+                              ),
+                            );
+                            
+                            await firebaseAuthService.signOut();
+                            
+                            // Remove o dialog de loading se ainda está na tela
+                            if (Navigator.canPop(context)) {
+                              Navigator.of(context).pop();
+                            }
+                            
+                            // APENAS para web: navega para login forçadamente
+                            if (kIsWeb) {
+                              // No web, força navegação para login e limpa stack
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/',
+                                (route) => false,
+                              );
+                              return;
+                            }
+                            
+                            // No mobile: deixa o AuthWrapper gerenciar automaticamente
+                            // Não faz navegação manual
+                            
+                          } catch (e) {
+                            // Remove o dialog se houver erro
+                            if (Navigator.canPop(context)) {
+                              Navigator.of(context).pop();
+                            }
+                            
+                            // Mostra erro
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Erro ao fazer logout: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                      ),
                                     ),
                                   ],
                                 ),
@@ -175,7 +214,7 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => TicketsScreen(user: user!),
+                                        (context) => TicketsScreen(user: user),
                                   ),
                                 );
                               },
@@ -189,7 +228,7 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => TicketsScreen(user: user!),
+                                        (context) => TicketsScreen(user: user),
                                   ),
                                 );
                               },
