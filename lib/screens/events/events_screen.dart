@@ -1,11 +1,14 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/services/events_news_service.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/screens/events/news_detail_screen.dart';
+import 'package:intl/intl.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -31,8 +34,8 @@ class _EventsScreenState extends State<EventsScreen> {
     try {
       final service = EventsNewsService();
       final data = await service.loadData(context);
-      final newsList = data['news'] ?? [];
-      final eventsList = data['events'] ?? [];
+      final newsList = (data['news'] ?? []).map<Map<String, String>>((e) => Map<String, String>.from(e)).toList();
+      final eventsList = (data['events'] ?? []).map<Map<String, String>>((e) => Map<String, String>.from(e)).toList();
 
       setState(() {
         news = newsList;
@@ -47,11 +50,56 @@ class _EventsScreenState extends State<EventsScreen> {
     }
   }
 
+  Future<void> _loadNewsFromBackend() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final response = await http.get(Uri.parse('http://192.168.1.2:3001/api/news'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> data = json['data'] ?? [];
+        final List<Map<String, String>> newsList = data.map<Map<String, String>>((item) {
+          return {
+            'id': item['id'] ?? '',
+            'title': item['title'] ?? '',
+            'description': item['description'] ?? '',
+            'date': item['date'] ?? '', // MANTÉM formato ISO
+            'author': item['author'] ?? '',
+            'imageUrl': '', // Adapte se houver imagem
+            'location': '', // Adapte se houver local
+          };
+        }).toList();
+        setState(() {
+          news = newsList;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          error = 'Erro ao buscar notícias: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
   DateTime _parseDate(String dateStr) {
     try {
-      return DateFormat('dd/MM/yyyy').parse(dateStr);
-    } catch (e) {
-      return DateTime(2000);
+      // Tenta ISO 8601 (notícias)
+      return DateTime.parse(dateStr);
+    } catch (_) {
+      try {
+        // Tenta dd/MM/yyyy (eventos)
+        return DateFormat('dd/MM/yyyy').parse(dateStr);
+      } catch (e) {
+        return DateTime(2000);
+      }
     }
   }
 
@@ -76,7 +124,7 @@ class _EventsScreenState extends State<EventsScreen> {
             : error != null
                 ? Center(
                     child: Text(
-                      'Erro: \$error',
+                      'Erro: ${error ?? "Erro desconhecido"}',
                       style: const TextStyle(color: AppColors.white),
                     ),
                   )
@@ -102,11 +150,20 @@ class _EventsScreenState extends State<EventsScreen> {
                                 children: [
                                   GestureDetector(
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/trainingDetail',
-                                        arguments: item,
-                                      );
+                                      if (_selectedTabIndex == 1) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => NewsDetailScreen(news: item),
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/trainingDetail',
+                                          arguments: item,
+                                        );
+                                      }
                                     },
                                     child: _selectedTabIndex == 0
                                         ? EventItem(
@@ -119,7 +176,6 @@ class _EventsScreenState extends State<EventsScreen> {
                                         : NewsItem(
                                             imageUrl: item['imageUrl'] ?? '',
                                             date: item['date'] ?? '',
-                                            location: item['location'] ?? '',
                                             title: item['title'] ?? '',
                                             description: item['description'] ?? '',
                                           ),
@@ -146,10 +202,13 @@ class _EventsScreenState extends State<EventsScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           setState(() {
             _selectedTabIndex = index;
           });
+          if (index == 1) {
+            await _loadNewsFromBackend();
+          }
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),

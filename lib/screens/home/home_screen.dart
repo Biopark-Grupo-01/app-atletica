@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (item) => NewsItem(
                     imageUrl: item['imageUrl'] ?? '',
                     date: item['date'] ?? '',
-                    location: item['location'] ?? '',
+                    // location: item['location'] ?? '',
                     title: item['title'] ?? '',
                     description: item['description'] ?? '',
                   ),
