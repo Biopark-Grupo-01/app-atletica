@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:app_atletica/models/product_model.dart';
 import 'package:app_atletica/widgets/forms/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,7 +24,7 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
   File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
 
-  List<Map<String, dynamic>> _categories = [];
+  List<ProductCategory> _categories = [];
   bool _loadingCategories = true;
   String? _selectedCategoryId;
 
@@ -41,7 +42,8 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
     setState(() {
       _loadingCategories = true;
     });
-    final categories = await StoreService.getCategories(context);
+    final categoryService = CategoryService();
+    final categories = await categoryService.getCategories();
     setState(() {
       _categories = categories;
       _loadingCategories = false;
@@ -147,8 +149,8 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                                 icon: Icons.category,
                                 items: _categories
                                     .map((cat) => DropdownMenuItem<String>(
-                                          value: cat['id'],
-                                          child: Text(cat['name'] ?? ''),
+                                          value: cat.id,
+                                          child: Text(cat.name),
                                         ))
                                     .toList(),
                                 value: _selectedCategoryId,
@@ -174,7 +176,7 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                             text: 'Salvar',
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                final success = await StoreService.createProduct(
+                                final success = await CategoryService.createProduct(
                                   name: _nameController.text,
                                   description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
                                   price: double.parse(_priceController.text.replaceAll(',', '.')),

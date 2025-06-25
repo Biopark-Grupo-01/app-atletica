@@ -63,7 +63,7 @@ class ProductService {
         description: 'Camiseta oficial da Atlética',
         price: 50.0,
         stock: 10,
-        category: 'ROUPAS',
+        categoryId: 'ROUPAS',
         image: 'camisetaa_masculina.png',
       ),
       ProductModel(
@@ -72,8 +72,17 @@ class ProductService {
         description: 'Caneca oficial da Atlética Biopark',
         price: 25.0,
         stock: 15,
-        category: 'CANECAS',
+        categoryId: 'CANECAS',
         image: 'caneca_personalizada.jpeg',
+      ),
+      ProductModel(
+        id: '3',
+        name: 'Chaveiro',
+        description: 'Chaveiro da Atlética Biopark',
+        price: 15.0,
+        stock: 30,
+        categoryId: 'CHAVEIROS',
+        image: 'chaveiro.jpeg',
       ),
     ];
   }
