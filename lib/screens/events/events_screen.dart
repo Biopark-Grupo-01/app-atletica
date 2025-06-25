@@ -146,6 +146,7 @@ class _EventsScreenState extends State<EventsScreen> {
                             itemCount: sortedList.length,
                             itemBuilder: (context, index) {
                               final item = sortedList[index];
+                              final isLast = index == sortedList.length - 1;
                               return Column(
                                 children: [
                                   GestureDetector(
@@ -180,7 +181,17 @@ class _EventsScreenState extends State<EventsScreen> {
                                             description: item['description'] ?? '',
                                           ),
                                   ),
-                                  const SizedBox(height: 40),
+                                  if (_selectedTabIndex == 1 && !isLast)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                                      child: Divider(
+                                        color: AppColors.lightGrey.withOpacity(0.4),
+                                        thickness: 1.2,
+                                        height: 1,
+                                      ),
+                                    )
+                                  else if (_selectedTabIndex == 0)
+                                    const SizedBox(height: 40),
                                 ],
                               );
                             },

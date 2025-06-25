@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:app_atletica/models/news_event_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
+import 'package:app_atletica/models/news_model.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class EventsNewsService {
   // Endpoints e cache keys
@@ -208,6 +211,7 @@ class EventsNewsService {
     }
   }
 
+  // Remover este método antigo createNews
   // Dados mockados para eventos
   List<EventModel> _getMockEvents() {
     return [
@@ -290,5 +294,56 @@ class EventsNewsService {
         isSubscribed: false,
       ),
     ];
+  }
+
+  Future<bool> createNews({
+    required String title,
+    required String description,
+    required String author,
+    String? imageUrl,
+    String? date,
+    String? time,
+  }) async {
+    final baseUrl = ApiService.baseUrl;
+    try {
+      final nowLocal = DateTime.now();
+      // Monta a data no formato yyyy-MM-dd HH:mm:ss
+      String dateTimeStr;
+      if (date != null && time != null) {
+        dateTimeStr = "$date $time";
+      } else {
+        dateTimeStr =
+            "${nowLocal.year.toString().padLeft(4, '0')}-"
+            "${nowLocal.month.toString().padLeft(2, '0')}-"
+            "${nowLocal.day.toString().padLeft(2, '0')} "
+            "${nowLocal.hour.toString().padLeft(2, '0')}:"
+            "${nowLocal.minute.toString().padLeft(2, '0')}:"
+            "${nowLocal.second.toString().padLeft(2, '0')}";
+      }
+      print('[createNews] Enviando: date=$dateTimeStr, nowLocal=$nowLocal');
+      final response = await http.post(
+        Uri.parse('$baseUrl/news'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'author': author,
+          'imageUrl': imageUrl,
+          'date': dateTimeStr,
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro ao criar notícia: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar notícia: $e');
+      return false;
+    }
   }
 }

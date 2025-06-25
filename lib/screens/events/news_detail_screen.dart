@@ -21,7 +21,7 @@ class NewsDetailScreen extends StatelessWidget {
 
   String get formattedDateTime {
     try {
-      final date = DateTime.parse(news['date'] ?? '').toLocal();
+      final date = DateTime.parse(news['date'] ?? '');
       final dateStr = DateFormat('dd/MM/yyyy').format(date);
       final hourStr = DateFormat('HH:mm').format(date);
       return '$dateStr • $hourStr';

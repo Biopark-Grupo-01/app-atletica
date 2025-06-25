@@ -19,9 +19,21 @@ class NewsItem extends StatelessWidget {
   String getTimeAgo() {
     if (date == null || date!.isEmpty) return '';
     try {
-      final dateTime = DateTime.parse(date!).toLocal();
+      DateTime dateTime;
+      if (date!.endsWith('Z')) {
+        // Backend salva como local mas adiciona 'Z', então removemos o 'Z' e parseamos como local
+        dateTime = DateTime.parse(date!.replaceAll('Z', ''));
+        // print('Data recebida (com Z, tratada como local): $date');
+        // print('DateTime parseado (sem Z, local): $dateTime');
+      } else {
+        dateTime = DateTime.parse(date!);
+        // print('Data recebida (sem Z): $date');
+        // print('DateTime parseado: $dateTime');
+      }
       final now = DateTime.now();
+      // print('Data atual: $now');
       final diff = now.difference(dateTime);
+      // print('Diferença: $diff');
       if (diff.inSeconds < 0) return 'Agora mesmo'; // futuro
       if (diff.inSeconds < 60) return 'Agora mesmo';
       if (diff.inMinutes < 60) return '${diff.inMinutes} min atrás';
@@ -30,7 +42,8 @@ class NewsItem extends StatelessWidget {
       if (diff.inDays < 30) return '${(diff.inDays / 7).floor()} sem atrás';
       if (diff.inDays < 365) return '${(diff.inDays / 30).floor()} m atrás';
       return '${(diff.inDays / 365).floor()} a atrás';
-    } catch (_) {
+    } catch (e) {
+      // print('Erro ao calcular getTimeAgo: $e');
       return '';
     }
   }
@@ -46,12 +59,15 @@ class NewsItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title ?? '',
-                style: const TextStyle(
-                  color: AppColors.yellow,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  title ?? '',
+                  style: const TextStyle(
+                    color: AppColors.yellow,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
                 ),
               ),
               const SizedBox(height: 2),
@@ -66,6 +82,8 @@ class NewsItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 description ?? '',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
               ),
             ],
