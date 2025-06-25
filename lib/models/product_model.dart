@@ -2,12 +2,12 @@
 class ProductCategory {
   final String id; // CANECAS, ROUPAS, etc.
   final String name;
-  final String icon;
+  final String? icon;
 
   ProductCategory({
     required this.id,
     required this.name,
-    required this.icon,
+    this.icon,
   });
 
   Map<String, dynamic> toJson() {
@@ -34,7 +34,6 @@ class ProductModel {
   final String? description;
   final double price;
   final int stock;
-  final String? category;
   final String? categoryId;
   final String? image;
   final DateTime? createdAt;
@@ -46,7 +45,6 @@ class ProductModel {
     this.description,
     required this.price,
     required this.stock,
-    this.category,
     this.categoryId,
     this.image,
     this.createdAt,
@@ -56,7 +54,6 @@ class ProductModel {
   Map<String, String> toJson() {
     return {
       'name': name,
-      'category': category ?? 'OUTROS',
       'category_id': categoryId ?? '',
       'price': price.toStringAsFixed(2).replaceAll('.', ','),
       'image':
@@ -78,7 +75,6 @@ class ProductModel {
           ? double.tryParse(json['price'].toString()) ?? 0.0
           : 0.0,
       stock: json['stock'] != null ? int.tryParse(json['stock'].toString()) ?? 0 : 0,
-      category: json['category']?.toString() ?? '',
       categoryId: (json['category_id'] ?? json['categoryId'])?.toString() ?? '',
       image: json['image']?.toString(),
       createdAt:

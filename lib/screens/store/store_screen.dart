@@ -20,11 +20,12 @@ class _StoreScreenState extends State<StoreScreen> {
   bool _isLoading = true;
   String? _error;
 
-  List<Map<String, dynamic>> _categories = [];
+  final CategoryService _categoryService = CategoryService();
+  List<ProductCategory> _categories = [];
   bool _isLoadingCategories = true;
   String? _categoriesError;
 
-  List<String> _selectedCategories = [];
+  final List<String> _selectedCategories = [];
   final TextEditingController _searchController = TextEditingController();
   bool _initialized = false;
 
@@ -45,12 +46,12 @@ class _StoreScreenState extends State<StoreScreen> {
     });
 
     try {
-      final categories = await StoreService.getCategories(context);
+      final categories = await _categoryService.getCategories();
       setState(() {
         _categories = categories;
         _isLoadingCategories = false;
       });
-      print('Categorias carregadas: ${_categories}');
+      print('Categorias carregadas: $_categories');
     } catch (e) {
       setState(() {
         _categoriesError = 'Não foi possível carregar as categorias: $e';
@@ -199,7 +200,7 @@ class _StoreScreenState extends State<StoreScreen> {
                               final category = _categories[index];
                               final isLast = index == _categories.length - 1;
                               final isSelected = _selectedCategories.contains(
-                                category['id'],
+                                category.id,
                               );
 
                               return Padding(
@@ -213,22 +214,22 @@ class _StoreScreenState extends State<StoreScreen> {
                                     onTap: () {
                                       setState(() {
                                         if (_selectedCategories.contains(
-                                          category['id'],
+                                          category.id,
                                         )) {
                                           _selectedCategories.remove(
-                                            category['id'],
+                                            category.id,
                                           );
                                         } else {
-                                          _selectedCategories.add(
-                                            category['id'],
-                                          );
+                                          _selectedCategories.add(category.id);
                                         }
                                       });
                                     },
                                     child: _buildCategoryIcon(
-                                      category['name'],
+                                      category.name,
                                       _getIconData(
-                                        category['icon'] ?? 'category',
+                                        category.icon!.isNotEmpty
+                                            ? category.icon
+                                            : 'category',
                                       ),
                                       isSelected: isSelected,
                                     ),
@@ -264,12 +265,18 @@ class _StoreScreenState extends State<StoreScreen> {
                             onTap: () {
                               // Busca o nome da categoria pelo id
                               final categoryName =
-                                  _categories.firstWhere(
-                                    (cat) =>
-                                        cat['id'] == product['category_id'],
-                                    orElse: () => {'name': ''},
-                                  )['name'] ??
-                                  '';
+                                  _categories
+                                      .firstWhere(
+                                        (cat) =>
+                                            cat.id == product['category_id'],
+                                        orElse:
+                                            () => ProductCategory(
+                                              id: '',
+                                              name: '',
+                                              icon: '',
+                                            ),
+                                      )
+                                      .name;
                               Navigator.pushNamed(
                                 context,
                                 '/productDetail',
@@ -308,6 +315,10 @@ class _StoreScreenState extends State<StoreScreen> {
         return Icons.emoji_objects;
       case 'ac_unit':
         return Icons.ac_unit;
+      case 'key':
+        return Icons.key;
+      case 'brush':
+        return Icons.brush;
       default:
         return Icons.category;
     }
