@@ -350,6 +350,51 @@ class EventsNewsService {
     }
   }
 
+  // Método para criar evento
+  Future<bool> createEvent({
+    required String title,
+    required String description,
+    required String date,
+    required String place,
+    required double price,
+    String? imageUrl,
+  }) async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final body = {
+        'title': title,
+        'description': description,
+        'date': date, // Já vem no formato ISO
+        'location': place, // Backend espera 'location', não 'place'
+        'price': price,
+        'type': 'party', // Valor padrão conforme solicitado
+      };
+
+      print('Enviando dados do evento: $body');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/events'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      print('Resposta do servidor: ${response.statusCode}');
+      print('Corpo da resposta: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        print('Erro ao criar evento: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar evento: $e');
+      return false;
+    }
+  }
+
   // Método para buscar eventos do backend
   Future<List<Map<String, String>>> getEventsFromBackend() async {
     try {

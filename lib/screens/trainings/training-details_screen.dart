@@ -428,7 +428,7 @@ Poderia me ajudar com a compra? 😊
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.shopping_cart, color: Color.fromARGB(169, 0, 0, 0)),
+                            Icon(Icons.shopping_cart, color: _ticketQuantity > 0 ? Colors.black : const Color.fromARGB(169, 0, 0, 0)),
                             const SizedBox(width: 8),
                             Text(
                               'Comprar Agora',
