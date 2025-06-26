@@ -64,7 +64,7 @@ class ProductService {
         price: 50.0,
         stock: 10,
         category: 'ROUPAS',
-        image: 'assets/images/camisetaa_masculina.png',
+        imageUrl: 'assets/images/camisetaa_masculina.png',
       ),
       ProductModel(
         id: '2',
@@ -73,7 +73,7 @@ class ProductService {
         price: 25.0,
         stock: 15,
         category: 'CANECAS',
-        image: 'assets/images/caneca_personalizada.jpeg',
+        imageUrl: 'assets/images/caneca_personalizada.jpeg',
       ),
     ];
   }

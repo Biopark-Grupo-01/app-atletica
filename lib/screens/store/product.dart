@@ -1,6 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/models/product_model.dart';
@@ -16,7 +15,6 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   String selectedModel = 'PP';
   int selectedQuantity = 1;
-  final PageController _pageController = PageController();
 
   List<ProductModel> _moreProducts = [];
   bool _loadingMoreProducts = true;
@@ -25,6 +23,113 @@ class _ProductScreenState extends State<ProductScreen> {
   void initState() {
     super.initState();
     _loadMoreProducts();
+  }
+
+  // ========== MÉTODOS DE IMAGEM ==========
+  
+  bool _hasValidProductImage(String imageUrl) {
+    return imageUrl.isNotEmpty && 
+           imageUrl != 'null' && 
+           !imageUrl.contains('placeholder') && 
+           !imageUrl.contains('via.placeholder') &&
+           !imageUrl.contains('assets/images/brasao.png');
+  }
+
+  String _getProductImageUrl(String imageUrl) {
+    // Se já é uma URL completa, usa diretamente
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // Se é um caminho relativo, constrói a URL completa
+    return StoreService.getFullImageUrl(imageUrl);
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      child: _hasValidProductImage(imageUrl) 
+          ? _buildImageWidget(_getProductImageUrl(imageUrl))
+          : Image.asset(
+              'assets/images/brasao.png', // Imagem mockada como fallback
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: const Color(0xFF345aa7),
+                  child: const Center(
+                    child: Icon(
+                      Icons.image_not_supported, 
+                      size: 60,
+                      color: Colors.white70,
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  // Widget helper para construir a imagem correta (asset ou network)
+  Widget _buildImageWidget(String imageUrl) {
+    // Se for um asset local, usa Image.asset
+    if (imageUrl.startsWith('assets/')) {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          print('Erro ao carregar asset: $error');
+          return Container(
+            color: const Color(0xFF345aa7),
+            child: const Center(
+              child: Icon(
+                Icons.image_not_supported, 
+                size: 60,
+                color: Colors.white70,
+              ),
+            ),
+          );
+        },
+      );
+    }
+    
+    // Se for uma URL do servidor, usa Image.network
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.contain,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: const Color(0xFF345aa7),
+          child: const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              strokeWidth: 2,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        print('Erro ao carregar imagem do produto: $error');
+        // Se falhar carregamento da rede, usa imagem mockada
+        return Image.asset(
+          'assets/images/brasao.png',
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: const Color(0xFF345aa7),
+              child: const Center(
+                child: Icon(
+                  Icons.image_not_supported, 
+                  size: 60,
+                  color: Colors.white70,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _loadMoreProducts() async {
@@ -66,83 +171,15 @@ class _ProductScreenState extends State<ProductScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.45,
-                child: PageView(
-                  controller: _pageController,
-                  children: [
-                    // Verificar se a imagem é URL ou asset local
-                    product['image'].toString().startsWith('http')
-                        ? Image.network(
-                          product['image'],
-                          fit: BoxFit.contain,
-                          errorBuilder:
-                              (context, error, stackTrace) => const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.white,
-                                  size: 80,
-                                ),
-                              ),
-                        )
-                        : Image.asset(
-                          product['image'],
-                          fit: BoxFit.contain,
-                          errorBuilder:
-                              (context, error, stackTrace) => const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.white,
-                                  size: 80,
-                                ),
-                              ),
-                        ),
-                    // Segunda imagem do carrossel (mesma lógica)
-                    product['image'].toString().startsWith('http')
-                        ? Image.network(
-                          product['image'],
-                          fit: BoxFit.contain,
-                          errorBuilder:
-                              (context, error, stackTrace) => const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.white,
-                                  size: 80,
-                                ),
-                              ),
-                        )
-                        : Image.asset(
-                          product['image'],
-                          fit: BoxFit.contain,
-                          errorBuilder:
-                              (context, error, stackTrace) => const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.white,
-                                  size: 80,
-                                ),
-                              ),
-                        ),
-                  ],
+                child: Container(
+                  width: double.infinity,
+                  child: _buildProductImage(product['imageUrl'] ?? 'assets/images/brasao.png'),
                 ),
               ),
             ),
 
-            // Indicador de página
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
-              child: Center(
-                child: SmoothPageIndicator(
-                  controller: _pageController,
-                  count: 2,
-                  effect: ExpandingDotsEffect(
-                    activeDotColor: Colors.white,
-                    dotColor: Colors.grey,
-                    dotHeight: 8,
-                    dotWidth: 8,
-                    spacing: 8,
-                  ),
-                ),
-              ),
-            ),
+            // Indicador de página (só aparece se houver mais de uma página)
+            const SizedBox(height: 16),
             const SizedBox(height: 8),
 
             // Nome do produto
@@ -435,14 +472,14 @@ class _ProductScreenState extends State<ProductScreen> {
                       children: _moreProducts
                           .where((p) => p.id != product['id'])
                           .map((p) => _buildProductCard(
-                                image: p.image ?? 'assets/images/brasao.png',
+                                image: p.imageUrl ?? 'assets/images/brasao.png',
                                 title: p.name,
                                 product: {
                                   'id': p.id,
                                   'name': p.name,
                                   'description': p.description,
                                   'price': p.price.toStringAsFixed(2),
-                                  'image': p.image ?? 'assets/images/brasao.png',
+                                  'imageUrl': p.imageUrl ?? 'assets/images/brasao.png',
                                   'category_id': p.categoryId,
                                   'category': product['category'],
                                 },
