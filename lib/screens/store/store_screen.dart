@@ -166,7 +166,7 @@ class _StoreScreenState extends State<StoreScreen> {
                       controller: _searchController,
                     ),
                     const SizedBox(height: 16),
-
+                    if (_categories.isNotEmpty)
                     // Categories horizontal list
                     if (_isLoadingCategories)
                       const Center(
