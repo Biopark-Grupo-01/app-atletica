@@ -5,18 +5,20 @@ class CarouselItem extends StatelessWidget {
   final List<Map<String, String>> items;
   final bool useCarousel;
   final Widget Function(Map<String, String>) itemBuilder;
+  final double? customHeight; // Altura customizada opcional
 
   const CarouselItem({
     super.key,
     required this.items,
     this.useCarousel = false,
     required this.itemBuilder,
+    this.customHeight, // Novo parâmetro opcional
   });
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final carouselHeight = screenHeight * 0.6;
+    final carouselHeight = customHeight ?? screenHeight * 0.45; // Usa altura customizada se fornecida
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,7 +1,12 @@
 import 'package:app_atletica/models/training_model.dart';
+import 'package:app_atletica/models/match_model.dart';
+import 'package:app_atletica/screens/events/news_detail_screen.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
+import 'package:app_atletica/screens/trainings/expandable_text.dart';
+import 'package:app_atletica/services/training_service.dart';
+import 'package:app_atletica/services/match_service.dart';
+import 'package:app_atletica/providers/user_provider.dart';
 import 'package:app_atletica/widgets/custom_square_button.dart';
-import 'package:app_atletica/widgets/training_match_item.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/services/events_news_service.dart';
 import 'package:app_atletica/theme/app_colors.dart';
@@ -13,6 +18,9 @@ import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,30 +32,95 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
-  List<Training> trainings = [];
+  List<dynamic> trainingsAndMatches = []; // Lista mista para treinos e amistosos
+  List<String> _subscribedIds = [];
+  List<Map<String, String>> _userSubscriptions = [];
 
   bool isLoading = true;
   String? error;
 
+  late final UserProvider userProvider;
+  late final user;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    user = userProvider.currentUser;
     _loadData();
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadData({bool preserveScroll = false}) async {
     try {
-      setState(() {
-        isLoading = true;
-        error = null;
-      });
+      if (!preserveScroll) {
+        setState(() {
+          isLoading = true;
+          error = null;
+        });
+      }
       final service = EventsNewsService();
-      final data = await service.loadData(context);
+      
+      // Carrega eventos diretamente do backend (limitado a 5)
+      final eventsFromBackend = await service.getEventsFromBackend();
+      final limitedEvents = eventsFromBackend.take(5).toList();
+      
+      // Carrega notícias diretamente do backend (limitado a 5)
+      final newsFromBackend = await service.getNewsFromBackend();
+      final limitedNews = newsFromBackend.take(5).toList();
+      
+      // Carrega treinos e amistosos diretamente do backend
+      final trainingService = TrainingService();
+      final matchService = MatchService();
+      
+      final trainingsFromBackend = await trainingService.getTrainings();
+      final matchesFromBackend = await matchService.getMatches();
+      
+      // Carrega as inscrições do usuário nos treinos
+      final userId = user.id;
+      final userSubscriptions = await trainingService.getUserSubscriptions(userId);
+      
+      // Filtra apenas treinos e amistosos futuros
+      final now = DateTime.now();
+      final futureTrainings = trainingsFromBackend.where((training) {
+        try {
+          final eventDate = DateTime.parse(training.date);
+          return eventDate.isAfter(now);
+        } catch (_) {
+          return false;
+        }
+      }).take(2).toList();
+      
+      final futureMatches = matchesFromBackend.where((match) {
+        try {
+          final eventDate = DateTime.parse(match.date);
+          return eventDate.isAfter(now);
+        } catch (_) {
+          return false;
+        }
+      }).take(2).toList();
+      
+      // Cria lista mista
+      final combinedList = <dynamic>[
+        ...futureTrainings,
+        ...futureMatches,
+      ];
+      
       setState(() {
-        news = List<Map<String, String>>.from(data['news'] ?? []);
-        events = List<Map<String, String>>.from(data['events'] ?? []);
-        trainings = List<Training>.from(data['trainings'] ?? []);
-        isLoading = false;
+        events = limitedEvents; // Usa eventos do backend limitados a 5
+        news = limitedNews; // Usa notícias do backend limitadas a 5
+        trainingsAndMatches = combinedList; // Usa treinos e amistosos do backend
+        
+        // Processa as subscrições
+        _userSubscriptions = userSubscriptions.map((sub) => {
+          'trainingId': sub['training']['id'] as String,
+          'subscriptionId': sub['id'] as String,
+        }).toList();
+        _subscribedIds = _userSubscriptions.map((sub) => sub['trainingId']!).toList();
+        
+        if (!preserveScroll) {
+          isLoading = false;
+        }
       });
     } catch (e) {
       print('Erro ao carregar dados da tela home: $e');
@@ -134,6 +207,89 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  String formatDate(String rawDate) {
+    try {
+      final parsedDate = DateTime.parse(rawDate);
+      return DateFormat('dd/MM/yyyy').format(parsedDate);
+    } catch (e) {
+      return rawDate; // Retorna como está se der erro
+    }
+  }
+
+  Widget _buildEventCard(String title, String description, String date, String location, String category, bool isSubscribed) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isSubscribed ? const Color(0xFF1E88E5).withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: isSubscribed ? Border.all(color: const Color(0xFF42A5F5), width: 2) : null,
+        boxShadow: isSubscribed
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF42A5F5).withValues(alpha: 0.5),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.calendar_today, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
+              Text(date, style: const TextStyle(color: Colors.white, fontSize: 14)),
+              const SizedBox(width: 12),
+              const Icon(Icons.location_on, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  location,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSubscribed ? Colors.greenAccent : const Color(0xFFFFD700),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  isSubscribed ? "INSCRITO" : category,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              color: isSubscribed ? Colors.greenAccent : const Color(0xFFFFD700),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          ExpandableText(
+            key: ValueKey(description),
+            text: description,
+            trimLines: 2,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) return _buildLoadingView();
@@ -143,6 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: CustomAppBar(),
       body: SafeArea(
         child: ListView(
+          controller: _scrollController,
           padding: const EdgeInsets.all(16),
           children: [
             const SizedBox(height: 10),
@@ -174,7 +331,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   label: 'Suporte',
                   color: AppColors.yellow,
                   onPressed: () {
-                    Navigator.pushNamed(context, '/home');
+                    openWhatsApp(
+                      '5544999719743',
+                      text: 'Olá! Preciso de suporte com o aplicativo da atlética.',
+                    );
                   },
                 ),
               ],
@@ -195,41 +355,74 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
                 : _buildEmptySection('Nenhum evento disponível no momento'),
+            // const SizedBox(height: 4),
             CustomTitle(title: 'NOTÍCIAS'),
             news.isNotEmpty
                 ? CarouselItem(
                   items: news,
                   useCarousel: true,
-                  itemBuilder: (item) => NewsItem(
-                    imageUrl: item['imageUrl'] ?? '',
-                    date: item['date'] ?? '',
-                    // location: item['location'] ?? '',
-                    title: item['title'] ?? '',
-                    description: item['description'] ?? '',
+                  customHeight: 200, // Altura fixa menor para notícias
+                  itemBuilder: (item) => GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => NewsDetailScreen(news: item),
+                        ),
+                      );
+                    },
+                    child: NewsItem(
+                      imageUrl: item['imageUrl'] ?? '',
+                      date: item['date'] ?? '',
+                      title: item['title'] ?? '',
+                      description: item['description'] ?? '',
+                    ),
                   ),
                 )
                 : _buildEmptySection('Nenhuma notícia disponível no momento'),
+            // const SizedBox(height: 4),
             CustomTitle(title: 'TREINOS E AMISTOSOS'),
-            trainings.isNotEmpty
+            trainingsAndMatches.isNotEmpty
                 ? ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: trainings.length,
+                  itemCount: trainingsAndMatches.length,
                   itemBuilder: (context, index) {
-                    final training = trainings[index];
+                    final item = trainingsAndMatches[index];
+                    final isTraining = item is Training;
+                    
+                    // Extrai dados comuns
+                    final title = isTraining ? item.title : (item as Match).title;
+                    final description = isTraining ? item.description : item.description;
+                    final date = isTraining ? item.date : item.date;
+                    final location = isTraining ? item.place : item.place;
+                    final modality = isTraining ? item.modality : item.modality;
+                    
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: GestureDetector(
                         onTap: () {
-                          showTrainingModal(context, training);
+                          if (isTraining) {
+                            final sub = _userSubscriptions.firstWhereOrNull((sub) => sub['trainingId'] == item.id);
+                            showTrainingModal(
+                              context, 
+                              item,
+                              _subscribedIds,
+                              _loadData,
+                              _scrollController,
+                              subscriptionId: sub != null ? sub['subscriptionId'] : null,
+                            );
+                          } else {
+                            showMatchModal(context, item);
+                          }
                         },
-                        child: TrainingMatchItem(
-                          title: training.title,
-                          description: training.description,
-                          date: training.date,
-                          location: training.place,
-                          modality: training.modality,
-                          isMatch: false, // ou true se for amistoso
+                        child: _buildEventCard(
+                          title,
+                          description,
+                          formatDate(date),
+                          location,
+                          modality.toUpperCase(),
+                          isTraining ? _subscribedIds.contains(item.id) : false, // Apenas treinos podem ter inscrição
                         ),
                       ),
                     );
@@ -242,15 +435,51 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: CustomBottomNavBar(currentIndex: 0),
     );
   }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 }
 
-void showTrainingModal(BuildContext context, Training training) {
-  showModalBottomSheet(
+void showTrainingModal(
+  BuildContext context,
+  Training training,
+  List<String> subscribedIds,
+  Future<void> Function({bool preserveScroll}) loadData,
+  ScrollController scrollController,
+  {String? subscriptionId}
+) async {
+  final double currentScrollOffset = scrollController.offset;
+  await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: Colors.black.withValues(alpha: 0.5),
-    builder: (_) => TrainingModal(training: training, isSubscribed: true),
+    builder: (_) => TrainingModal(
+      training: training,
+      isSubscribed: subscribedIds.contains(training.id),
+      subscriptionId: subscriptionId,
+      onClose: () async {
+        await loadData(preserveScroll: true);
+      },
+    ),
+  ).then((_) async {
+    await loadData(preserveScroll: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.jumpTo(currentScrollOffset);
+    });
+  });
+}
+
+void showMatchModal(BuildContext context, Match match) async {
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withValues(alpha: 0.5),
+    builder: (_) => TrainingModal(match: match),
   );
 }
 
