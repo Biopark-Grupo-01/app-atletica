@@ -234,6 +234,9 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                           subscriptionId: sub != null ? sub['subscriptionId'] : null,
                                         );
                                       },
+                                      onLongPress: () {
+                                        _showContextMenu(context, training, true);
+                                      },
                                       child: _buildEventCard(
                                         training.title,
                                         training.description,
@@ -251,6 +254,9 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
                                     child: GestureDetector(
                                       onTap: () {
                                         showMatchModal(context, match);
+                                      },
+                                      onLongPress: () {
+                                        _showContextMenu(context, match, false);
                                       },
                                       child: _buildEventCard(
                                         match.title,
@@ -444,6 +450,186 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _showContextMenu(BuildContext context, dynamic event, bool isTraining) async {
+    final eventTitle = isTraining ? (event as Training).title : (event as Match).title;
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF001835),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Opções para "$eventTitle"',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.white),
+                title: const Text('Editar', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editEvent(event, isTraining);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Excluir', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteEvent(context, event, isTraining);
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _editEvent(dynamic event, bool isTraining) {
+    if (isTraining) {
+      final training = event as Training;
+      // Navegar para a tela de edição de treino
+      Navigator.pushNamed(
+        context,
+        '/trainings_registration',
+        arguments: training, // Passa o treino atual para edição
+      ).then((_) {
+        // Recarrega os dados quando volta da tela de edição
+        _loadData();
+      });
+    } else {
+      final match = event as Match;
+      // Navegar para a tela de edição de amistoso
+      Navigator.pushNamed(
+        context,
+        '/trainings_registration',
+        arguments: match, // Passa o amistoso atual para edição
+      ).then((_) {
+        // Recarrega os dados quando volta da tela de edição
+        _loadData();
+      });
+    }
+  }
+
+  Future<void> _deleteEvent(BuildContext context, dynamic event, bool isTraining) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF2C3E50),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text(
+            'Confirmar Exclusão',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            isTraining 
+              ? 'Tem certeza que deseja excluir este treino?\n\n"${(event as Training).title}"'
+              : 'Tem certeza que deseja excluir este amistoso?\n\n"${(event as Match).title}"',
+            style: const TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red.withOpacity(0.2),
+              ),
+              child: const Text(
+                'Excluir',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _performDelete(event, isTraining);
+    }
+  }
+
+  Future<void> _performDelete(dynamic event, bool isTraining) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      bool success = false;
+      if (isTraining) {
+        final training = event as Training;
+        success = await _trainingService.deleteTraining(training.id);
+      } else {
+        final match = event as Match;
+        success = await _matchService.deleteMatch(match.id);
+      }
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isTraining ? 'Treino excluído com sucesso!' : 'Amistoso excluído com sucesso!',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Recarrega os dados
+        await _loadData();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isTraining ? 'Erro ao excluir treino!' : 'Erro ao excluir amistoso!',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 

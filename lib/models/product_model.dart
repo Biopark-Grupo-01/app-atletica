@@ -55,10 +55,12 @@ class ProductModel {
 
   Map<String, String> toJson() {
     return {
+      'id': id,
       'name': name,
       'category': category ?? 'OUTROS',
       'category_id': categoryId ?? '',
       'price': price.toStringAsFixed(2).replaceAll('.', ','),
+      'stock': stock.toString(),
       'image':
           image != null && image!.startsWith('http')
               ? image!

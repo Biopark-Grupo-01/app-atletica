@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:app_atletica/models/news_event_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
-import 'package:app_atletica/models/news_model.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class EventsNewsService {
   // Endpoints e cache keys
-  static const String _newsEndpoint = '/news';
   static const String _newsCache = 'news_cache';
   static const String _eventsEndpoint = '/events';
   static const String _trainingsEndpoint = '/trainings';
@@ -299,31 +296,115 @@ class EventsNewsService {
     ];
   }
 
-  Future<bool> createNews({
+  // Métodos CRUD para Eventos
+  Future<bool> createEvent({
+    required String title,
+    String? description,
+    required String date,
+    required String location,
+    String? price,
+    String? type,
+  }) async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.post(
+        Uri.parse('$baseUrl/events'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'date': date,
+          'location': location,
+          'price': price,
+          'type': type ?? 'party',
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro ao criar evento: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar evento: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateEvent({
+    required String eventId,
     required String title,
     required String description,
-    required String author,
-    String? imageUrl,
-    String? date,
-    String? time,
+    required String date,
+    required String location,
+    String? price,
+    String? type,
   }) async {
-    final baseUrl = ApiService.baseUrl;
     try {
-      final nowLocal = DateTime.now();
-      // Monta a data no formato yyyy-MM-dd HH:mm:ss
-      String dateTimeStr;
-      if (date != null && time != null) {
-        dateTimeStr = "$date $time";
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.put(
+        Uri.parse('$baseUrl/events/$eventId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'date': date,
+          'location': location,
+          'price': price,
+          'type': type ?? 'party',
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
       } else {
-        dateTimeStr =
-            "${nowLocal.year.toString().padLeft(4, '0')}-"
-            "${nowLocal.month.toString().padLeft(2, '0')}-"
-            "${nowLocal.day.toString().padLeft(2, '0')} "
-            "${nowLocal.hour.toString().padLeft(2, '0')}:"
-            "${nowLocal.minute.toString().padLeft(2, '0')}:"
-            "${nowLocal.second.toString().padLeft(2, '0')}";
+        print('Erro ao atualizar evento: ${response.statusCode}');
+        return false;
       }
-      print('[createNews] Enviando: date=$dateTimeStr, nowLocal=$nowLocal');
+    } catch (e) {
+      print('Erro ao atualizar evento: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteEvent(String eventId) async {
+    if (eventId.isEmpty) {
+      print('Erro: ID do evento não pode estar vazio');
+      return false;
+    }
+    
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.delete(
+        Uri.parse('$baseUrl/events/$eventId'),
+        headers: {'Accept': 'application/json'},
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao excluir evento: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao excluir evento: $e');
+      return false;
+    }
+  }
+
+  // Métodos CRUD para Notícias
+  Future<bool> createNews({
+    required String title,
+    String? description,
+    required String date,
+    String? author,
+  }) async {
+    try {
+      final baseUrl = ApiService.baseUrl;
       final response = await http.post(
         Uri.parse('$baseUrl/news'),
         headers: {
@@ -333,9 +414,8 @@ class EventsNewsService {
         body: json.encode({
           'title': title,
           'description': description,
+          'date': date,
           'author': author,
-          'imageUrl': imageUrl,
-          'date': dateTimeStr,
         }),
       );
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -350,47 +430,60 @@ class EventsNewsService {
     }
   }
 
-  // Método para criar evento
-  Future<bool> createEvent({
+  Future<bool> updateNews({
+    required String newsId,
     required String title,
     required String description,
     required String date,
-    required String place,
-    required double price,
-    String? imageUrl,
+    String? author,
   }) async {
     try {
       final baseUrl = ApiService.baseUrl;
-      final body = {
-        'title': title,
-        'description': description,
-        'date': date, // Já vem no formato ISO
-        'location': place, // Backend espera 'location', não 'place'
-        'price': price,
-        'type': 'party', // Valor padrão conforme solicitado
-      };
-
-      print('Enviando dados do evento: $body');
-
-      final response = await http.post(
-        Uri.parse('$baseUrl/events'),
+      final response = await http.put(
+        Uri.parse('$baseUrl/news/$newsId'),
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: jsonEncode(body),
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'date': date,
+          'author': author,
+        }),
       );
-
-      print('Resposta do servidor: ${response.statusCode}');
-      print('Corpo da resposta: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
         return true;
       } else {
-        print('Erro ao criar evento: ${response.statusCode} - ${response.body}');
+        print('Erro ao atualizar notícia: ${response.statusCode}');
         return false;
       }
     } catch (e) {
-      print('Erro ao criar evento: $e');
+      print('Erro ao atualizar notícia: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteNews(String newsId) async {
+    if (newsId.isEmpty) {
+      print('Erro: ID da notícia não pode estar vazio');
+      return false;
+    }
+    
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.delete(
+        Uri.parse('$baseUrl/news/$newsId'),
+        headers: {'Accept': 'application/json'},
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao excluir notícia: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao excluir notícia: $e');
       return false;
     }
   }
@@ -453,4 +546,5 @@ class EventsNewsService {
       return [];
     }
   }
+
 }

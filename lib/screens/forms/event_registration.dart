@@ -25,6 +25,41 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
   final TextEditingController _priceController = TextEditingController();
   File? _imageFile;
   bool _isLoading = false;
+  bool _isEditing = false;
+  String? _editingId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Carrega dados de edição se fornecidos
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments != null && arguments is Map<String, String> && !_isEditing) {
+      _loadEditingData(arguments);
+    }
+  }
+
+  void _loadEditingData(Map<String, String> eventData) {
+    setState(() {
+      _isEditing = true;
+      _editingId = eventData['id'];
+      _titleController.text = eventData['title'] ?? '';
+      _descriptionController.text = eventData['description'] ?? '';
+      _placeController.text = eventData['location'] ?? '';
+      _priceController.text = eventData['price'] ?? '';
+      
+      // Formatar data para exibição (de ISO para DD/MM/YYYY)
+      if (eventData['date'] != null && eventData['date']!.isNotEmpty) {
+        try {
+          final dateTime = DateTime.parse(eventData['date']!);
+          _dateController.text = '${dateTime.day.toString().padLeft(2, '0')}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.year}';
+          _timeController.text = '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+        } catch (e) {
+          print('Erro ao parsear data: $e');
+          _dateController.text = eventData['date'] ?? '';
+        }
+      }
+    });
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -59,8 +94,8 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
       return '${formattedDate}T${hour}:${minute}:00Z';
     } catch (e) {
       print('Erro ao formatar data/hora: $e');
-      // Fallback para data atual
-      return DateTime.now().toUtc().toIso8601String();
+      // Fallback para data atual (horário local)
+      return DateTime.now().toIso8601String();
     }
   }
 
@@ -83,8 +118,10 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                       children: [
                         const SizedBox(height: 10),
                         Center(
-                          child: const CustomTitleForms(
-                            title: 'CADASTRO DE EVENTO',
+                          child: CustomTitleForms(
+                            title: _isEditing 
+                              ? 'EDITAR EVENTO'
+                              : 'CADASTRO DE EVENTO',
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -342,7 +379,9 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                         const SizedBox(height: 32),
                         Center(
                           child: CustomButton(
-                            text: _isLoading ? 'Salvando...' : 'Salvar',
+                            text: _isLoading 
+                              ? (_isEditing ? 'Atualizando...' : 'Salvando...') 
+                              : (_isEditing ? 'Atualizar' : 'Salvar'),
                             onPressed: _isLoading
                                 ? () {}
                                 : () async {
@@ -360,26 +399,49 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                                         _timeController.text,
                                       );
                                       
-                                      final success = await EventsNewsService().createEvent(
-                                        title: _titleController.text,
-                                        description: _descriptionController.text,
-                                        date: isoDateTime,
-                                        place: _placeController.text,
-                                        price: price,
-                                        imageUrl: null, // TODO: Implementar upload de imagem se necessário
-                                      );
+                                      bool success;
+                                      if (_isEditing) {
+                                        // Atualizar evento existente
+                                        success = await EventsNewsService().updateEvent(
+                                          eventId: _editingId!,
+                                          title: _titleController.text,
+                                          description: _descriptionController.text,
+                                          date: isoDateTime,
+                                          location: _placeController.text,
+                                          price: price.toString(),
+                                        );
+                                      } else {
+                                        // Criar evento novo
+                                        success = await EventsNewsService().createEvent(
+                                          title: _titleController.text,
+                                          description: _descriptionController.text,
+                                          date: isoDateTime,
+                                          location: _placeController.text,
+                                          price: price.toString(),
+                                        );
+                                      }
                                       
                                       setState(() => _isLoading = false);
                                       if (!mounted) return;
                                       
                                       if (success) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Evento cadastrado com sucesso!'), backgroundColor: Colors.green),
+                                          SnackBar(
+                                            content: Text(_isEditing 
+                                              ? 'Evento atualizado com sucesso!' 
+                                              : 'Evento cadastrado com sucesso!'),
+                                            backgroundColor: Colors.green,
+                                          ),
                                         );
                                         Navigator.pop(context);
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Erro ao cadastrar evento!'), backgroundColor: Colors.red),
+                                          SnackBar(
+                                            content: Text(_isEditing 
+                                              ? 'Erro ao atualizar evento!' 
+                                              : 'Erro ao cadastrar evento!'),
+                                            backgroundColor: Colors.red,
+                                          ),
                                         );
                                       }
                                     }

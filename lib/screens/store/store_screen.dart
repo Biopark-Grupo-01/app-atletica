@@ -258,6 +258,9 @@ class _StoreScreenState extends State<StoreScreen> {
                                 },
                               );
                             },
+                            onLongPress: () {
+                              _showContextMenu(context, product);
+                            },
                             child: _buildHorizontalProductCard(
                               product['name'] ?? '',
                               product['price'] ?? '',
@@ -420,5 +423,194 @@ class _StoreScreenState extends State<StoreScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _showContextMenu(BuildContext context, Map<String, dynamic> product) async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF091B40),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Opções para "${product['name']}"',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.white),
+                title: const Text('Editar', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editProduct(product);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Excluir', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteProduct(context, product);
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _editProduct(Map<String, dynamic> product) {
+    try {
+      print('Dados do produto para edição:');
+      print('Product map: $product');
+      
+      // Converter preço corretamente - convertendo vírgula para ponto antes do parse
+      final priceString = product['price']?.toString() ?? '0';
+      final priceValue = double.tryParse(priceString.replaceAll(',', '.')) ?? 0.0;
+      
+      print('Price string: $priceString');
+      print('Price value: $priceValue');
+      
+      // Converter para ProductModel
+      final productModel = ProductModel(
+        id: product['id']?.toString() ?? '',
+        name: product['name']?.toString() ?? '',
+        description: product['description']?.toString(),
+        price: priceValue,
+        stock: int.tryParse(product['stock']?.toString() ?? '0') ?? 0,
+        image: product['image']?.toString(),
+        categoryId: product['category_id']?.toString() ?? '',
+      );
+      
+      print('ProductModel criado: preço = ${productModel.price}');
+      
+      // Navegar para a tela de edição de produto
+      Navigator.pushNamed(
+        context,
+        '/product_registration',
+        arguments: productModel,
+      ).then((_) {
+        // Recarrega os dados quando volta da tela de edição
+        _loadProducts();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao abrir edição: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _deleteProduct(BuildContext context, Map<String, dynamic> product) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF2C3E50),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text(
+            'Confirmar Exclusão',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Tem certeza que deseja excluir este produto?\n\n"${product['name']}"',
+            style: const TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red.withOpacity(0.2),
+              ),
+              child: const Text(
+                'Excluir',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _performDelete(product);
+    }
+  }
+
+  Future<void> _performDelete(Map<String, dynamic> product) async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final productId = product['id']?.toString();
+      if (productId == null || productId.isEmpty) {
+        throw Exception('ID do produto não encontrado');
+      }
+
+      final success = await StoreService.deleteProduct(productId);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Produto excluído com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Recarrega os dados
+        await _loadProducts();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro ao excluir produto!'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

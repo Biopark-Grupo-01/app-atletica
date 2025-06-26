@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
-import 'package:app_atletica/widgets/forms/custom_text_field.dart';
-import 'package:app_atletica/widgets/forms/custom_text_box.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,6 +22,28 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
   File? _imageFile;
   final TextEditingController _authorController = TextEditingController();
   bool _isLoading = false;
+  bool _isEditing = false;
+  String? _editingId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Carrega dados de edição se fornecidos
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments != null && arguments is Map<String, String> && !_isEditing) {
+      _loadEditingData(arguments);
+    }
+  }
+
+  void _loadEditingData(Map<String, String> newsData) {
+    setState(() {
+      _isEditing = true;
+      _editingId = newsData['id'];
+      _titleController.text = newsData['title'] ?? '';
+      _descriptionController.text = newsData['description'] ?? '';
+      _authorController.text = newsData['author'] ?? '';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +63,10 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const Center(
-                          child: CustomTitleForms(title: 'CADASTRO DE NOTÍCIA'),
+                        Center(
+                          child: CustomTitleForms(title: _isEditing 
+                            ? 'EDITAR NOTÍCIA' 
+                            : 'CADASTRO DE NOTÍCIA'),
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
@@ -191,28 +213,58 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                         const SizedBox(height: 32),
                         Center(
                           child: CustomButton(
-                            text: _isLoading ? 'Salvando...' : 'Salvar',
+                            text: _isLoading 
+                              ? (_isEditing ? 'Atualizando...' : 'Salvando...') 
+                              : (_isEditing ? 'Atualizar' : 'Salvar'),
                             onPressed: _isLoading
                                 ? () {}
                                 : () async {
                                     if (_formKey.currentState!.validate()) {
                                       setState(() => _isLoading = true);
-                                      final success = await EventsNewsService().createNews(
-                                        title: _titleController.text,
-                                        description: _descriptionController.text,
-                                        author: _authorController.text,
-                                        imageUrl: null, // Envie uma URL real se houver upload, ou null
-                                      );
+                                      
+                                      // Data atual em formato ISO (horário local)
+                                      final String currentDate = DateTime.now().toIso8601String();
+                                      
+                                      bool success;
+                                      if (_isEditing) {
+                                        // Atualizar notícia existente
+                                        success = await EventsNewsService().updateNews(
+                                          newsId: _editingId!,
+                                          title: _titleController.text,
+                                          description: _descriptionController.text,
+                                          date: currentDate,
+                                          author: _authorController.text,
+                                        );
+                                      } else {
+                                        // Criar notícia nova
+                                        success = await EventsNewsService().createNews(
+                                          title: _titleController.text,
+                                          description: _descriptionController.text,
+                                          date: currentDate,
+                                          author: _authorController.text,
+                                        );
+                                      }
+                                      
                                       setState(() => _isLoading = false);
                                       if (!mounted) return;
                                       if (success) {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Notícia cadastrada com sucesso!'), backgroundColor: Colors.green),
+                                          SnackBar(
+                                            content: Text(_isEditing 
+                                              ? 'Notícia atualizada com sucesso!' 
+                                              : 'Notícia cadastrada com sucesso!'),
+                                            backgroundColor: Colors.green,
+                                          ),
                                         );
                                         Navigator.pop(context);
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Erro ao cadastrar notícia!'), backgroundColor: Colors.red),
+                                          SnackBar(
+                                            content: Text(_isEditing 
+                                              ? 'Erro ao atualizar notícia!' 
+                                              : 'Erro ao cadastrar notícia!'),
+                                            backgroundColor: Colors.red,
+                                          ),
                                         );
                                       }
                                     }

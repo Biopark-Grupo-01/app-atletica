@@ -67,4 +67,63 @@ class MatchService {
       return false;
     }
   }
+
+  Future<bool> deleteMatch(String matchId) async {
+    final baseUrl = ApiService.baseUrl;
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/matches/$matchId'),
+        headers: {'Accept': 'application/json'},
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao excluir amistoso: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao excluir amistoso: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateMatch({
+    required String matchId,
+    required String title,
+    required String description,
+    required String place,
+    required String startDate,
+    required String startTime,
+    required String responsible,
+    required String trainingModalityId,
+  }) async {
+    final baseUrl = ApiService.baseUrl;
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/matches/$matchId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'place': place,
+          'start_date': startDate,
+          'start_time': startTime,
+          'responsible': responsible,
+          'trainingModalityId': trainingModalityId,
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao atualizar amistoso: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao atualizar amistoso: $e');
+      return false;
+    }
+  }
 }

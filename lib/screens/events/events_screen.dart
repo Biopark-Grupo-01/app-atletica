@@ -127,31 +127,36 @@ class _EventsScreenState extends State<EventsScreen> {
                               final isLast = index == sortedList.length - 1;
                               return Column(
                                 children: [
-                                  _selectedTabIndex == 0
-                                      ? EventItem(
-                                          imageUrl: item['imageUrl'] ?? '',
-                                          date: item['date'] ?? '',
-                                          location: item['location'] ?? '',
-                                          title: item['title'] ?? '',
-                                          description: item['description'] ?? '',
-                                          price: item['price'] ?? '0,00',
-                                        )
-                                      : GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => NewsDetailScreen(news: item),
-                                              ),
-                                            );
-                                          },
-                                          child: NewsItem(
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      _showContextMenu(context, item, _selectedTabIndex);
+                                    },
+                                    child: _selectedTabIndex == 0
+                                        ? EventItem(
                                             imageUrl: item['imageUrl'] ?? '',
                                             date: item['date'] ?? '',
+                                            location: item['location'] ?? '',
                                             title: item['title'] ?? '',
                                             description: item['description'] ?? '',
+                                            price: item['price'] ?? '0,00',
+                                          )
+                                        : GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => NewsDetailScreen(news: item),
+                                                ),
+                                              );
+                                            },
+                                            child: NewsItem(
+                                              imageUrl: item['imageUrl'] ?? '',
+                                              date: item['date'] ?? '',
+                                              title: item['title'] ?? '',
+                                              description: item['description'] ?? '',
+                                            ),
                                           ),
-                                        ),
+                                  ),
                                   if (_selectedTabIndex == 1 && !isLast)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -216,5 +221,186 @@ class _EventsScreenState extends State<EventsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _showContextMenu(BuildContext context, Map<String, String> item, int tabIndex) async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.blue,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Opções para "${item['title']}"',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.edit, color: Colors.white),
+                title: const Text('Editar', style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editItem(item, tabIndex);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text('Excluir', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteItem(context, item, tabIndex);
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _editItem(Map<String, String> item, int tabIndex) {
+    if (tabIndex == 0) {
+      // Editar evento
+      Navigator.pushNamed(
+        context,
+        '/event_registration',
+        arguments: item,
+      ).then((_) {
+        // Recarrega os dados quando volta da tela de edição
+        _loadEventsFromService();
+      });
+    } else {
+      // Editar notícia
+      Navigator.pushNamed(
+        context,
+        '/news_registration',
+        arguments: item,
+      ).then((_) {
+        // Recarrega os dados quando volta da tela de edição
+        _loadNewsFromService();
+      });
+    }
+  }
+
+  Future<void> _deleteItem(BuildContext context, Map<String, String> item, int tabIndex) async {
+    final String itemType = tabIndex == 0 ? 'evento' : 'notícia';
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF2C3E50),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            'Confirmar Exclusão',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Tem certeza que deseja excluir este $itemType?\n\n"${item['title']}"',
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancelar',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.red.withOpacity(0.2),
+              ),
+              child: Text(
+                'Excluir',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _performDelete(item, tabIndex);
+    }
+  }
+
+  Future<void> _performDelete(Map<String, String> item, int tabIndex) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final itemId = item['id'];
+      if (itemId == null || itemId.isEmpty) {
+        throw Exception('ID do item não encontrado');
+      }
+
+      bool success;
+      if (tabIndex == 0) {
+        // Excluir evento
+        success = await _service.deleteEvent(itemId);
+      } else {
+        // Excluir notícia
+        success = await _service.deleteNews(itemId);
+      }
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${tabIndex == 0 ? 'Evento' : 'Notícia'} excluído(a) com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Recarrega os dados
+        if (tabIndex == 0) {
+          await _loadEventsFromService();
+        } else {
+          await _loadNewsFromService();
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao excluir ${tabIndex == 0 ? 'evento' : 'notícia'}!'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

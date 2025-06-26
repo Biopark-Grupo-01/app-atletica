@@ -11,6 +11,8 @@ import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/services/training_service.dart';
 import 'package:app_atletica/services/match_service.dart';
+import 'package:app_atletica/models/training_model.dart';
+import 'package:app_atletica/models/match_model.dart';
 
 class TrainingsRegistrationForm extends StatefulWidget {
   const TrainingsRegistrationForm({super.key});
@@ -41,11 +43,81 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
   String? _selectedSport;
   String? _selectedType;
   String? _selectedModalityId;
+  bool _isEditing = false;
+  String? _editingId;
 
   @override
   void initState() {
     super.initState();
     _loadModalities();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Os dados de edição são carregados no _loadModalities após as modalidades serem carregadas
+  }
+
+  void _loadEditingData(dynamic eventData) {
+    setState(() {
+      _isEditing = true;
+    });
+
+    if (eventData is Training) {
+      final training = eventData;
+      _editingId = training.id;
+      _titleController.text = training.title;
+      _descriptionController.text = training.description;
+      _placeController.text = training.place;
+      _coachController.text = training.coach;
+      _responsibleController.text = training.responsible;
+      _selectedType = 'Treinos';
+      _selectedSport = training.modality;
+      
+      // Encontrar o modalityId correspondente
+      _selectedModalityId = _modalities.firstWhere(
+        (mod) => mod['name'] == training.modality, 
+        orElse: () => {}
+      )['id'];
+      
+      // Formatar a data (de YYYY-MM-DD para DD/MM/YYYY)
+      try {
+        final date = DateTime.parse(training.date);
+        _dateController.text = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+      } catch (e) {
+        _dateController.text = training.date;
+      }
+      
+      // Formatar o horário
+      _timeController.text = training.time;
+      
+    } else if (eventData is Match) {
+      final match = eventData;
+      _editingId = match.id;
+      _titleController.text = match.title;
+      _descriptionController.text = match.description;
+      _placeController.text = match.place;
+      _responsibleController.text = match.responsible;
+      _selectedType = 'Amistosos';
+      _selectedSport = match.modality;
+      
+      // Encontrar o modalityId correspondente
+      _selectedModalityId = _modalities.firstWhere(
+        (mod) => mod['name'] == match.modality, 
+        orElse: () => {}
+      )['id'];
+      
+      // Formatar a data (de YYYY-MM-DD para DD/MM/YYYY)
+      try {
+        final date = DateTime.parse(match.date);
+        _dateController.text = "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+      } catch (e) {
+        _dateController.text = match.date;
+      }
+      
+      // Formatar o horário
+      _timeController.text = match.time;
+    }
   }
 
   Future<void> _loadModalities() async {
@@ -58,6 +130,12 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
       _modalities = modalities;
       _loadingModalities = false;
     });
+    
+    // Recarregar dados de edição após modalidades carregadas
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments != null && !_isEditing) {
+      _loadEditingData(arguments);
+    }
   }
 
   Future<void> _pickImage() async {
@@ -91,8 +169,10 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                       children: [
                         const SizedBox(height: 10),
                         Center(
-                          child: const CustomTitleForms(
-                            title: 'CADASTRO DE TREINOS E AMISTOSOS',
+                          child: CustomTitleForms(
+                            title: _isEditing 
+                              ? 'EDITAR TREINOS E AMISTOSOS'
+                              : 'CADASTRO DE TREINOS E AMISTOSOS',
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -347,25 +427,45 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                         const SizedBox(height: 32),
                         Center(
                           child: CustomButton(
-                            text: 'Salvar',
+                            text: _isEditing ? 'Atualizar' : 'Salvar',
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
                                 if (_selectedType == 'Treinos') {
                                   final service = TrainingService();
-                                  final success = await service.createTraining(
-                                    title: _titleController.text,
-                                    description: _descriptionController.text,
-                                    place: _placeController.text,
-                                    startDate: _dateController.text.split('/').reversed.join('-'),
-                                    startTime: _timeController.text.padLeft(8, '0'),
-                                    coach: _coachController.text,
-                                    responsible: _responsibleController.text,
-                                    trainingModalityId: _selectedModalityId ?? '',
-                                  );
+                                  bool success;
+                                  
+                                  if (_isEditing) {
+                                    // Atualizar treino existente
+                                    success = await service.updateTraining(
+                                      trainingId: _editingId!,
+                                      title: _titleController.text,
+                                      description: _descriptionController.text,
+                                      place: _placeController.text,
+                                      startDate: _dateController.text.split('/').reversed.join('-'),
+                                      startTime: _timeController.text.padLeft(8, '0'),
+                                      coach: _coachController.text,
+                                      responsible: _responsibleController.text,
+                                      trainingModalityId: _selectedModalityId ?? '',
+                                    );
+                                  } else {
+                                    success = await service.createTraining(
+                                      title: _titleController.text,
+                                      description: _descriptionController.text,
+                                      place: _placeController.text,
+                                      startDate: _dateController.text.split('/').reversed.join('-'),
+                                      startTime: _timeController.text.padLeft(8, '0'),
+                                      coach: _coachController.text,
+                                      responsible: _responsibleController.text,
+                                      trainingModalityId: _selectedModalityId ?? '',
+                                    );
+                                  }
+                                  
                                   if (success) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Treino cadastrado com sucesso!'),
+                                      SnackBar(
+                                        content: Text(_isEditing 
+                                          ? 'Treino atualizado com sucesso!' 
+                                          : 'Treino cadastrado com sucesso!'),
                                         backgroundColor: Colors.green,
                                       ),
                                     );
@@ -373,24 +473,47 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                                     Navigator.pop(context);
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Erro ao criar treino.')),
+                                      SnackBar(
+                                        content: Text(_isEditing 
+                                          ? 'Erro ao atualizar treino.' 
+                                          : 'Erro ao criar treino.'),
+                                      ),
                                     );
                                   }
                                 } else if (_selectedType == 'Amistosos') {
                                   final service = MatchService();
-                                  final success = await service.createMatch(
-                                    title: _titleController.text,
-                                    description: _descriptionController.text,
-                                    place: _placeController.text,
-                                    startDate: _dateController.text.split('/').reversed.join('-'),
-                                    startTime: _timeController.text.padLeft(8, '0'),
-                                    responsible: _responsibleController.text,
-                                    trainingModalityId: _selectedModalityId ?? '',
-                                  );
+                                  bool success;
+                                  
+                                  if (_isEditing) {
+                                    // Atualizar amistoso existente
+                                    success = await service.updateMatch(
+                                      matchId: _editingId!,
+                                      title: _titleController.text,
+                                      description: _descriptionController.text,
+                                      place: _placeController.text,
+                                      startDate: _dateController.text.split('/').reversed.join('-'),
+                                      startTime: _timeController.text.padLeft(8, '0'),
+                                      responsible: _responsibleController.text,
+                                      trainingModalityId: _selectedModalityId ?? '',
+                                    );
+                                  } else {
+                                    success = await service.createMatch(
+                                      title: _titleController.text,
+                                      description: _descriptionController.text,
+                                      place: _placeController.text,
+                                      startDate: _dateController.text.split('/').reversed.join('-'),
+                                      startTime: _timeController.text.padLeft(8, '0'),
+                                      responsible: _responsibleController.text,
+                                      trainingModalityId: _selectedModalityId ?? '',
+                                    );
+                                  }
+                                  
                                   if (success) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Amistoso cadastrado com sucesso!'),
+                                      SnackBar(
+                                        content: Text(_isEditing 
+                                          ? 'Amistoso atualizado com sucesso!' 
+                                          : 'Amistoso cadastrado com sucesso!'),
                                         backgroundColor: Colors.green,
                                       ),
                                     );
@@ -398,7 +521,11 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                                     Navigator.pop(context);
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Erro ao criar amistoso.')),
+                                      SnackBar(
+                                        content: Text(_isEditing 
+                                          ? 'Erro ao atualizar amistoso.' 
+                                          : 'Erro ao criar amistoso.'),
+                                      ),
                                     );
                                   }
                                 }

@@ -49,6 +49,7 @@ class TrainingService {
         return true;
       } else {
         print('(else) Erro ao se inscrever: ${response.statusCode}');
+        print('(else) Erro ao se inscrever: ${json.encode({'trainingId': trainingId, 'userId': userId})}');
         return false;
       }
     } catch (e) {
@@ -183,6 +184,67 @@ class TrainingService {
       }
     } catch (e) {
       print('Erro ao criar treino: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteTraining(String trainingId) async {
+    final baseUrl = ApiService.baseUrl;
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/trainings/$trainingId'),
+        headers: {'Accept': 'application/json'},
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao excluir treino: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao excluir treino: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateTraining({
+    required String trainingId,
+    required String title,
+    required String description,
+    required String place,
+    required String startDate,
+    required String startTime,
+    required String coach,
+    required String responsible,
+    required String trainingModalityId,
+  }) async {
+    final baseUrl = ApiService.baseUrl;
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/trainings/$trainingId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'place': place,
+          'start_date': startDate,
+          'start_time': startTime,
+          'coach': coach,
+          'responsible': responsible,
+          'trainingModalityId': trainingModalityId,
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return true;
+      } else {
+        print('Erro ao atualizar treino: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao atualizar treino: $e');
       return false;
     }
   }

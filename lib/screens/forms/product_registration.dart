@@ -10,6 +10,7 @@ import 'package:app_atletica/widgets/forms/custom_text_box.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/services/store_service.dart';
+import 'package:app_atletica/models/product_model.dart';
 
 class ProductRegistrationForm extends StatefulWidget {
   const ProductRegistrationForm({super.key});
@@ -26,6 +27,8 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
   List<Map<String, dynamic>> _categories = [];
   bool _loadingCategories = true;
   String? _selectedCategoryId;
+  bool _isEditing = false;
+  String? _editingId;
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -37,6 +40,31 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
     _loadCategories();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Os dados de edição são carregados no _loadCategories após as categorias serem carregadas
+  }
+
+  void _loadEditingData(ProductModel product) {
+    print('Carregando dados do produto para edição:');
+    print('ID: ${product.id}');
+    print('Nome: ${product.name}');
+    print('Preço original: ${product.price}');
+    print('Preço formatado: ${product.price.toStringAsFixed(2).replaceAll('.', ',')}');
+    print('Descrição: ${product.description}');
+    print('CategoryId: ${product.categoryId}');
+    
+    setState(() {
+      _isEditing = true;
+      _editingId = product.id;
+      _nameController.text = product.name;
+      _priceController.text = product.price.toStringAsFixed(2).replaceAll('.', ',');
+      _descriptionController.text = product.description ?? '';
+      _selectedCategoryId = product.categoryId;
+    });
+  }
+
   Future<void> _loadCategories() async {
     setState(() {
       _loadingCategories = true;
@@ -46,6 +74,12 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
       _categories = categories;
       _loadingCategories = false;
     });
+    
+    // Recarregar dados de edição após categorias carregadas
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments != null && arguments is ProductModel && !_isEditing) {
+      _loadEditingData(arguments);
+    }
   }
 
   Future<void> _pickImage() async {
@@ -78,8 +112,10 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                       children: [
                         const SizedBox(height: 10),
                         Center(
-                          child: const CustomTitleForms(
-                            title: 'CADASTRO DE PRODUTO',
+                          child: CustomTitleForms(
+                            title: _isEditing 
+                              ? 'EDITAR PRODUTO'
+                              : 'CADASTRO DE PRODUTO',
                           ),
                         ),
                         GestureDetector(
@@ -171,20 +207,48 @@ class _ProductRegistrationFormState extends State<ProductRegistrationForm> {
                         const SizedBox(height: 25),
                         Center(
                           child: CustomButton(
-                            text: 'Salvar',
+                            text: _isEditing ? 'Atualizar' : 'Salvar',
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                final success = await StoreService.createProduct(
-                                  name: _nameController.text,
-                                  description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
-                                  price: double.parse(_priceController.text.replaceAll(',', '.')),
-                                  categoryId: _selectedCategoryId!,
-                                );
+                                bool success;
+                                
+                                if (_isEditing) {
+                                  // Atualizar produto existente
+                                  success = await StoreService.updateProduct(
+                                    productId: _editingId!,
+                                    name: _nameController.text,
+                                    description: _descriptionController.text.isNotEmpty ? _descriptionController.text : '',
+                                    price: double.parse(_priceController.text.replaceAll(',', '.')),
+                                    categoryId: _selectedCategoryId!,
+                                  );
+                                } else {
+                                  // Criar produto novo
+                                  success = await StoreService.createProduct(
+                                    name: _nameController.text,
+                                    description: _descriptionController.text.isNotEmpty ? _descriptionController.text : null,
+                                    price: double.parse(_priceController.text.replaceAll(',', '.')),
+                                    categoryId: _selectedCategoryId!,
+                                  );
+                                }
+                                
                                 if (success) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(_isEditing 
+                                        ? 'Produto atualizado com sucesso!' 
+                                        : 'Produto cadastrado com sucesso!'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
                                   Navigator.pop(context);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Erro ao criar produto.')),
+                                    SnackBar(
+                                      content: Text(_isEditing 
+                                        ? 'Erro ao atualizar produto.' 
+                                        : 'Erro ao cadastrar produto.'),
+                                      backgroundColor: Colors.red,
+                                    ),
                                   );
                                 }
                               }
