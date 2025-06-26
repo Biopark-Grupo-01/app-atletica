@@ -1,5 +1,6 @@
 import 'package:app_atletica/models/match_model.dart';
 import 'package:app_atletica/models/training_model.dart';
+import 'package:app_atletica/providers/user_provider.dart';
 import 'package:app_atletica/screens/trainings/expandable_text.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:app_atletica/services/match_service.dart';
@@ -9,6 +10,7 @@ import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class TrainingsScreen extends StatefulWidget {
   const TrainingsScreen({super.key});
@@ -34,9 +36,14 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
 
   List<Map<String, dynamic>> _modalities = [];
 
+  late final UserProvider userProvider;
+  late final user;
+
   @override
   void initState() {
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    user = userProvider.currentUser;
     _loadData();
     _loadModalities();
   }
@@ -49,7 +56,7 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
       });
     }
     try {
-      const userId = '3e66159f-efaa-4c74-8bce-51c1fef3622e';
+      final userId = user.id;
       if (_selectedTabIndex == 1) {
         final userSubscriptions = await _trainingService.getUserSubscriptions(userId);
         final trainings = await _trainingService.getTrainings();

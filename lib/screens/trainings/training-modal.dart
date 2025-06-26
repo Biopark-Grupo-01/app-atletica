@@ -1,9 +1,11 @@
 import 'package:app_atletica/models/match_model.dart';
 import 'package:app_atletica/models/training_model.dart';
+import 'package:app_atletica/providers/user_provider.dart';
 import 'package:app_atletica/services/training_service.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class TrainingModal extends StatefulWidget  {
   final Training? training;
@@ -31,15 +33,20 @@ class _TrainingModalState extends State<TrainingModal> {
 
   final _service = TrainingService();
 
+  late final UserProvider userProvider;
+  late final user;
+
   @override
   void initState() {
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    user = userProvider.currentUser;
     _subscribed = widget.isSubscribed;
   }
 
   Future<void> _handleSubscribe() async {
     setState(() => _loading = true);
-    final success = await _service.subscribeToTraining(widget.training!.id, '3e66159f-efaa-4c74-8bce-51c1fef3622e');
+    final success = await _service.subscribeToTraining(widget.training!.id, user.id);
     setState(() {
       _loading = false;
       if (success) _subscribed = true;

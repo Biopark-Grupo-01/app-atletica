@@ -1,3 +1,4 @@
+import 'package:app_atletica/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/services/training_service.dart';
 import 'package:app_atletica/theme/app_colors.dart';
@@ -5,6 +6,7 @@ import 'package:app_atletica/models/training_model.dart';
 import 'package:app_atletica/screens/trainings/training-modal.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class SubscribedTrainingsScreen extends StatefulWidget {
   const SubscribedTrainingsScreen({super.key});
@@ -22,9 +24,15 @@ class _SubscribedTrainingsScreenState extends State<SubscribedTrainingsScreen> {
   List<Map<String, String>> _userSubscriptions = [];
   final ScrollController _scrollController = ScrollController();
 
+  late final UserProvider userProvider;
+  late final user;
+
+
   @override
   void initState() {
     super.initState();
+    userProvider = Provider.of<UserProvider>(context, listen: false);
+    user = userProvider.currentUser;
     _loadTrainings();
   }
 
@@ -35,7 +43,7 @@ class _SubscribedTrainingsScreenState extends State<SubscribedTrainingsScreen> {
     });
     try {
       // Substitua pelo id real do usuário logado
-      const userId = '3e66159f-efaa-4c74-8bce-51c1fef3622e';
+      final userId = user.id;
       final trainings = await _trainingService.getUserSubscriptions(userId);
       setState(() {
         _trainings = trainings;
