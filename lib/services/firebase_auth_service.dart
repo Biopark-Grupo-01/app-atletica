@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:app_atletica/services/auth_service.dart';
 import 'package:app_atletica/models/user_model.dart';
 import 'package:app_atletica/config/app_config.dart';
+import 'package:app_atletica/services/firebase_messaging_service.dart';
 
 class FirebaseAuthService {
   final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
@@ -46,6 +47,9 @@ class FirebaseAuthService {
         print('Salvando sessão do usuário: ${userModel.name}');
         await AuthService.saveUserSession(idToken, userModel);
         print('Sessão salva com sucesso');
+        
+        // Envia token FCM para o backend após login bem-sucedido
+        await _sendFCMTokenToBackend();
       } else {
         final responseBody = json.decode(response.body);
         throw Exception(responseBody['message'] ?? 'Falha ao fazer login com o backend.');
@@ -92,6 +96,9 @@ class FirebaseAuthService {
       if (response.statusCode == 200) {
         final userModel = UserModel.fromJson(json.decode(response.body));
         await AuthService.saveUserSession(idToken, userModel);
+        
+        // Envia token FCM para o backend após login bem-sucedido
+        await _sendFCMTokenToBackend();
       } else {
         final responseBody = json.decode(response.body);
         throw Exception(responseBody['message'] ?? 'Falha ao fazer login com o backend.');
@@ -153,5 +160,33 @@ class FirebaseAuthService {
 
   auth.User? getCurrentUser() {
     return _firebaseAuth.currentUser;
+  }
+
+  /// Envia o token FCM para o backend
+  Future<void> _sendFCMTokenToBackend() async {
+    try {
+      final fcmToken = await FirebaseMessagingService.getSavedToken();
+      if (fcmToken == null) {
+        print('Token FCM não disponível');
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('$_apiUrl/users/fcm-token'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${await _firebaseAuth.currentUser?.getIdToken()}',
+        },
+        body: json.encode({'fcmToken': fcmToken}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print('Token FCM enviado com sucesso para o backend');
+      } else {
+        print('Erro ao enviar token FCM: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro ao enviar token FCM para backend: $e');
+    }
   }
 }

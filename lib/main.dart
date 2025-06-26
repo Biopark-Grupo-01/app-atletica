@@ -28,7 +28,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:app_atletica/services/firebase_auth_service.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:app_atletica/services/firebase_messaging_service.dart';
 
 import 'package:app_atletica/utils/error_handler.dart';
 
@@ -39,8 +40,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // Configura handler para mensagens em background
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   // Define o idioma das mensagens de erro do Firebase Auth
   await auth.FirebaseAuth.instance.setLanguageCode("pt-BR");
+
+  // Inicializa Firebase Messaging
+  await FirebaseMessagingService.initialize();
 
   // Configura um handler global para capturar erros de Flutter
   FlutterError.onError = (FlutterErrorDetails details) {
