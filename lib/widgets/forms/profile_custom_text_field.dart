@@ -35,7 +35,8 @@ class CustomTextFieldProfile extends StatelessWidget {
           decoration: InputDecoration(
             labelText: label,
             labelStyle: const TextStyle(color: AppColors.white),
-            suffixIcon: suffixIcon ?? Icon(icon, color: AppColors.white),
+            prefixIcon: Icon(icon, color: AppColors.white),
+            suffixIcon: suffixIcon,
             border: const UnderlineInputBorder(),
             enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: AppColors.white),

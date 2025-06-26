@@ -93,62 +93,247 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                         ),
                         const SizedBox(height: 24),
                         // Campo para adicionar imagem
-                        GestureDetector(
-                          onTap: _isLoading
-                              ? null
-                              : () async {
-                                  final picker = ImagePicker();
-                                  final picked = await picker.pickImage(source: ImageSource.gallery);
-                                  if (picked != null) {
-                                    setState(() {
-                                      _imageFile = File(picked.path);
-                                    });
-                                  }
-                                },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(Icons.image, color: AppColors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Imagem da Notícia',
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            clipBehavior: Clip.antiAlias,
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 200,
-                              child: _imageFile != null
-                                  ? Image.file(
-                                      _imageFile!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: AppColors.lightGrey,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              size: 50,
-                                              color: Colors.grey,
-                                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: _isLoading
+                                  ? null
+                                  : () async {
+                                      // Mostra um modal para escolher entre galeria e câmera
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: AppColors.blue,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                        ),
+                                        builder: (context) => Container(
+                                          padding: const EdgeInsets.all(20),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                'Selecionar Imagem',
+                                                style: TextStyle(
+                                                  color: AppColors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () async {
+                                                      Navigator.pop(context);
+                                                      final picker = ImagePicker();
+                                                      final picked = await picker.pickImage(
+                                                        source: ImageSource.gallery,
+                                                        maxWidth: 1920,
+                                                        maxHeight: 1080,
+                                                        imageQuality: 85,
+                                                      );
+                                                      if (picked != null) {
+                                                        setState(() {
+                                                          _imageFile = File(picked.path);
+                                                        });
+                                                        
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text('Imagem selecionada da galeria!'),
+                                                            backgroundColor: Colors.green,
+                                                            duration: Duration(seconds: 2),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                    child: Column(
+                                                      children: const [
+                                                        Icon(
+                                                          Icons.photo_library,
+                                                          size: 50,
+                                                          color: AppColors.yellow,
+                                                        ),
+                                                        SizedBox(height: 8),
+                                                        Text(
+                                                          'Galeria',
+                                                          style: TextStyle(
+                                                            color: AppColors.white,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () async {
+                                                      Navigator.pop(context);
+                                                      final picker = ImagePicker();
+                                                      final picked = await picker.pickImage(
+                                                        source: ImageSource.camera,
+                                                        maxWidth: 1920,
+                                                        maxHeight: 1080,
+                                                        imageQuality: 85,
+                                                      );
+                                                      if (picked != null) {
+                                                        setState(() {
+                                                          _imageFile = File(picked.path);
+                                                        });
+                                                        
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          const SnackBar(
+                                                            content: Text('Foto capturada com sucesso!'),
+                                                            backgroundColor: Colors.green,
+                                                            duration: Duration(seconds: 2),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                    child: Column(
+                                                      children: const [
+                                                        Icon(
+                                                          Icons.camera_alt,
+                                                          size: 50,
+                                                          color: AppColors.yellow,
+                                                        ),
+                                                        SizedBox(height: 8),
+                                                        Text(
+                                                          'Câmera',
+                                                          style: TextStyle(
+                                                            color: AppColors.white,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 20),
+                                            ],
                                           ),
-                                        );
-                                      },
-                                    )
-                                  : Image.network(
-                                      'https://via.placeholder.com/350x150',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: AppColors.lightGrey,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              size: 50,
-                                              color: Colors.grey,
+                                        ),
+                                      );
+                                    },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: _imageFile != null ? Colors.transparent : AppColors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: AppColors.white.withValues(alpha: 0.3),
+                                    width: 2,
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  child: _imageFile != null
+                                      ? Stack(
+                                          children: [
+                                            Image.file(
+                                              _imageFile!,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  color: AppColors.lightGrey,
+                                                  child: const Center(
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.image_not_supported,
+                                                          size: 50,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        SizedBox(height: 8),
+                                                        Text(
+                                                          'Erro ao carregar imagem',
+                                                          style: TextStyle(color: Colors.grey),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                             ),
+                                            Positioned(
+                                              top: 8,
+                                              right: 8,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _imageFile = null;
+                                                  });
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.withValues(alpha: 0.8),
+                                                    borderRadius: BorderRadius.circular(15),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.white,
+                                                    size: 16,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : const Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.add_photo_alternate_outlined,
+                                                size: 50,
+                                                color: AppColors.white,
+                                              ),
+                                              SizedBox(height: 8),
+                                              Text(
+                                                'Toque para adicionar uma imagem',
+                                                style: TextStyle(
+                                                  color: AppColors.white,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                '(Opcional)',
+                                                style: TextStyle(
+                                                  color: AppColors.white,
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      },
-                                    ),
+                                        ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
@@ -227,21 +412,23 @@ class _NewsRegistrationFormState extends State<NewsRegistrationForm> {
                                       
                                       bool success;
                                       if (_isEditing) {
-                                        // Atualizar notícia existente
-                                        success = await EventsNewsService().updateNews(
+                                        // Atualizar notícia existente com imagem opcional
+                                        success = await EventsNewsService().updateNewsWithImage(
                                           newsId: _editingId!,
                                           title: _titleController.text,
                                           description: _descriptionController.text,
                                           date: currentDate,
                                           author: _authorController.text,
+                                          imageFile: _imageFile, // Pode ser null
                                         );
                                       } else {
-                                        // Criar notícia nova
-                                        success = await EventsNewsService().createNews(
+                                        // Criar notícia nova com imagem opcional
+                                        success = await EventsNewsService().createNewsWithImage(
                                           title: _titleController.text,
                                           description: _descriptionController.text,
                                           date: currentDate,
                                           author: _authorController.text,
+                                          imageFile: _imageFile, // Pode ser null
                                         );
                                       }
                                       

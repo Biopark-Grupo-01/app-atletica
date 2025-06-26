@@ -193,46 +193,63 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(height: 20),
                         CustomTextFieldProfile(
                           controller: nameController,
-                          label: 'Nome: ',
-                          icon: Icons.create,
+                          label: 'Nome',
+                          icon: Icons.person,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            return null;
+                          },
                         ),
 
                         CustomTextFieldProfile(
                           controller: cpfController,
-                          label: 'CPF: ',
-                          icon: Icons.create,
+                          label: 'CPF',
+                          icon: Icons.credit_card,
                           inputFormatters: [cpfMask],
                         ),
 
                         CustomTextFieldProfile(
                           controller: emailController,
-                          label: 'E-mail: ',
-                          icon: Icons.create,
+                          label: 'E-mail',
+                          icon: Icons.email,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Campo obrigatório';
+                            }
+                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                              return 'Digite um e-mail válido';
+                            }
+                            return null;
+                          },
                         ),
 
                         CustomTextFieldProfile(
                           controller: passwordController,
-                          label: 'Senha: ',
-                          icon: Icons.create,
+                          label: 'Nova Senha',
+                          icon: Icons.lock,
                           obscureText: obscurePassword,
                           suffixIcon: IconButton(
-                            icon: Icon(obscurePassword ? Icons.visibility : Icons.visibility_off),
+                            icon: Icon(
+                              obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              color: AppColors.white,
+                            ),
                             onPressed: () => setState(() => obscurePassword = !obscurePassword),
                           ),
-                          validator: (value) => value == null || value.isEmpty ? 'Campo obrigatório' : null,
                         ),
 
                         CustomTextFieldProfile(
                           controller: phoneController,
-                          label: 'Telefone: ',
-                          icon: Icons.create,
+                          label: 'Telefone',
+                          icon: Icons.phone,
                           inputFormatters: [phoneMask],
                         ),
 
                         CustomTextFieldProfile(
                           controller: birthDateController,
-                          label: 'Data de Nascimento: ',
-                          icon: Icons.create,
+                          label: 'Data de Nascimento',
+                          icon: Icons.calendar_today,
                           inputFormatters: [birthDateMask],
                         ),
 

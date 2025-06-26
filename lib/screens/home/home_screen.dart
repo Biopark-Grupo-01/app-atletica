@@ -355,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
                 : _buildEmptySection('Nenhum evento disponível no momento'),
-            // const SizedBox(height: 4),
+            const SizedBox(height: 10),
             CustomTitle(title: 'NOTÍCIAS'),
             news.isNotEmpty
                 ? CarouselItem(
@@ -380,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
                 : _buildEmptySection('Nenhuma notícia disponível no momento'),
-            // const SizedBox(height: 4),
+            const SizedBox(height: 15),
             CustomTitle(title: 'TREINOS E AMISTOSOS'),
             trainingsAndMatches.isNotEmpty
                 ? ListView.builder(

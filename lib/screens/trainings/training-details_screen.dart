@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/services/events_news_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,25 @@ class TreinoDetalhesScreen extends StatefulWidget {
 
 class _TreinoDetalhesScreenState extends State<TreinoDetalhesScreen> {
   int _ticketQuantity = 0; // Quantidade de ingressos selecionados
+
+  String _getImageUrl(String? imageUrl) {
+    // Se imageUrl está vazio ou é uma URL de placeholder, usa imagem mockada
+    if (imageUrl == null || imageUrl.isEmpty || imageUrl.contains('placeholder') || imageUrl.contains('via.placeholder')) {
+      return 'assets/images/cartao.png'; // Imagem mockada como fallback
+    }
+    
+    // Se a imageUrl já é uma URL completa (com http/https), usa diretamente
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // Se é um caminho relativo do backend, constrói a URL completa
+    return EventsNewsService().getFullImageUrl(imageUrl);
+  }
+
+  bool _isNetworkImage(String imageUrl) {
+    return imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
+  }
 
   String _calculateTotalPrice(String unitPrice, int quantity) {
     final double price = double.tryParse(unitPrice.replaceAll(',', '.')) ?? 0.0;
@@ -163,6 +183,8 @@ Poderia me ajudar com a compra? 😊
     final String location = eventData['location'] ?? 'DE OLHO NO INSTA  -  Londrina, PR';
     final String description = eventData['description'] ?? 'Não importa se é de avião, de patinete, a pé ou de carro, o nosso destino é um só.\n\nDia 17/05 você tem um encontro marcado com a XV na maior Cervejada do sul do país.\nDespache suas malas, afivele seu cinto e vem com a XV nessa viagem com destino à alegria. 💙❤️🦈';
     final String price = eventData['price'] ?? '88,00';
+    final String imageUrl = eventData['imageUrl'] ?? '';
+    final String finalImageUrl = _getImageUrl(imageUrl);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -176,10 +198,22 @@ Poderia me ajudar com a compra? 😊
                 SizedBox(
                   height: screenHeight * 0.2,
                   width: double.infinity,
-                  child: Image.asset(
-                    "assets/images/cartao.png",
-                    fit: BoxFit.cover,
-                  ),
+                  child: _isNetworkImage(finalImageUrl)
+                      ? Image.network(
+                          finalImageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // Se falhar carregamento da rede, usa imagem local
+                            return Image.asset(
+                              'assets/images/cartao.png',
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          finalImageUrl,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 12,

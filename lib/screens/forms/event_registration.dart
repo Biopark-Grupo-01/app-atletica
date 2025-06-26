@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
@@ -62,14 +63,133 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
   }
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    // Mostra um modal para escolher entre galeria e câmera
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.blue,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Selecionar Imagem',
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final picker = ImagePicker();
+                    final picked = await picker.pickImage(
+                      source: ImageSource.gallery,
+                      maxWidth: 1920,
+                      maxHeight: 1080,
+                      imageQuality: 85,
+                    );
+                    if (picked != null) {
+                      final compressedImage = await _compressImage(File(picked.path));
+                      setState(() {
+                        _imageFile = compressedImage;
+                      });
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Imagem selecionada da galeria!'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                  child: Column(
+                    children: const [
+                      Icon(
+                        Icons.photo_library,
+                        size: 50,
+                        color: AppColors.yellow,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Galeria',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final picker = ImagePicker();
+                    final picked = await picker.pickImage(
+                      source: ImageSource.camera,
+                      maxWidth: 1920,
+                      maxHeight: 1080,
+                      imageQuality: 85,
+                    );
+                    if (picked != null) {
+                      final compressedImage = await _compressImage(File(picked.path));
+                      setState(() {
+                        _imageFile = compressedImage;
+                      });
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Foto capturada com sucesso!'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                  child: Column(
+                    children: const [
+                      Icon(
+                        Icons.camera_alt,
+                        size: 50,
+                        color: AppColors.yellow,
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Câmera',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
-    if (image != null) {
-      setState(() {
-        _imageFile = File(image.path);
-      });
-    }
+  Future<File> _compressImage(File file) async {
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      file.path.replaceAll('.jpg', '_compressed.jpg').replaceAll('.png', '_compressed.jpg'),
+      quality: 85,
+      format: CompressFormat.jpeg,
+    );
+    return compressedFile != null ? File(compressedFile.path) : file;
   }
 
   String _formatDateTimeToISO(String date, String time) {
@@ -125,52 +245,136 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: _isLoading ? null : _pickImage,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(10),
+                        // Campo para adicionar imagem
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: const [
+                                Icon(Icons.image, color: AppColors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Imagem do Evento',
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            clipBehavior: Clip.antiAlias,
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 250,
-                              child: _imageFile != null
-                                  ? Image.file(
-                                      _imageFile!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: AppColors.lightGrey,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              size: 50,
-                                              color: Colors.grey,
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: _isLoading ? null : _pickImage,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: _imageFile != null ? Colors.transparent : AppColors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: AppColors.white.withValues(alpha: 0.3),
+                                    width: 2,
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 200,
+                                  child: _imageFile != null
+                                      ? Stack(
+                                          children: [
+                                            Image.file(
+                                              _imageFile!,
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  color: AppColors.lightGrey,
+                                                  child: const Center(
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.image_not_supported,
+                                                          size: 50,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        SizedBox(height: 8),
+                                                        Text(
+                                                          'Erro ao carregar imagem',
+                                                          style: TextStyle(color: Colors.grey),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    )
-                                  : Image.network(
-                                      'https://via.placeholder.com/350x150',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          color: AppColors.lightGrey,
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              size: 50,
-                                              color: Colors.grey,
+                                            Positioned(
+                                              top: 8,
+                                              right: 8,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _imageFile = null;
+                                                  });
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text('Imagem removida'),
+                                                      backgroundColor: Colors.orange,
+                                                    ),
+                                                  );
+                                                },
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(4),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.withValues(alpha: 0.8),
+                                                    borderRadius: BorderRadius.circular(15),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.white,
+                                                    size: 16,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
+                                          ],
+                                        )
+                                      : const Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.add_photo_alternate_outlined,
+                                                size: 50,
+                                                color: AppColors.white,
+                                              ),
+                                              SizedBox(height: 8),
+                                              Text(
+                                                'Toque para adicionar uma imagem',
+                                                style: TextStyle(
+                                                  color: AppColors.white,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4),
+                                              Text(
+                                                '(Opcional)',
+                                                style: TextStyle(
+                                                  color: AppColors.white,
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      },
-                                    ),
+                                        ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                         const SizedBox(height: 24),
                         TextFormField(
@@ -402,22 +606,24 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                                       bool success;
                                       if (_isEditing) {
                                         // Atualizar evento existente
-                                        success = await EventsNewsService().updateEvent(
+                                        success = await EventsNewsService().updateEventWithImage(
                                           eventId: _editingId!,
                                           title: _titleController.text,
                                           description: _descriptionController.text,
                                           date: isoDateTime,
                                           location: _placeController.text,
                                           price: price.toString(),
+                                          imageFile: _imageFile,
                                         );
                                       } else {
                                         // Criar evento novo
-                                        success = await EventsNewsService().createEvent(
+                                        success = await EventsNewsService().createEventWithImage(
                                           title: _titleController.text,
                                           description: _descriptionController.text,
                                           date: isoDateTime,
                                           location: _placeController.text,
                                           price: price.toString(),
+                                          imageFile: _imageFile,
                                         );
                                       }
                                       

@@ -36,7 +36,7 @@ class ProductModel {
   final int stock;
   final String? category;
   final String? categoryId;
-  final String? image;
+  final String? imageUrl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -48,7 +48,7 @@ class ProductModel {
     required this.stock,
     this.category,
     this.categoryId,
-    this.image,
+    this.imageUrl,
     this.createdAt,
     this.updatedAt,
   });
@@ -61,12 +61,7 @@ class ProductModel {
       'category_id': categoryId ?? '',
       'price': price.toStringAsFixed(2).replaceAll('.', ','),
       'stock': stock.toString(),
-      'image':
-          image != null && image!.startsWith('http')
-              ? image!
-              : image != null && image!.isNotEmpty
-              ? 'assets/images/$image'
-              : 'assets/images/brasao.png',
+      'imageUrl': imageUrl ?? 'assets/images/brasao.png', // Preserva a URL original sem modificações
       'description': description ?? 'Sem descrição disponível.',
     };
   }
@@ -82,7 +77,7 @@ class ProductModel {
       stock: json['stock'] != null ? int.tryParse(json['stock'].toString()) ?? 0 : 0,
       category: json['category']?.toString() ?? '',
       categoryId: (json['category_id'] ?? json['categoryId'])?.toString() ?? '',
-      image: json['image']?.toString(),
+      imageUrl: json['imageUrl']?.toString() ?? json['image']?.toString(), // Tenta ambos os campos
       createdAt:
           json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
       updatedAt:
