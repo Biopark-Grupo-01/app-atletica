@@ -185,14 +185,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? CarouselItem(
                   items: events,
                   useCarousel: true,
-                  itemBuilder:
-                      (item) => EventItem(
-                        imageUrl: item['imageUrl'] ?? '',
-                        date: item['date'] ?? '',
-                        location: item['location'] ?? '',
-                        title: item['title'] ?? '',
-                        description: item['description'] ?? '',
-                      ),
+                  itemBuilder: (item) => EventItem(
+                    imageUrl: item['imageUrl'] ?? '',
+                    date: item['date'] ?? '',
+                    location: item['location'] ?? '',
+                    title: item['title'] ?? '',
+                    description: item['description'] ?? '',
+                    price: item['price'] ?? '',
+                  ),
                 )
                 : _buildEmptySection('Nenhum evento disponível no momento'),
             CustomTitle(title: 'NOTÍCIAS'),
@@ -200,14 +200,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? CarouselItem(
                   items: news,
                   useCarousel: true,
-                  itemBuilder:
-                      (item) => NewsItem(
-                        imageUrl: item['imageUrl'] ?? '',
-                        date: item['date'] ?? '',
-                        location: item['location'] ?? '',
-                        title: item['title'] ?? '',
-                        description: item['description'] ?? '',
-                      ),
+                  itemBuilder: (item) => NewsItem(
+                    imageUrl: item['imageUrl'] ?? '',
+                    date: item['date'] ?? '',
+                    // location: item['location'] ?? '',
+                    title: item['title'] ?? '',
+                    description: item['description'] ?? '',
+                  ),
                 )
                 : _buildEmptySection('Nenhuma notícia disponível no momento'),
             CustomTitle(title: 'TREINOS E AMISTOSOS'),

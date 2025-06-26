@@ -1,4 +1,5 @@
 import 'package:app_atletica/screens/account/edit_profile_screen.dart';
+import 'package:app_atletica/screens/forms/news_registration.dart';
 import 'package:app_atletica/screens/forms/profile_registration.dart';
 import 'package:app_atletica/screens/forms/trainings_registration.dart';
 import 'package:app_atletica/screens/account/account_settings_screen.dart';

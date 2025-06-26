@@ -5,6 +5,7 @@ class EventModel {
   final String location;
   final String title;
   final String? description;
+  final String? price;
 
   EventModel({
     required this.id,
@@ -13,6 +14,7 @@ class EventModel {
     required this.location,
     required this.title,
     this.description,
+    this.price,
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class EventModel {
       'location': location,
       'title': title,
       'description': description,
+      'price': price,
     };
   }
   
@@ -34,6 +37,7 @@ class EventModel {
       'location': location,
       'title': title,
       'description': description ?? '',
+      'price': price ?? '0,00',
     };
   }
 
@@ -45,6 +49,7 @@ class EventModel {
       location: json['location'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
+      price: json['price'] ?? '0,00',
     );
   }
 }

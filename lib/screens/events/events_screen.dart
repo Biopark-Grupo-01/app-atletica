@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/services/events_news_service.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/events/event_item.dart';
 import 'package:app_atletica/widgets/events/news_item.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
+import 'package:app_atletica/screens/events/news_detail_screen.dart';
+import 'package:intl/intl.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -15,6 +16,7 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
+  final EventsNewsService _service = EventsNewsService();
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
   bool isLoading = true;
@@ -24,18 +26,36 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadEventsFromService(); // Carrega eventos do serviço por padrão
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadNewsFromService() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
     try {
-      final service = EventsNewsService();
-      final data = await service.loadData(context);
-      final newsList = data['news'] ?? [];
-      final eventsList = data['events'] ?? [];
-
+      final newsList = await _service.getNewsFromBackend();
       setState(() {
         news = newsList;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadEventsFromService() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+    try {
+      final eventsList = await _service.getEventsFromBackend();
+      setState(() {
         events = eventsList;
         isLoading = false;
       });
@@ -49,9 +69,15 @@ class _EventsScreenState extends State<EventsScreen> {
 
   DateTime _parseDate(String dateStr) {
     try {
-      return DateFormat('dd/MM/yyyy').parse(dateStr);
-    } catch (e) {
-      return DateTime(2000);
+      // Tenta ISO 8601 (notícias)
+      return DateTime.parse(dateStr);
+    } catch (_) {
+      try {
+        // Tenta dd/MM/yyyy (eventos)
+        return DateFormat('dd/MM/yyyy').parse(dateStr);
+      } catch (e) {
+        return DateTime(2000);
+      }
     }
   }
 
@@ -76,7 +102,7 @@ class _EventsScreenState extends State<EventsScreen> {
             : error != null
                 ? Center(
                     child: Text(
-                      'Erro: \$error',
+                      'Erro: ${error ?? "Erro desconhecido"}',
                       style: const TextStyle(color: AppColors.white),
                     ),
                   )
@@ -98,33 +124,45 @@ class _EventsScreenState extends State<EventsScreen> {
                             itemCount: sortedList.length,
                             itemBuilder: (context, index) {
                               final item = sortedList[index];
+                              final isLast = index == sortedList.length - 1;
                               return Column(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/trainingDetail',
-                                        arguments: item,
-                                      );
-                                    },
-                                    child: _selectedTabIndex == 0
-                                        ? EventItem(
+                                  _selectedTabIndex == 0
+                                      ? EventItem(
+                                          imageUrl: item['imageUrl'] ?? '',
+                                          date: item['date'] ?? '',
+                                          location: item['location'] ?? '',
+                                          title: item['title'] ?? '',
+                                          description: item['description'] ?? '',
+                                          price: item['price'] ?? '0,00',
+                                        )
+                                      : GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => NewsDetailScreen(news: item),
+                                              ),
+                                            );
+                                          },
+                                          child: NewsItem(
                                             imageUrl: item['imageUrl'] ?? '',
                                             date: item['date'] ?? '',
-                                            location: item['location'] ?? '',
-                                            title: item['title'] ?? '',
-                                            description: item['description'] ?? '',
-                                          )
-                                        : NewsItem(
-                                            imageUrl: item['imageUrl'] ?? '',
-                                            date: item['date'] ?? '',
-                                            location: item['location'] ?? '',
                                             title: item['title'] ?? '',
                                             description: item['description'] ?? '',
                                           ),
-                                  ),
-                                  const SizedBox(height: 40),
+                                        ),
+                                  if (_selectedTabIndex == 1 && !isLast)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 24.0),
+                                      child: Divider(
+                                        color: AppColors.lightGrey.withOpacity(0.4),
+                                        thickness: 1.2,
+                                        height: 1,
+                                      ),
+                                    )
+                                  else if (_selectedTabIndex == 0)
+                                    const SizedBox(height: 40),
                                 ],
                               );
                             },
@@ -146,10 +184,15 @@ class _EventsScreenState extends State<EventsScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           setState(() {
             _selectedTabIndex = index;
           });
+          if (index == 1) {
+            await _loadNewsFromService();
+          } else if (index == 0) {
+            await _loadEventsFromService();
+          }
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),

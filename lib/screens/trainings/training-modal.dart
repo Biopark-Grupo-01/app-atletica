@@ -122,9 +122,9 @@ class _TrainingModalState extends State<TrainingModal> {
                                 const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
                                 const SizedBox(width: 6),
                                 Text(
-                                  isTraining
-                                      ? "${formatDate(widget.training!.date)} • ${widget.training!.time}"
-                                      : "${formatDate(widget.match!.date)} • ${widget.match!.time}",
+                                    isTraining
+                                      ? "${formatDate(widget.training!.date)} • ${widget.training!.time.substring(0, 5)}"
+                                      : "${formatDate(widget.match!.date)} • ${widget.match!.time.substring(0, 5)}",
                                   style: const TextStyle(color: Colors.white70, fontSize: 13),
                                 ),
                               ],

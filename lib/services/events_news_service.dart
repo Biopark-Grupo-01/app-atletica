@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:app_atletica/models/news_event_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
+import 'package:app_atletica/models/news_model.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 class EventsNewsService {
   // Endpoints e cache keys
@@ -208,6 +211,7 @@ class EventsNewsService {
     }
   }
 
+  // Remover este método antigo createNews
   // Dados mockados para eventos
   List<EventModel> _getMockEvents() {
     return [
@@ -218,6 +222,7 @@ class EventsNewsService {
         location: 'Toledo',
         title: 'Confraternização Semana Acadêmica',
         description: 'Ocorrerá uma festa para o fim da semana acadêmica',
+        price: '25,00',
       ),
       EventModel(
         id: '2',
@@ -226,6 +231,7 @@ class EventsNewsService {
         location: 'Toledo',
         title: 'Evento da API',
         description: 'Evento vindo do back-end.',
+        price: '50,00',
       ),
       EventModel(
         id: '3',
@@ -234,6 +240,7 @@ class EventsNewsService {
         location: 'Toledo',
         title: 'Festa Junina da Atlética',
         description: 'Tradicional festa com comidas típicas, música e muita diversão.',
+        price: '35,00',
       ),
     ];
   }
@@ -290,5 +297,160 @@ class EventsNewsService {
         isSubscribed: false,
       ),
     ];
+  }
+
+  Future<bool> createNews({
+    required String title,
+    required String description,
+    required String author,
+    String? imageUrl,
+    String? date,
+    String? time,
+  }) async {
+    final baseUrl = ApiService.baseUrl;
+    try {
+      final nowLocal = DateTime.now();
+      // Monta a data no formato yyyy-MM-dd HH:mm:ss
+      String dateTimeStr;
+      if (date != null && time != null) {
+        dateTimeStr = "$date $time";
+      } else {
+        dateTimeStr =
+            "${nowLocal.year.toString().padLeft(4, '0')}-"
+            "${nowLocal.month.toString().padLeft(2, '0')}-"
+            "${nowLocal.day.toString().padLeft(2, '0')} "
+            "${nowLocal.hour.toString().padLeft(2, '0')}:"
+            "${nowLocal.minute.toString().padLeft(2, '0')}:"
+            "${nowLocal.second.toString().padLeft(2, '0')}";
+      }
+      print('[createNews] Enviando: date=$dateTimeStr, nowLocal=$nowLocal');
+      final response = await http.post(
+        Uri.parse('$baseUrl/news'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'title': title,
+          'description': description,
+          'author': author,
+          'imageUrl': imageUrl,
+          'date': dateTimeStr,
+        }),
+      );
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        return true;
+      } else {
+        print('Erro ao criar notícia: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar notícia: $e');
+      return false;
+    }
+  }
+
+  // Método para criar evento
+  Future<bool> createEvent({
+    required String title,
+    required String description,
+    required String date,
+    required String place,
+    required double price,
+    String? imageUrl,
+  }) async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final body = {
+        'title': title,
+        'description': description,
+        'date': date, // Já vem no formato ISO
+        'location': place, // Backend espera 'location', não 'place'
+        'price': price,
+        'type': 'party', // Valor padrão conforme solicitado
+      };
+
+      print('Enviando dados do evento: $body');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/events'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      print('Resposta do servidor: ${response.statusCode}');
+      print('Corpo da resposta: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        print('Erro ao criar evento: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar evento: $e');
+      return false;
+    }
+  }
+
+  // Método para buscar eventos do backend
+  Future<List<Map<String, String>>> getEventsFromBackend() async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.get(Uri.parse('$baseUrl/events'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> data = json['data'] ?? [];
+        return data.map<Map<String, String>>((item) {
+          return {
+            'id': item['id'] ?? '',
+            'title': item['title'] ?? '',
+            'description': item['description'] ?? '',
+            'date': item['date'] ?? '', // MANTÉM formato ISO
+            'location': item['location'] ?? '',
+            'price': item['price'] ?? '',
+            'type': item['type'] ?? '',
+            'imageUrl': '', // Adapte se houver imagem no futuro
+          };
+        }).toList();
+      } else {
+        print('Erro ao buscar eventos: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erro ao buscar eventos: $e');
+      return [];
+    }
+  }
+
+  // Método para buscar notícias do backend
+  Future<List<Map<String, String>>> getNewsFromBackend() async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.get(Uri.parse('$baseUrl/news'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> data = json['data'] ?? [];
+        return data.map<Map<String, String>>((item) {
+          return {
+            'id': item['id'] ?? '',
+            'title': item['title'] ?? '',
+            'description': item['description'] ?? '',
+            'date': item['date'] ?? '', // MANTÉM formato ISO
+            'author': item['author'] ?? '',
+            'imageUrl': '', // Adapte se houver imagem
+            'location': '', // Adapte se houver local
+          };
+        }).toList();
+      } else {
+        print('Erro ao buscar notícias: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erro ao buscar notícias: $e');
+      return [];
+    }
   }
 }
