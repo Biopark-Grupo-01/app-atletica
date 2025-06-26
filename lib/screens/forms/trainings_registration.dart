@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:app_atletica/widgets/forms/custom_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/forms/custom_title_forms.dart';
@@ -23,7 +21,6 @@ class TrainingsRegistrationForm extends StatefulWidget {
 }
 
 class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
-  File? _imageUrl;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
@@ -138,17 +135,6 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      setState(() {
-        _imageUrl = File(image.path);
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // Removido MaterialApp para evitar banner de debug
@@ -176,38 +162,6 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            clipBehavior: Clip.antiAlias,
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 250,
-                              child: Image.network(
-                                _imageUrl != null
-                                    ? _imageUrl!.path
-                                    : 'https://via.placeholder.com/350x150',
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: AppColors.lightGrey,
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
                         CustomTextField(
                           label: 'Título',
                           icon: Icons.create,

@@ -67,6 +67,13 @@ flutter:
     - assets/images/chaveiro.jpeg
     - assets/images/tatuagens_temporarias.jpeg
     - assets/images/selfieCarteirinha.png
+    - assets/images/FUTEBOL.jpg
+    - assets/images/BASQUETE.jpg
+    - assets/images/VOLEI.jpg
+    - assets/images/HANDEBOL.jpg
+    - assets/images/NATACAO.jpg
+    - assets/images/TENIS.jpg
+    - assets/images/GOLF.jpg
   fonts:
     - family: Oswald
       fonts:

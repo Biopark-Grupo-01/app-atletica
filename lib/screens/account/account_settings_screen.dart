@@ -11,6 +11,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:app_atletica/services/firebase_auth_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AccountSettingsScreen extends StatelessWidget {
   const AccountSettingsScreen({super.key});
@@ -31,14 +32,9 @@ class AccountSettingsScreen extends StatelessWidget {
           backgroundColor: AppColors.blue,
           body: SafeArea(
             child: SingleChildScrollView(
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
-                ),
-                child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                       Container(
                         height: MediaQuery.of(context).size.height * 0.2,
                         width: double.infinity,
@@ -88,8 +84,8 @@ class AccountSettingsScreen extends StatelessWidget {
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  user.cpf ??
-                                                      'CPF não disponível',
+                                                  user.role ??
+                                                      'Cargo não disponível',
                                                   style: const TextStyle(
                                                     fontSize: 16,
                                                     color: Colors.white70,
@@ -213,6 +209,17 @@ class AccountSettingsScreen extends StatelessWidget {
                                 );
                               },
                             ),
+                            MenuCard(
+                              icon: Icons.support_agent,
+                              title: "Suporte",
+                              subtitle: "Fale conosco pelo WhatsApp",
+                              onTap: () {
+                                openWhatsApp(
+                                  '5544999719743',
+                                  text: 'Olá! Preciso de suporte com o aplicativo da atlética.',
+                                );
+                              },
+                            ),
                             // MenuCard(
                             //   icon: Icons.bookmark,
                             //   title: "Salvos",
@@ -242,14 +249,6 @@ class AccountSettingsScreen extends StatelessWidget {
                                 },
                               ),
                             ],
-                            if (!userProvider.isAdmin) ...[
-                              MenuCard(
-                                icon: Icons.support_agent,
-                                title: "Suporte",
-                                subtitle: "Fale com a atlética",
-                                onTap: () {},
-                              ),
-                            ],
                             if (userProvider.isAdmin) ...[
                               MenuCard(
                                 icon: FontAwesomeIcons.userTie,
@@ -270,8 +269,6 @@ class AccountSettingsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-              ),
             ),
           ),
           bottomNavigationBar: const CustomBottomNavBar(currentIndex: 4),
@@ -332,4 +329,13 @@ Widget buildClubeCheersCard({
       ),
     ),
   );
+}
+
+void openWhatsApp(String phoneNumber, {String? text}) async {
+  String url = "whatsapp://send?phone=$phoneNumber";
+  if (text != null) {
+    url += "&text=${Uri.encodeComponent(text)}";
+  }
+
+  await launchUrl(Uri.parse(url));
 }
