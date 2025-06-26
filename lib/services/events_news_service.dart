@@ -17,11 +17,23 @@ class EventsNewsService {
 
   Future<Map<String, dynamic>> loadData(BuildContext context) async {
     try {
-      // Obtém eventos e treinos
+      // Obtém eventos do backend e treinos mockados
+      final eventsList = await getEventsFromBackend();
+      final trainingsList = _getMockTrainings();
+      
+      // Retorna os dados no formato esperado
+      return {
+        'events': eventsList,
+        'trainings': trainingsList,
+        'news': [], // Lista vazia para news já que foi removida
+      };
+    } catch (e) {
+      print('Erro ao carregar dados: $e');
+      // Se falhar, usa dados mockados como fallback
       final eventsList = _getMockEvents();
       final trainingsList = _getMockTrainings();
       
-      // Converte eventos para Map<String, String>
+      // Converte eventos mockados para Map<String, String>
       final formattedEvents = eventsList.map((event) => {
         'id': event.id,
         'imageUrl': event.imageUrl ?? '',
@@ -29,19 +41,12 @@ class EventsNewsService {
         'location': event.location,
         'title': event.title,
         'description': event.description ?? '',
+        'price': '', // Eventos mockados não têm preço
       }).toList();
       
-      // Retorna os dados no formato esperado
       return {
         'events': formattedEvents,
         'trainings': trainingsList,
-        'news': [], // Lista vazia para news já que foi removida
-      };
-    } catch (e) {
-      print('Erro ao carregar dados: $e');
-      return {
-        'events': <Map<String, String>>[],
-        'trainings': <Training>[],
         'news': <Map<String, String>>[],
       };
     }
@@ -307,25 +312,42 @@ class EventsNewsService {
     required String location,
     String? price,
     String? type,
+    String? imageUrl,
   }) async {
     try {
       final baseUrl = ApiService.baseUrl;
+      
+      final Map<String, dynamic> eventData = {
+        'title': title,
+        'description': description,
+        'date': date,
+        'location': location,
+        'price': price,
+        'type': type ?? 'party',
+      };
+
+      // Adiciona imageUrl apenas se foi fornecida
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        eventData['imageUrl'] = imageUrl;
+      }
+
+      print('=== CRIANDO EVENTO ===');
+      print('Dados do evento: $eventData');
+
       final response = await http.post(
         Uri.parse('$baseUrl/events'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: json.encode({
-          'title': title,
-          'description': description,
-          'date': date,
-          'location': location,
-          'price': price,
-          'type': type ?? 'party',
-        }),
+        body: json.encode(eventData),
       );
+      
+      print('Status Code: ${response.statusCode}');
+      print('Resposta: ${response.body}');
+      
       if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Evento criado com sucesso!');
         return true;
       } else {
         print('Erro ao criar evento: ${response.statusCode}');
@@ -345,25 +367,43 @@ class EventsNewsService {
     required String location,
     String? price,
     String? type,
+    String? imageUrl,
   }) async {
     try {
       final baseUrl = ApiService.baseUrl;
+      
+      final Map<String, dynamic> eventData = {
+        'title': title,
+        'description': description,
+        'date': date,
+        'location': location,
+        'price': price,
+        'type': type ?? 'party',
+      };
+
+      // Adiciona imageUrl apenas se foi fornecida
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        eventData['imageUrl'] = imageUrl;
+      }
+
+      print('=== ATUALIZANDO EVENTO ===');
+      print('ID do evento: $eventId');
+      print('Dados do evento: $eventData');
+
       final response = await http.put(
         Uri.parse('$baseUrl/events/$eventId'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: json.encode({
-          'title': title,
-          'description': description,
-          'date': date,
-          'location': location,
-          'price': price,
-          'type': type ?? 'party',
-        }),
+        body: json.encode(eventData),
       );
+      
+      print('Status Code: ${response.statusCode}');
+      print('Resposta: ${response.body}');
+      
       if (response.statusCode == 200 || response.statusCode == 204) {
+        print('Evento atualizado com sucesso!');
         return true;
       } else {
         print('Erro ao atualizar evento: ${response.statusCode}');
@@ -508,7 +548,7 @@ class EventsNewsService {
             'location': item['location'] ?? '',
             'price': item['price'] ?? '',
             'type': item['type'] ?? '',
-            'imageUrl': '', // Adapte se houver imagem no futuro
+            'imageUrl': item['imageUrl'] ?? '', // Campo de imagem do backend
           };
         }).toList();
       } else {
@@ -555,7 +595,7 @@ class EventsNewsService {
 
   // ========== MÉTODOS DE UPLOAD DE IMAGEM ==========
   
-  // Método para fazer upload de imagem - Específico para o seu backend
+  // Método para fazer upload de imagem - Específico para o seu backend (Notícias)
   Future<String?> uploadImage(File imageFile) async {
     try {
       // Valida se o arquivo é uma imagem válida
@@ -565,7 +605,7 @@ class EventsNewsService {
       }
       
       final baseUrl = ApiService.baseUrl;
-      print('=== UPLOAD DE IMAGEM ===');
+      print('=== UPLOAD DE IMAGEM (NOTÍCIA) ===');
       print('BaseURL: $baseUrl');
       print('URL completa: $baseUrl/upload/news-image');
       
@@ -630,6 +670,85 @@ class EventsNewsService {
       }
     } catch (e) {
       print('Erro ao fazer upload da imagem: $e');
+      return null;
+    }
+  }
+
+  // Método para fazer upload de imagem de evento - Específico para eventos
+  Future<String?> uploadEventImage(File imageFile) async {
+    try {
+      // Valida se o arquivo é uma imagem válida
+      if (!_isValidImageFile(imageFile.path)) {
+        print('Arquivo não é uma imagem válida: ${imageFile.path}');
+        return null;
+      }
+      
+      final baseUrl = ApiService.baseUrl;
+      print('=== UPLOAD DE IMAGEM (EVENTO) ===');
+      print('BaseURL: $baseUrl');
+      print('URL completa: $baseUrl/upload/event-image');
+      
+      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/upload/event-image'));
+      
+      // Adiciona o arquivo à requisição usando o campo 'file' como especificado
+      final contentType = _getContentType(imageFile.path);
+      
+      // Como fallback, força JPEG se não conseguiu detectar o tipo
+      final finalContentType = contentType.mimeType == 'image/jpeg' && 
+          !imageFile.path.toLowerCase().contains('.jpg') && 
+          !imageFile.path.toLowerCase().contains('.jpeg') 
+        ? MediaType('image', 'jpeg')
+        : contentType;
+      
+      final multipartFile = await http.MultipartFile.fromPath(
+        'file', // Campo específico do seu backend
+        imageFile.path,
+        contentType: finalContentType,
+        filename: 'event_image.jpg', // Nome explícito com extensão
+      );
+      
+      print('ContentType definido: ${finalContentType.mimeType}');
+      print('Nome do arquivo original: ${imageFile.path.split('/').last}');
+      print('Nome do arquivo enviado: event_image.jpg');
+      
+      request.files.add(multipartFile);
+      
+      // Adiciona headers
+      request.headers.addAll({
+        'Accept': 'application/json',
+      });
+      
+      print('Enviando imagem para: $baseUrl/upload/event-image');
+      print('Arquivo: ${imageFile.path}');
+      
+      final response = await request.send();
+      
+      print('Status Code: ${response.statusCode}');
+      
+      if (response.statusCode == 201) {
+        final responseData = await response.stream.bytesToString();
+        final jsonData = json.decode(responseData);
+        
+        print('Resposta do upload: $jsonData');
+        
+        // Extrai a URL conforme a estrutura do seu backend
+        String? imageUrl = jsonData['data']?['url'];
+        
+        if (imageUrl != null) {
+          print('Upload bem-sucedido. URL da imagem do evento: $imageUrl');
+          return imageUrl; // Retorna "/uploads/events/filename.jpg"
+        } else {
+          print('URL da imagem não encontrada na resposta');
+          return null;
+        }
+      } else {
+        print('Erro no upload da imagem do evento: ${response.statusCode}');
+        final responseData = await response.stream.bytesToString();
+        print('Resposta de erro: $responseData');
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao fazer upload da imagem do evento: $e');
       return null;
     }
   }
@@ -824,5 +943,91 @@ class EventsNewsService {
     }
     
     return true;
+  }
+
+  // Método para criar evento com upload de imagem
+  Future<bool> createEventWithImage({
+    required String title,
+    String? description,
+    required String date,
+    required String location,
+    String? price,
+    String? type,
+    File? imageFile,
+  }) async {
+    String? imageUrl;
+    
+    try {
+      // Faz upload da imagem primeiro, se fornecida
+      if (imageFile != null) {
+        print('Iniciando upload da imagem do evento...');
+        imageUrl = await uploadEventImage(imageFile);
+        if (imageUrl == null) {
+          print('Falha no upload da imagem - continuando sem imagem');
+          // Continua sem a imagem se o upload falhar
+        } else {
+          print('Upload da imagem bem-sucedido: $imageUrl');
+        }
+      }
+
+      // Cria o evento (com ou sem imagem)
+      return await createEvent(
+        title: title,
+        description: description,
+        date: date,
+        location: location,
+        price: price,
+        type: type,
+        imageUrl: imageUrl,
+      );
+
+    } catch (e) {
+      print('Erro ao criar evento com imagem: $e');
+      return false;
+    }
+  }
+
+  // Método para atualizar evento com upload de imagem
+  Future<bool> updateEventWithImage({
+    required String eventId,
+    required String title,
+    required String description,
+    required String date,
+    required String location,
+    String? price,
+    String? type,
+    File? imageFile,
+  }) async {
+    String? imageUrl;
+    
+    try {
+      // Faz upload da nova imagem, se fornecida
+      if (imageFile != null) {
+        print('Iniciando upload da nova imagem do evento...');
+        imageUrl = await uploadEventImage(imageFile);
+        if (imageUrl == null) {
+          print('Falha no upload da nova imagem - mantendo imagem anterior');
+          // Continua sem atualizar a imagem se o upload falhar
+        } else {
+          print('Upload da nova imagem bem-sucedido: $imageUrl');
+        }
+      }
+
+      // Atualiza o evento (com ou sem nova imagem)
+      return await updateEvent(
+        eventId: eventId,
+        title: title,
+        description: description,
+        date: date,
+        location: location,
+        price: price,
+        type: type,
+        imageUrl: imageUrl,
+      );
+
+    } catch (e) {
+      print('Erro ao atualizar evento com imagem: $e');
+      return false;
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/services/events_news_service.dart';
 import 'package:intl/intl.dart';
 
 class EventItem extends StatelessWidget {
@@ -31,6 +32,24 @@ class EventItem extends StatelessWidget {
     }
   }
 
+  bool _hasValidImage() {
+    // Verifica se tem uma imagem válida do backend
+    return imageUrl.isNotEmpty && 
+           imageUrl != 'null' && 
+           !imageUrl.contains('placeholder') && 
+           !imageUrl.contains('via.placeholder');
+  }
+
+  String _getNetworkImageUrl() {
+    // Se já é uma URL completa, usa diretamente
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // Se é um caminho relativo do backend, constrói a URL completa
+    return EventsNewsService().getFullImageUrl(imageUrl);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -44,6 +63,7 @@ class EventItem extends StatelessWidget {
             'location': location,
             'description': description,
             'price': price,
+            'imageUrl': imageUrl, // Adiciona imageUrl aos argumentos
           },
         );
       },
@@ -56,23 +76,54 @@ class EventItem extends StatelessWidget {
             color: AppColors.white,
             borderRadius: BorderRadius.circular(10),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
+          clipBehavior: Clip.antiAlias,          child: SizedBox(
             width: double.infinity,
-            height: 250,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: AppColors.lightGrey,
-                  child: const Center(
-                    child: Icon(Icons.image_not_supported, size: 50),
+            height: 200,
+            child: _hasValidImage() 
+                ? Image.network(
+                    _getNetworkImageUrl(),
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: AppColors.lightGrey,
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.yellow),
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print('Erro ao carregar imagem do evento: $error');
+                      // Se falhar carregamento da rede, usa imagem mockada
+                      return Image.asset(
+                        'assets/images/roupa1.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: AppColors.lightGrey,
+                            child: const Center(
+                              child: Icon(Icons.image_not_supported, size: 50),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  )
+                : Image.asset(
+                    'assets/images/roupa1.png', // Imagem mockada como fallback
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: AppColors.lightGrey,
+                        child: const Center(
+                          child: Icon(Icons.image_not_supported, size: 50),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
             ),
-          ),
         ),
 
         // Informações de texto abaixo do retângulo
