@@ -4,6 +4,7 @@ import 'package:app_atletica/services/events_news_service.dart';
 import 'package:intl/intl.dart';
 
 class EventItem extends StatelessWidget {
+  final String id;
   final String imageUrl;
   final String date;
   final String location;
@@ -13,6 +14,7 @@ class EventItem extends StatelessWidget {
 
   const EventItem({
     super.key,
+    required this.id,
     required this.imageUrl,
     required this.date,
     required this.location,
@@ -58,12 +60,13 @@ class EventItem extends StatelessWidget {
           context,
           '/trainingDetail',
           arguments: {
+            'id': id,
             'title': title,
             'date': date,
             'location': location,
             'description': description,
             'price': price,
-            'imageUrl': imageUrl, // Adiciona imageUrl aos argumentos
+            'imageUrl': imageUrl,
           },
         );
       },

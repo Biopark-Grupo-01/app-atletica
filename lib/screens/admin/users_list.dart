@@ -171,7 +171,7 @@ class UsersListState extends State<UsersList> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const TicketsScreen(),
+                                  builder: (_) => TicketsScreen(specificUserId: user.id),
                                 ),
                               );
                             },

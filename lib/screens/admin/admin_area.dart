@@ -6,6 +6,7 @@ import 'package:app_atletica/widgets/menu_card.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/screens/account/register/register_home.dart';
 import 'package:app_atletica/screens/admin/users_list.dart';
+import 'package:app_atletica/screens/admin/admin_tickets_screen.dart';
 
 class AdminArea extends StatefulWidget {
   const AdminArea({super.key});
@@ -53,6 +54,17 @@ class _AdminAreaState extends State<AdminArea> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => UsersList()),
+                        );
+                      },
+                    ),
+                    MenuCard(
+                      icon: Icons.confirmation_number,
+                      title: "Ingressos",
+                      subtitle: "Gerenciar Ingressos",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AdminTicketsScreen()),
                         );
                       },
                     ),

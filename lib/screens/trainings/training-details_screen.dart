@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/services/events_news_service.dart';
+import 'package:app_atletica/widgets/events/event_tickets_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -363,80 +364,86 @@ Poderia me ajudar com a compra? 😊
                     ],
                   ),
                   const SizedBox(height: 48),
-                  const Text(
-                    'Ingressos',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  // const Text(
-                  //   'EMBARQUE NA REVOADA',
-                  //   style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                  // ),
-                  // const SizedBox(height: 8),
-
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(128, 52, 90, 167),
-                      borderRadius: BorderRadius.circular(8),
+                  
+                  // Seção de Ingressos (nova implementação)
+                  if (eventData['id'] != null && eventData['id']!.isNotEmpty) ...[
+                    EventTicketsWidget(
+                      eventId: eventData['id']!,
+                      onTicketPurchased: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Ingresso adquirido! Verifique na área de ingressos.'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('PRIMEIRO LOTE', style: TextStyle(color: Colors.white70)),
-                            const SizedBox(height: 8),
-                            Text('R\$ $price', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
-                            // const Text('+ taxa a partir de R\$ 8,80', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                            if (_ticketQuantity > 0) ...[
+                  ] else ...[
+                    // Fallback para eventos sem ID (sistema antigo)
+                    const Text(
+                      'Ingressos',
+                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(128, 52, 90, 167),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('PRIMEIRO LOTE', style: TextStyle(color: Colors.white70)),
                               const SizedBox(height: 8),
-                              Text(
-                                'Total: R\$ ${_calculateTotalPrice(price, _ticketQuantity)}',
-                                style: const TextStyle(
-                                  color: Colors.greenAccent,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                              Text('R\$ $price', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                              if (_ticketQuantity > 0) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Total: R\$ ${_calculateTotalPrice(price, _ticketQuantity)}',
+                                  style: const TextStyle(
+                                    color: Colors.greenAccent,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                              ],
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (_ticketQuantity > 0) {
+                                      _ticketQuantity--;
+                                    }
+                                  });
+                                },
+                                icon: const Icon(Icons.remove, color: Colors.white),
+                              ),
+                              Text('$_ticketQuantity', style: const TextStyle(color: Colors.white, fontSize: 16)),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _ticketQuantity++;
+                                  });
+                                },
+                                icon: const Icon(Icons.add, color: Colors.white),
                               ),
                             ],
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (_ticketQuantity > 0) {
-                                    _ticketQuantity--;
-                                  }
-                                });
-                              },
-                              icon: const Icon(Icons.remove, color: Colors.white),
-                            ),
-                            Text('$_ticketQuantity', style: const TextStyle(color: Colors.white, fontSize: 16)),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _ticketQuantity++;
-                                });
-                              },
-                              icon: const Icon(Icons.add, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: SizedBox(
+                    SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
@@ -475,40 +482,8 @@ Poderia me ajudar com a compra? 😊
                           ],
                         ),
                       ),
-                    ),                    
-                  ),
-
-                  // const SizedBox(height: 16),
-                  // Container(
-                  //   padding: const EdgeInsets.all(16),
-                  //   decoration: BoxDecoration(
-                  //     color: Color(0xff292929),
-                  //     borderRadius: BorderRadius.circular(8),
-                  //   ),
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: const [
-                  //       Row(
-                  //         children: [
-                  //           Icon(Icons.receipt_long, color: Colors.redAccent, size: 20),
-                  //           SizedBox(width: 8),
-                  //           Expanded(
-                  //             child: Text(
-                  //               'Taxas aplicadas ao pagar com Pix, cartão de crédito ou boleto',
-                  //               style: TextStyle(color: Colors.white, fontSize: 13),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       SizedBox(height: 12),
-                  //       Text(
-                  //         '🔻 Metade da taxa com o clube',
-                  //         style: TextStyle(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.bold),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-
+                    ),
+                  ],
 
                   const SizedBox(height: 36),
 
@@ -572,7 +547,7 @@ Poderia me ajudar com a compra? 😊
                     style: const TextStyle(color: subTextColor, fontSize: 14),
                   ),
 
-                  const SizedBox(height: 72),
+                  const SizedBox(height: 40),
 
                   // Faixa Etária
                   _sectionTitle(Icons.how_to_reg, 'Faixa Etária'),
