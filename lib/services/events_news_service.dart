@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:app_atletica/models/training_model.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/models/news_event_model.dart';
 import 'package:app_atletica/services/api_service.dart';
 import 'package:app_atletica/services/local_storage_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 class EventsNewsService {
   // Endpoints e cache keys
@@ -526,17 +529,20 @@ class EventsNewsService {
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final List<dynamic> data = json['data'] ?? [];
-        return data.map<Map<String, String>>((item) {
-          return {
-            'id': item['id'] ?? '',
-            'title': item['title'] ?? '',
-            'description': item['description'] ?? '',
-            'date': item['date'] ?? '', // MANTÉM formato ISO
-            'author': item['author'] ?? '',
-            'imageUrl': '', // Adapte se houver imagem
+        
+        final newsList = data.map<Map<String, String>>((item) {
+          return <String, String>{
+            'id': (item['id'] ?? '').toString(),
+            'title': (item['title'] ?? '').toString(),
+            'description': (item['description'] ?? '').toString(),
+            'date': (item['date'] ?? '').toString(), // MANTÉM formato ISO
+            'author': (item['author'] ?? '').toString(),
+            'imageUrl': (item['imageUrl'] ?? '').toString(), // Campo de imagem do backend
             'location': '', // Adapte se houver local
           };
         }).toList();
+        
+        return newsList;
       } else {
         print('Erro ao buscar notícias: ${response.statusCode}');
         return [];
@@ -547,4 +553,276 @@ class EventsNewsService {
     }
   }
 
+  // ========== MÉTODOS DE UPLOAD DE IMAGEM ==========
+  
+  // Método para fazer upload de imagem - Específico para o seu backend
+  Future<String?> uploadImage(File imageFile) async {
+    try {
+      // Valida se o arquivo é uma imagem válida
+      if (!_isValidImageFile(imageFile.path)) {
+        print('Arquivo não é uma imagem válida: ${imageFile.path}');
+        return null;
+      }
+      
+      final baseUrl = ApiService.baseUrl;
+      print('=== UPLOAD DE IMAGEM ===');
+      print('BaseURL: $baseUrl');
+      print('URL completa: $baseUrl/upload/news-image');
+      
+      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/upload/news-image'));
+      
+      // Adiciona o arquivo à requisição usando o campo 'file' como especificado
+      final contentType = _getContentType(imageFile.path);
+      
+      // Como fallback, força JPEG se não conseguiu detectar o tipo
+      final finalContentType = contentType.mimeType == 'image/jpeg' && 
+          !imageFile.path.toLowerCase().contains('.jpg') && 
+          !imageFile.path.toLowerCase().contains('.jpeg') 
+        ? MediaType('image', 'jpeg')
+        : contentType;
+      
+      final multipartFile = await http.MultipartFile.fromPath(
+        'file', // Campo específico do seu backend
+        imageFile.path,
+        contentType: finalContentType,
+        filename: 'image.jpg', // Nome explícito com extensão
+      );
+      
+      print('ContentType definido: ${finalContentType.mimeType}');
+      print('Nome do arquivo original: ${imageFile.path.split('/').last}');
+      print('Nome do arquivo enviado: image.jpg');
+      
+      request.files.add(multipartFile);
+      
+      // Adiciona headers
+      request.headers.addAll({
+        'Accept': 'application/json',
+      });
+      
+      print('Enviando imagem para: $baseUrl/upload/news-image');
+      print('Arquivo: ${imageFile.path}');
+      
+      final response = await request.send();
+      
+      print('Status Code: ${response.statusCode}');
+      
+      if (response.statusCode == 201) {
+        final responseData = await response.stream.bytesToString();
+        final jsonData = json.decode(responseData);
+        
+        print('Resposta do upload: $jsonData');
+        
+        // Extrai a URL conforme a estrutura do seu backend
+        String? imageUrl = jsonData['data']?['url'];
+        
+        if (imageUrl != null) {
+          print('Upload bem-sucedido. URL da imagem: $imageUrl');
+          return imageUrl; // Retorna "/uploads/news/filename.jpg"
+        } else {
+          print('URL da imagem não encontrada na resposta');
+          return null;
+        }
+      } else {
+        print('Erro no upload da imagem: ${response.statusCode}');
+        final responseData = await response.stream.bytesToString();
+        print('Resposta de erro: $responseData');
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao fazer upload da imagem: $e');
+      return null;
+    }
+  }
+
+  // Método atualizado para criar notícia com imagem
+  Future<bool> createNewsWithImage({
+    required String title,
+    String? description,
+    required String date,
+    String? author,
+    File? imageFile,
+  }) async {
+    try {
+      String? imageUrl;
+      
+      // Faz upload da imagem primeiro, se fornecida
+      if (imageFile != null) {
+        print('Iniciando upload da imagem...');
+        imageUrl = await uploadImage(imageFile);
+        if (imageUrl == null) {
+          print('Falha no upload da imagem - continuando sem imagem');
+          // Continua sem a imagem se o upload falhar
+        } else {
+          print('Upload da imagem bem-sucedido: $imageUrl');
+        }
+      }
+      
+      final baseUrl = ApiService.baseUrl;
+      
+      print('=== CRIAR NOTÍCIA ===');
+      print('BaseURL: $baseUrl');
+      print('URL completa: $baseUrl/news');
+      
+      // Monta o body da requisição conforme especificação do seu backend
+      Map<String, dynamic> requestBody = {
+        'title': title,
+        'description': description,
+        'date': date,
+        'author': author,
+      };
+      
+      // Adiciona imageUrl apenas se o upload foi bem-sucedido
+      if (imageUrl != null) {
+        requestBody['imageUrl'] = imageUrl;
+      }
+      
+      print('Criando notícia com dados: $requestBody');
+      
+      final response = await http.post(
+        Uri.parse('$baseUrl/news'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(requestBody),
+      );
+      
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Notícia criada com sucesso');
+        return true;
+      } else {
+        print('Erro ao criar notícia: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao criar notícia: $e');
+      return false;
+    }
+  }
+
+  // Método atualizado para atualizar notícia com imagem
+  Future<bool> updateNewsWithImage({
+    required String newsId,
+    required String title,
+    required String description,
+    required String date,
+    String? author,
+    File? imageFile,
+  }) async {
+    try {
+      String? imageUrl;
+      
+      // Faz upload da nova imagem, se fornecida
+      if (imageFile != null) {
+        print('Iniciando upload da nova imagem...');
+        imageUrl = await uploadImage(imageFile);
+        if (imageUrl == null) {
+          print('Falha no upload da nova imagem - continuando sem atualizar a imagem');
+          // Continua sem atualizar a imagem se o upload falhar
+        } else {
+          print('Upload da nova imagem bem-sucedido: $imageUrl');
+        }
+      }
+      
+      final baseUrl = ApiService.baseUrl;
+      
+      // Monta o body da requisição conforme especificação do seu backend
+      Map<String, dynamic> requestBody = {
+        'title': title,
+        'description': description,
+        'date': date,
+        'author': author,
+      };
+      
+      // Adiciona imageUrl apenas se foi feito upload de uma nova imagem
+      if (imageUrl != null) {
+        requestBody['imageUrl'] = imageUrl;
+      }
+      
+      print('Atualizando notícia $newsId com dados: $requestBody');
+      
+      final response = await http.put(
+        Uri.parse('$baseUrl/news/$newsId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(requestBody),
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print('Notícia atualizada com sucesso');
+        return true;
+      } else {
+        print('Erro ao atualizar notícia: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Erro ao atualizar notícia: $e');
+      return false;
+    }
+  }
+
+  // Método para construir URL completa da imagem
+  String getFullImageUrl(String imageUrl) {
+    final baseUrl = ApiService.baseUrl;
+    
+    if (imageUrl.startsWith('http')) {
+      return imageUrl; // Já é uma URL completa
+    }
+    
+    // Remove '/api' do baseUrl para imagens, pois elas são servidas diretamente pelo servidor
+    // Exemplo: baseUrl = "http://192.168.1.2:3001/api" -> "http://192.168.1.2:3001"
+    final baseUrlWithoutApi = baseUrl.replaceAll('/api', '');
+    final fullUrl = '$baseUrlWithoutApi$imageUrl';
+    
+    return fullUrl;
+  }
+
+  // Método auxiliar para determinar o contentType baseado na extensão do arquivo
+  MediaType _getContentType(String filePath) {
+    // Usa o pacote mime para detectar automaticamente o tipo
+    final mimeType = lookupMimeType(filePath);
+    
+    if (mimeType != null) {
+      final parts = mimeType.split('/');
+      return MediaType(parts[0], parts[1]);
+    }
+    
+    // Fallback manual baseado na extensão
+    final extension = filePath.toLowerCase().split('.').last;
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        return MediaType('image', 'jpeg');
+      case 'png':
+        return MediaType('image', 'png');
+      case 'gif':
+        return MediaType('image', 'gif');
+      default:
+        return MediaType('image', 'jpeg'); // Fallback para JPEG
+    }
+  }
+
+  // Método auxiliar para validar se o arquivo é uma imagem válida
+  bool _isValidImageFile(String filePath) {
+    final validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    final extension = filePath.toLowerCase().split('.').last;
+    
+    // Verifica extensão
+    if (!validExtensions.contains(extension)) {
+      return false;
+    }
+    
+    // Verifica MIME type
+    final mimeType = lookupMimeType(filePath);
+    if (mimeType == null || !mimeType.startsWith('image/')) {
+      return false;
+    }
+    
+    return true;
+  }
 }

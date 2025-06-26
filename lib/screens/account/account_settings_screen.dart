@@ -213,20 +213,20 @@ class AccountSettingsScreen extends StatelessWidget {
                                 );
                               },
                             ),
-                            MenuCard(
-                              icon: Icons.bookmark,
-                              title: "Salvos",
-                              subtitle: "Itens que você salvou",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => const TicketsScreen(),
-                                  ),
-                                );
-                              },
-                            ),
+                            // MenuCard(
+                            //   icon: Icons.bookmark,
+                            //   title: "Salvos",
+                            //   subtitle: "Itens que você salvou",
+                            //   onTap: () {
+                            //     Navigator.push(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //         builder:
+                            //             (context) => const TicketsScreen(),
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
                             if (userProvider.isAssociate) ...[
                               MenuCard(
                                 icon: Icons.badge,

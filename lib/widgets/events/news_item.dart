@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
-import 'package:intl/intl.dart';
 
-class NewsItem extends StatelessWidget {
+class NewsItem extends StatefulWidget {
   final String imageUrl;
   final String? title;
   final String? description;
@@ -16,24 +15,23 @@ class NewsItem extends StatelessWidget {
     this.date,
   });
 
+  @override
+  State<NewsItem> createState() => _NewsItemState();
+}
+
+class _NewsItemState extends State<NewsItem> {
   String getTimeAgo() {
-    if (date == null || date!.isEmpty) return '';
+    if (widget.date == null || widget.date!.isEmpty) return '';
     try {
       DateTime dateTime;
-      if (date!.endsWith('Z')) {
+      if (widget.date!.endsWith('Z')) {
         // Backend salva como local mas adiciona 'Z', então removemos o 'Z' e parseamos como local
-        dateTime = DateTime.parse(date!.replaceAll('Z', ''));
-        // print('Data recebida (com Z, tratada como local): $date');
-        // print('DateTime parseado (sem Z, local): $dateTime');
+        dateTime = DateTime.parse(widget.date!.replaceAll('Z', ''));
       } else {
-        dateTime = DateTime.parse(date!);
-        // print('Data recebida (sem Z): $date');
-        // print('DateTime parseado: $dateTime');
+        dateTime = DateTime.parse(widget.date!);
       }
       final now = DateTime.now();
-      // print('Data atual: $now');
       final diff = now.difference(dateTime);
-      // print('Diferença: $diff');
       if (diff.inSeconds < 0) return 'Agora mesmo'; // futuro
       if (diff.inSeconds < 60) return 'Agora mesmo';
       if (diff.inMinutes < 60) return '${diff.inMinutes} min atrás';
@@ -43,7 +41,6 @@ class NewsItem extends StatelessWidget {
       if (diff.inDays < 365) return '${(diff.inDays / 30).floor()} m atrás';
       return '${(diff.inDays / 365).floor()} a atrás';
     } catch (e) {
-      // print('Erro ao calcular getTimeAgo: $e');
       return '';
     }
   }
@@ -53,7 +50,8 @@ class NewsItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Removido o retângulo com imagem
+        // Removido: Imagem da notícia não será exibida no card
+        // Imagem só aparece na tela de detalhes
         Padding(
           padding: const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 0),
           child: Column(
@@ -62,7 +60,7 @@ class NewsItem extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  title ?? '',
+                  widget.title ?? '',
                   style: const TextStyle(
                     color: AppColors.yellow,
                     fontWeight: FontWeight.bold,
@@ -83,7 +81,7 @@ class NewsItem extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                description ?? '',
+                widget.description ?? '',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
