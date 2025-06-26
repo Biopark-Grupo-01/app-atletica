@@ -204,7 +204,7 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => const TicketsScreen(),
+                                        (context) => TicketsScreen(specificUserId: user.id),
                                   ),
                                 );
                               },

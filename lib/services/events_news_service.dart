@@ -592,6 +592,33 @@ class EventsNewsService {
       return [];
     }
   }
+  // Método para buscar evento específico por ID
+  Future<Map<String, String>?> getEventById(String eventId) async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.get(Uri.parse('$baseUrl/events/$eventId'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final Map<String, dynamic> data = json['data'] ?? {};
+        return {
+          'id': data['id']?.toString() ?? '',
+          'title': data['title']?.toString() ?? '',
+          'description': data['description']?.toString() ?? '',
+          'date': data['date']?.toString() ?? '',
+          'location': data['location']?.toString() ?? '',
+          'price': data['price']?.toString() ?? '',
+          'type': data['type']?.toString() ?? '',
+          'imageUrl': data['imageUrl']?.toString() ?? '',
+        };
+      } else {
+        print('Erro ao buscar evento $eventId: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao buscar evento $eventId: $e');
+      return null;
+    }
+  }
 
   // ========== MÉTODOS DE UPLOAD DE IMAGEM ==========
   

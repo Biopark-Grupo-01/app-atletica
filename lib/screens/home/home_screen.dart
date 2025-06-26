@@ -346,6 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   items: events,
                   useCarousel: true,
                   itemBuilder: (item) => EventItem(
+                    id: item['id'] ?? '',
                     imageUrl: item['imageUrl'] ?? '',
                     date: item['date'] ?? '',
                     location: item['location'] ?? '',

@@ -133,6 +133,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                     },
                                     child: _selectedTabIndex == 0
                                         ? EventItem(
+                                            id: item['id'] ?? '',
                                             imageUrl: item['imageUrl'] ?? '',
                                             date: item['date'] ?? '',
                                             location: item['location'] ?? '',
