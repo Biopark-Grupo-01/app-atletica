@@ -125,12 +125,14 @@ Color getCategoryColor(String category) {
 // Cores para diferentes papéis de usuário
 Color roleColor(String? role) {
   switch (role?.toUpperCase()) {
-    case 'ASSOCIADO':
+    case 'ASSOCIATE':
       return const Color.fromARGB(255, 49, 151, 234);
-    case 'DIRETORIA':
+    case 'DIRECTOR':
       return AppColors.yellow;
-    case 'NÃO ASSOCIADO':
+    case 'NON_ASSOCIATE':
       return AppColors.lightGrey;
+    case 'ADMIN':
+      return const Color.fromARGB(255, 255, 77, 77);
     default:
       return AppColors.lightGrey;
   }

@@ -8,9 +8,6 @@ class TreinoDetalhesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    const iconColor = Colors.white;
-    const textColor = Colors.white;
-    const subTextColor = Colors.white70;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -37,7 +34,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -348,7 +345,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
                     'Não importa se é de avião, de patinete, a pé ou de carro, o nosso destino é um só.\n\n'
                     'Dia 17/05 você tem um encontro marcado com a XV na maior Cervejada do sul do país.\n'
                     'Despache suas malas, afivele seu cinto e vem com a XV nessa viagem com destino à alegria. 💙❤️🦈',
-                    style: TextStyle(color: subTextColor, fontSize: 14),
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
 
                   const SizedBox(height: 72),
@@ -358,7 +355,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text(
                     'Proibido menores de 18',
-                    style: TextStyle(color: subTextColor),
+                    style: TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 24),
 
@@ -367,7 +364,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text(
                     '• Documento Oficial com foto',
-                    style: TextStyle(color: subTextColor),
+                    style: TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 24),
 
@@ -377,7 +374,7 @@ class TreinoDetalhesScreen extends StatelessWidget {
                   const Text(
                     'A solicitação de cancelamento pode ser feita em até 7 dias corridos após a compra, '
                     'desde que seja feita antes de 48 horas do início do evento.',
-                    style: TextStyle(color: subTextColor),
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),

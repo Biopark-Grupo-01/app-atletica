@@ -66,6 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         nameController.text = user.name;
         cpfController.text = user.cpf ?? '';
         emailController.text = user.email;
+        phoneController.text = user.phone ?? '';
         avatarUrl = user.avatarUrl ?? '';
       }
     } catch (e) {
@@ -102,8 +103,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         email: emailController.text.trim(),
         avatarUrl: avatarUrl,
         role: currentUser.role,
+        roleDisplayName: currentUser.roleDisplayName, // Preservar o roleDisplayName
+        phone: phoneController.text.trim(),
         registration: currentUser.registration,
         validUntil: currentUser.validUntil,
+        firebaseUid: currentUser.firebaseUid,
+        planStartDate: currentUser.planStartDate,
+        planEndDate: currentUser.planEndDate,
       );
 
       // Atualizando o usuário usando o provider

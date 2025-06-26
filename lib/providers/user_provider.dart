@@ -1,157 +1,88 @@
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:app_atletica/models/user_model.dart';
 import 'package:app_atletica/services/auth_service.dart';
 
 class UserProvider extends ChangeNotifier {
   UserModel? _currentUser;
-  bool _isLoading = false;
+  bool _isLoading = true;
   String? _errorMessage;
-  bool _isLoggedIn = false;
+  late StreamSubscription<auth.User?> _authSubscription;
 
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  bool get isLoggedIn => _isLoggedIn;
-  bool get isAdmin => _currentUser?.role == 'ADMIN';  UserProvider() {
-    // Inicialização padrão, chama _loadUser
-    mockLoginUser(); // Simula usuário logado automaticamente ao iniciar
-  }
-  
-  /// Inicializa o provider de forma assíncrona e retorna quando concluído
-  Future<void> initializeAsync() async {
-    await _loadUser();
-  }// Carregar usuário salvo no SharedPreferences
-  Future<void> _loadUser() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  bool get isLoggedIn => _currentUser != null;
+  bool get isAdmin => _currentUser?.isAdmin ?? false;
+  bool get isAssociate => _currentUser?.isAssociate ?? false;
 
-    try {
-      print('Carregando informações de usuário...');
-      
-      // Verificar status de login usando o serviço
-      _isLoggedIn = await AuthService.isLoggedIn();
-      print('Usuário está logado: $_isLoggedIn');
-      
-      // Carregar dados do usuário se estiver logado
-      if (_isLoggedIn) {
-        _currentUser = await AuthService.getCurrentUser();
-        print('Usuário carregado: ${_currentUser?.name ?? "null"}');
-        
-        // Se não conseguir recuperar o usuário, deslogar
-        if (_currentUser == null) {
-          print('Dados do usuário não encontrados ou inválidos, deslogando');
-          _isLoggedIn = false;
-          await AuthService.logout(); // Limpa os dados de sessão
-        }
-      }
-    } catch (e) {
-      print('Erro ao carregar usuário: $e');
-      _errorMessage = 'Erro ao carregar usuário: $e';
-      _isLoggedIn = false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-      print('Carregamento de usuário concluído. isLoggedIn: $_isLoggedIn');
-    }
+  UserProvider() {
+    _authSubscription =
+        auth.FirebaseAuth.instance.authStateChanges().listen(_onAuthStateChanged);
   }
 
-  // Login de usuário
-  Future<bool> login(String email, String password) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final result = await AuthService.mockLogin(email, password);
-
-      if (result['success']) {
-        _currentUser = result['user'];
-        await AuthService.saveUserSession(result['token'], _currentUser!);
-        _isLoggedIn = true;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = result['message'];
-        notifyListeners();
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = 'Erro durante o login: $e';
-      notifyListeners();
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Registro de usuário
-  Future<bool> register(
-    String name,
-    String email,
-    String password,
-    String? cpf,
-  ) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final result = await AuthService.mockRegister(name, email, password, cpf);
-
-      if (result['success']) {
-        _currentUser = result['user'];
-        await AuthService.saveUserSession(result['token'], _currentUser!);
-        _isLoggedIn = true;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = result['message'];
-        notifyListeners();
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = 'Erro durante o registro: $e';
-      notifyListeners();
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Logout de usuário
-  Future<void> logout() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await AuthService.logout();
+  Future<void> _onAuthStateChanged(auth.User? firebaseUser) async {
+    print('Auth state changed: ${firebaseUser?.uid}');
+    
+    if (firebaseUser == null) {
+      print('Firebase user é null, fazendo logout local');
       _currentUser = null;
-      _isLoggedIn = false;
-    } catch (e) {
-      _errorMessage = 'Erro durante o logout: $e';
-    } finally {
       _isLoading = false;
+      _errorMessage = null; // Limpa qualquer erro anterior
       notifyListeners();
+      await AuthService.logout();
+    } else {
+      try {
+        // Aguarda um pouco para garantir que a sessão foi salva
+        await Future.delayed(const Duration(milliseconds: 100));
+        _currentUser = await AuthService.getCurrentUser();
+        
+        // Se não temos dados locais, aguarda mais um pouco e tenta novamente
+        if (_currentUser == null) {
+          print('Usuário não encontrado localmente, aguardando...');
+          await Future.delayed(const Duration(milliseconds: 500));
+          _currentUser = await AuthService.getCurrentUser();
+        }
+        
+        // Só faz logout se ainda não temos dados após as tentativas
+        if (_currentUser == null) {
+          print('Usuário ainda não encontrado após tentativas, fazendo logout');
+          await auth.FirebaseAuth.instance.signOut();
+        } else {
+          print('Usuário carregado: ${_currentUser?.name}');
+        }
+      } catch (e) {
+        print('Erro ao sincronizar usuário: $e');
+        _errorMessage = 'Erro ao sincronizar usuário: $e';
+        _currentUser = null;
+        await auth.FirebaseAuth.instance.signOut();
+      }
     }
+    
+    // Garante que sempre remove o loading e notifica
+    if (_isLoading) {
+      _isLoading = false;
+    }
+    notifyListeners();
   }
 
-  // Atualizar perfil do usuário
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    super.dispose();
+  }
+
   Future<bool> updateProfile(UserModel updatedUser) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      // Simula um atraso de rede
-      await Future.delayed(Duration(seconds: 1));
-
-      // Atualiza o usuário localmente
+      await Future.delayed(const Duration(seconds: 1));
+      print('Atualizando usuário: ${updatedUser.name}, role: ${updatedUser.role}, roleDisplayName: ${updatedUser.roleDisplayName}');
       _currentUser = updatedUser;
       await AuthService.updateCurrentUser(_currentUser!);
-
       _isLoading = false;
       notifyListeners();
       return true;
@@ -163,25 +94,15 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  // Limpar mensagem de erro
   void clearError() {
     _errorMessage = null;
     notifyListeners();
   }
 
-  // Método para simular um usuário logado (apenas para testes)
-  void mockLoginUser() {
-    _currentUser = UserModel(
-      id: '1',
-      name: 'Usuário Teste',
-      email: 'teste@email.com',
-      cpf: '123.456.789-00',
-      avatarUrl: '',
-      role: 'ADMIN',
-      registration: 12345,
-      validUntil: '2025-12-31',
-    );
-    _isLoggedIn = true;
+  // Método para forçar atualização do estado (útil para debugging)
+  void forceRefresh() {
+    _isLoading = false;
     notifyListeners();
+    print('UserProvider state forced refresh - isLoggedIn: $isLoggedIn, isLoading: $_isLoading');
   }
 }

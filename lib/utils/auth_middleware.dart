@@ -40,12 +40,50 @@ class AuthMiddleware {
     return true;
   }
   
+  // Verificação se usuário é associado
+  static Future<bool> checkAssociate(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    
+    if (!userProvider.isLoggedIn) {
+      // Redireciona para tela de login
+      Navigator.of(context).pushReplacementNamed('/login');
+      return false;
+    }
+    
+    if (!userProvider.isAssociate) {
+      // Se não for associado, exibe mensagem
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Esta funcionalidade é exclusiva para associados'),
+          backgroundColor: Colors.orange,
+        )
+      );
+      return false;
+    }
+    
+    return true;
+  }
+  
   // Widget que verifica autenticação 
-  static Widget authBuilder({required Widget child, bool adminOnly = false}) {
+  static Widget authBuilder({
+    required Widget child, 
+    bool adminOnly = false, 
+    bool associateOnly = false
+  }) {
     return Builder(
       builder: (context) {
+        Future<bool> checkFunction;
+        
+        if (adminOnly) {
+          checkFunction = checkAdmin(context);
+        } else if (associateOnly) {
+          checkFunction = checkAssociate(context);
+        } else {
+          checkFunction = checkAuth(context);
+        }
+        
         return FutureBuilder<bool>(
-          future: adminOnly ? checkAdmin(context) : checkAuth(context),
+          future: checkFunction,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Scaffold(

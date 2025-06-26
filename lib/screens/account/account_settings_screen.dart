@@ -9,6 +9,8 @@ import 'package:app_atletica/screens/account/memberShipCard.dart';
 import 'package:app_atletica/screens/admin/admin_area.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:app_atletica/services/firebase_auth_service.dart';
+import 'package:flutter/foundation.dart';
 
 class AccountSettingsScreen extends StatelessWidget {
   const AccountSettingsScreen({super.key});
@@ -19,6 +21,11 @@ class AccountSettingsScreen extends StatelessWidget {
     return Consumer<UserProvider>(
       builder: (context, userProvider, _) {
         final user = userProvider.currentUser;
+
+        // Se não há usuário logado, não renderiza nada - deixa o AuthWrapper gerenciar
+        if (user == null) {
+          return const SizedBox.shrink();
+        }
 
         return Scaffold(
           backgroundColor: AppColors.blue,
@@ -42,12 +49,7 @@ class AccountSettingsScreen extends StatelessWidget {
                             colors: [Color(0xff21396a), AppColors.blue],
                           ),
                         ),
-                        child:
-                            user == null
-                                ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                                : Stack(
+                        child: Stack(
                                   children: [
                                     Positioned(
                                       bottom: 0,
@@ -78,7 +80,6 @@ class AccountSettingsScreen extends StatelessWidget {
                                                 Text(
                                                   user.name,
                                                   maxLines: 3,
-                                                  // overflow: TextOverflow.ellipsis,
                                                   style: const TextStyle(
                                                     fontSize: 26,
                                                     fontWeight: FontWeight.bold,
@@ -90,8 +91,9 @@ class AccountSettingsScreen extends StatelessWidget {
                                                   user.cpf ??
                                                       'CPF não disponível',
                                                   style: const TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: 16,
                                                     color: Colors.white70,
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
                                               ],
@@ -102,21 +104,52 @@ class AccountSettingsScreen extends StatelessWidget {
                                     ),
                                     Positioned(
                                       top: 10,
-                                      right: 0,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.logout),
-                                        color: AppColors.white,
-                                        onPressed: () async {
-                                          // Deslogar o usuário usando o Provider
-                                          await userProvider.logout();
-                                          if (context.mounted) {
-                                            Navigator.pushReplacementNamed(
-                                              context,
-                                              '/login',
-                                            );
-                                          }
-                                        },
-                                      ),
+                                      right: 0,                      child: IconButton(
+                        icon: const Icon(Icons.logout),
+                        color: AppColors.white,
+                        onPressed: () async {
+                          try {
+                            final firebaseAuthService = Provider.of<FirebaseAuthService>(context, listen: false);
+                            
+                            // Mostra loading durante logout
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => Center(
+                                child: CircularProgressIndicator(color: AppColors.yellow),
+                              ),
+                            );
+                            
+                            await firebaseAuthService.signOut();
+                            
+                            // Remove o dialog de loading se ainda está na tela
+                            if (Navigator.canPop(context)) {
+                              Navigator.of(context).pop();
+                            }
+                            
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/',
+                                (route) => false,
+                              );
+                            }
+                            
+                          } catch (e) {
+                            // Remove o dialog se houver erro
+                            if (Navigator.canPop(context)) {
+                              Navigator.of(context).pop();
+                            }
+                            
+                            // Mostra erro
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Erro ao fazer logout: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                      ),
                                     ),
                                   ],
                                 ),
@@ -175,7 +208,7 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => TicketsScreen(user: user!),
+                                        (context) => const TicketsScreen(),
                                   ),
                                 );
                               },
@@ -189,24 +222,26 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => TicketsScreen(user: user!),
+                                        (context) => const TicketsScreen(),
                                   ),
                                 );
                               },
                             ),
-                            MenuCard(
-                              icon: Icons.badge,
-                              title: "Carteirinha",
-                              subtitle: "Sua carteirinha de associação",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => MembershipCardScreen(),
-                                  ),
-                                );
-                              },
-                            ),
+                            if (userProvider.isAssociate) ...[
+                              MenuCard(
+                                icon: Icons.badge,
+                                title: "Carteirinha",
+                                subtitle: "Sua carteirinha de associação",
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => MembershipCardScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                             if (!userProvider.isAdmin) ...[
                               MenuCard(
                                 icon: Icons.support_agent,
@@ -277,7 +312,7 @@ Widget buildClubeCheersCard({
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

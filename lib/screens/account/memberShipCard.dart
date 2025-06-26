@@ -23,10 +23,11 @@ class MembershipCardScreen extends StatelessWidget {
             child: Column(
               children: [
                 Expanded(
-                  child:
-                      currentUser != null
+                  child: currentUser != null
+                      ? (currentUser.isAssociate
                           ? _buildMembershipCard(context, currentUser)
-                          : _buildNoCardMessage(context),
+                          : _buildNotAssociateMessage(context))
+                      : _buildNoCardMessage(context),
                 ),
               ],
             ),
@@ -70,6 +71,9 @@ class MembershipCardScreen extends StatelessWidget {
               ),
               _buildInfoRow('CPF:', user.cpf ?? 'Não informado'),
               _buildInfoRow('E-mail:', user.email),
+              if (user.phone != null && user.phone!.isNotEmpty)
+                _buildInfoRow('Telefone:', user.phone!),
+              _buildInfoRow('Categoria:', user.roleDisplayName ?? user.role ?? 'Não informado'),
               _buildInfoRow('Validade:', user.validUntil ?? '31/12/2025'),
               Column(
                 children: [
@@ -125,6 +129,48 @@ class MembershipCardScreen extends StatelessWidget {
                 foregroundColor: Colors.black,
               ),
               child: const Text('Fazer Login'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget para mostrar mensagem quando o usuário não é associado
+  Widget _buildNotAssociateMessage(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.card_membership_outlined, size: 80, color: Colors.white54),
+            const SizedBox(height: 16),
+            const Text(
+              'Carteira não disponível',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Sua conta ainda não possui associação ativa. Entre em contato com a atlética para mais informações sobre como se tornar um associado.',
+              style: TextStyle(color: Colors.white70, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellow,
+                foregroundColor: Colors.black,
+              ),
+              child: const Text('Voltar'),
             ),
           ],
         ),
