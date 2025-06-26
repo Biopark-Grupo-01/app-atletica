@@ -169,6 +169,11 @@ class TicketModel {
     }
   }
 
+  // Getter para preço formatado
+  String get formattedPrice {
+    return price.toStringAsFixed(2).replaceAll('.', ',');
+  }
+
   bool get isAvailable => status.toLowerCase() == 'available';
   bool get isReserved => status.toLowerCase() == 'reserved';
   bool get isSold => status.toLowerCase() == 'sold';

@@ -122,65 +122,20 @@ class _EventTicketsWidgetState extends State<EventTicketsWidget> {
     }
   }
 
-  void _showTicketDetails(TicketModel ticket) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(ticket.name),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Descrição: ${ticket.description}'),
-            const SizedBox(height: 8),
-            Text(
-              'Preço: R\$ ${ticket.price.toStringAsFixed(2).replaceAll('.', ',')}',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text('Status: ${ticket.statusFormatted}'),
-          ],
+  Future<void> _purchaseFirstAvailable() async {
+    if (_tickets.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Não há ingressos disponíveis'),
+          backgroundColor: Colors.red,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Fechar'),
-          ),
-          if (ticket.isAvailable) ...[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // Redireciona para WhatsApp ou contato da atlética
-                _buyWithAtletica(ticket);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-              child: Text('Comprar com a Atlética'),
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton(
-              onPressed: _isPurchasing
-                  ? null
-                  : () {
-                      Navigator.pop(context);
-                      _purchaseTicket(ticket);
-                    },
-              child: _isPurchasing
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text('Comprar pelo App'),
-            ),
-          ],
-        ],
-      ),
-    );
+      );
+      return;
+    }
+
+    // Pega o primeiro ticket disponível
+    final firstAvailable = _tickets.first;
+    await _purchaseTicket(firstAvailable);
   }
 
   Future<void> _buyWithAtletica(TicketModel ticket) async {
@@ -327,37 +282,52 @@ Poderia me ajudar com a compra? 😊
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Ingressos Disponíveis',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.white,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Ingressos Disponíveis',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.white,
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.yellow,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${_tickets.length} disponíveis',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: _tickets.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final ticket = _tickets[index];
-            return _buildTicketCard(ticket);
-          },
-        ),
+        if (_tickets.isNotEmpty) ...[
+          _buildTicketTypeCard(_tickets.first), // Mostra apenas o primeiro tipo (todos têm mesmo preço/descrição)
+        ],
       ],
     );
   }
 
-  Widget _buildTicketCard(TicketModel ticket) {
+  Widget _buildTicketTypeCard(TicketModel sampleTicket) {
+    final availableCount = _tickets.length;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: ticket.isAvailable ? AppColors.yellow : Colors.grey,
+          color: availableCount > 0 ? AppColors.yellow : Colors.grey,
           width: 1,
         ),
       ),
@@ -369,7 +339,7 @@ Poderia me ajudar com a compra? 😊
             children: [
               Expanded(
                 child: Text(
-                  ticket.name,
+                  sampleTicket.name,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -378,7 +348,7 @@ Poderia me ajudar com a compra? 😊
                 ),
               ),
               Text(
-                _formatPrice(ticket.price),
+                _formatPrice(sampleTicket.price),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -389,63 +359,95 @@ Poderia me ajudar com a compra? 😊
           ),
           const SizedBox(height: 8),
           Text(
-            ticket.description,
+            sampleTicket.description,
             style: TextStyle(
               color: AppColors.white.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
+          const SizedBox(height: 8),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: availableCount > 0 ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: availableCount > 0 ? Colors.green : Colors.red,
+                width: 1,
+              ),
+            ),
+            child: Text(
+              availableCount > 0 ? '$availableCount ingressos disponíveis' : 'Esgotado',
+              style: TextStyle(
+                color: availableCount > 0 ? Colors.green : Colors.red,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  'Status: ${ticket.statusFormatted}',
-                  style: TextStyle(
-                    color: ticket.isAvailable ? Colors.green : Colors.orange,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              if (availableCount > 0) ...[
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _buyWithAtletica(sampleTicket),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.phone, size: 16),
+                        const SizedBox(width: 8),
+                        Text('Comprar com a Atlética'),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              if (ticket.isAvailable) ...[
-                ElevatedButton(
-                  onPressed: () => _buyWithAtletica(ticket),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isPurchasing ? null : () => _purchaseFirstAvailable(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.yellow,
+                      foregroundColor: AppColors.black,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: _isPurchasing
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.smartphone, size: 16),
+                              const SizedBox(width: 8),
+                              Text('Comprar pelo App'),
+                            ],
+                          ),
                   ),
-                  child: Text(
-                    'Atlética',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
-                const SizedBox(width: 4),
-                ElevatedButton(
-                  onPressed: _isPurchasing ? null : () => _purchaseTicket(ticket),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.yellow,
-                    foregroundColor: AppColors.black,
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  ),
-                  child: _isPurchasing
-                      ? SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(
-                          'App',
-                          style: TextStyle(fontSize: 12),
-                        ),
                 ),
               ] else ...[
-                TextButton(
-                  onPressed: () => _showTicketDetails(ticket),
-                  child: Text(
-                    'Detalhes',
-                    style: TextStyle(color: AppColors.white),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Ingressos Esgotados',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],

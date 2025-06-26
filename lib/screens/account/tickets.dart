@@ -171,6 +171,13 @@ class _TicketsScreenState extends State<TicketsScreen> {
   Future<void> _showStatusChangeDialog(TicketModel ticket) async {
     if (!_isAdmin) return;
 
+    // Se estamos visualizando tickets de um usuário específico, mostra ações específicas para admin
+    if (widget.specificUserId != null) {
+      _showUserTicketManagementDialog(ticket);
+      return;
+    }
+
+    // Fluxo original para admin geral
     final statusOptions = [
       {'text': 'Disponível', 'value': 'available'},
       {'text': 'Reservado', 'value': 'reserved'},
@@ -229,6 +236,120 @@ class _TicketsScreenState extends State<TicketsScreen> {
     );
   }
 
+  Future<void> _showUserTicketManagementDialog(TicketModel ticket) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Gerenciar Ingresso'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Ingresso: ${ticket.name}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('Status Atual: ${ticket.displayStatus}'),
+            const SizedBox(height: 16),
+            Text(
+              'Ações disponíveis:',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+        actions: [
+          // Marcar como Pago
+          if (ticket.userStatus != 'paid' && ticket.userStatus != 'used')
+            TextButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                _markTicketAsPaid(ticket);
+              },
+              icon: Icon(Icons.payment, color: Colors.green),
+              label: Text('Marcar como Pago'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
+            ),
+          
+          // Marcar como Usado
+          if (ticket.userStatus == 'paid' || ticket.userStatus == 'not_paid')
+            TextButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                _markTicketAsUsed(ticket);
+              },
+              icon: Icon(Icons.check_circle, color: Colors.blue),
+              label: Text('Marcar como Usado'),
+              style: TextButton.styleFrom(foregroundColor: Colors.blue),
+            ),
+          
+          // Remover Ingresso
+          TextButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+              _showRemoveTicketConfirmation(ticket);
+            },
+            icon: Icon(Icons.delete, color: Colors.red),
+            label: Text('Remover Ingresso'),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+          ),
+          
+          // Cancelar
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showRemoveTicketConfirmation(TicketModel ticket) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirmar Remoção'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning, color: Colors.orange, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              'Tem certeza que deseja remover o ingresso "${ticket.name}" deste usuário?',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Esta ação não pode ser desfeita.',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _removeTicketFromUser(ticket);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Remover'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _updateTicketStatus(
     TicketModel ticket, {
     String? status,
@@ -259,6 +380,79 @@ class _TicketsScreenState extends State<TicketsScreen> {
     }
   }
 
+  Future<void> _markTicketAsPaid(TicketModel ticket) async {
+    try {
+      await TicketService.markTicketAsPaid(ticket.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ingresso marcado como pago com sucesso'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      _loadTickets(); // Recarrega os tickets
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao marcar ingresso como pago: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
+  Future<void> _markTicketAsUsed(TicketModel ticket) async {
+    try {
+      await TicketService.markTicketAsUsed(ticket.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ingresso marcado como usado com sucesso'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      _loadTickets(); // Recarrega os tickets
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao marcar ingresso como usado: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
+  Future<void> _removeTicketFromUser(TicketModel ticket) async {
+    try {
+      // Torna o ticket disponível novamente removendo a associação com o usuário
+      await TicketService.makeTicketAvailable(ticket.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ingresso removido do usuário com sucesso'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      _loadTickets(); // Recarrega os tickets
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao remover ingresso do usuário: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+    }
+  }
+
   String _formatDate(DateTime date) {
     return DateFormat('dd/MM/yyyy').format(date);
   }
@@ -266,6 +460,59 @@ class _TicketsScreenState extends State<TicketsScreen> {
   String _getImageUrl(TicketModel ticket) {
     // Retorna uma imagem padrão ou baseada no evento
     return 'https://picsum.photos/300/150?random=${ticket.id.hashCode}';
+  }
+
+  Widget _buildUserTicketManagementHeader() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: AppColors.lightBlue.withOpacity(0.1),
+        border: Border.all(color: AppColors.lightBlue, width: 1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.admin_panel_settings,
+                color: AppColors.lightBlue,
+                size: 24,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Gerenciamento de Ingressos',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.lightBlue,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Visualizando ingressos de um usuário específico.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Toque em um ingresso para gerenciar (marcar como pago/usado ou remover).',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[500],
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -294,6 +541,10 @@ class _TicketsScreenState extends State<TicketsScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
+                          // Header específico para admin visualizando usuário
+                          if (widget.specificUserId != null && _isAdmin)
+                            _buildUserTicketManagementHeader(),
+                          
                           CustomSearchBar(
                             hintText: 'Pesquisar ingressos',
                             controller: _searchController,
@@ -392,7 +643,9 @@ class _TicketsScreenState extends State<TicketsScreen> {
             Icon(Icons.confirmation_number, size: 64, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
-              'Nenhum ingresso encontrado',
+              widget.specificUserId != null
+                  ? 'Este usuário não possui ingressos'
+                  : 'Nenhum ingresso encontrado',
               style: TextStyle(color: Colors.grey, fontSize: 16),
             ),
           ],
@@ -407,13 +660,45 @@ class _TicketsScreenState extends State<TicketsScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final ticket = _tickets[index];
+        final isUserSpecificManagement = widget.specificUserId != null && _isAdmin;
+        
         return GestureDetector(
-          onLongPress: _isAdmin ? () => _showStatusChangeDialog(ticket) : null,
-          child: TicketCard(
-            date: _formatDate(ticket.createdAt),
-            title: ticket.name,
-            status: ticket.ticketCardStatus,
-            imagePath: _getImageUrl(ticket),
+          // Se é admin vendo usuário específico, usa tap; senão usa long press
+          onTap: isUserSpecificManagement ? () => _showUserTicketManagementDialog(ticket) : null,
+          onLongPress: (!isUserSpecificManagement && _isAdmin) ? () => _showStatusChangeDialog(ticket) : null,
+          child: Container(
+            decoration: isUserSpecificManagement ? BoxDecoration(
+              border: Border.all(color: AppColors.lightBlue.withOpacity(0.3), width: 1),
+              borderRadius: BorderRadius.circular(12),
+            ) : null,
+            child: Stack(
+              children: [
+                TicketCard(
+                  date: _formatDate(ticket.createdAt),
+                  title: ticket.name,
+                  status: ticket.ticketCardStatus,
+                  imagePath: _getImageUrl(ticket),
+                ),
+                // Indicador de ação disponível para admin
+                if (isUserSpecificManagement)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.lightBlue,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        Icons.touch_app,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },
