@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "54589112046-e86esgvo2unm2i1cl2huc0jerc8iguip.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app_atletica",
+            "certificate_hash": "3bf4fdc5eb95c8f81f3040155e3d0f186e8d37e4"
+          }
+        },
+        {
+          "client_id": "54589112046-qnfj3g6d4d7oni5vpc7cndocfrt3f23a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app_atletica",
+            "certificate_hash": "82d811efa091c0097c1735c8a06d6a81fc88b065"
+          }
+        },
+        {
           "client_id": "54589112046-t3bapn1un33mqk48ph4urtk0pud761jr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
