@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "54589112046-t3bapn1un33mqk48ph4urtk0pud761jr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app_atletica",
+            "certificate_hash": "4c5efae5be89facf10db4d0f2f450b295308eb46"
+          }
+        },
+        {
           "client_id": "54589112046-o5mdhdj4s78iia31shk41cp4kimf6ucl.apps.googleusercontent.com",
           "client_type": 3
         }

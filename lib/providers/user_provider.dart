@@ -14,8 +14,8 @@ class UserProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isLoggedIn => _currentUser != null;
-  bool get isAdmin =>
-      _currentUser?.role == 'ADMIN' || _currentUser?.role == 'DIRECTOR';
+  bool get isAdmin => _currentUser?.isAdmin ?? false;
+  bool get isAssociate => _currentUser?.isAssociate ?? false;
 
   UserProvider() {
     _authSubscription =
@@ -80,6 +80,7 @@ class UserProvider extends ChangeNotifier {
 
     try {
       await Future.delayed(const Duration(seconds: 1));
+      print('Atualizando usuário: ${updatedUser.name}, role: ${updatedUser.role}, roleDisplayName: ${updatedUser.roleDisplayName}');
       _currentUser = updatedUser;
       await AuthService.updateCurrentUser(_currentUser!);
       _isLoading = false;

@@ -291,7 +291,7 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: AppColors.yellow, width: 2),
                               ),
-                              fillColor: _selectedType == 'Treinos' ? Colors.transparent : Colors.grey.withOpacity(0.15),
+                              fillColor: _selectedType == 'Treinos' ? Colors.transparent : Colors.grey.withValues(alpha: 0.15),
                               filled: true,
                             ),
                             style: TextStyle(color: _selectedType == 'Treinos' ? AppColors.white : Colors.grey),

@@ -107,26 +107,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Opacity(
-            opacity: 0.5,
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/brasao.png'),
-                  fit: BoxFit.contain,
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/brasao.png'),
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
           ),
           Container(color: const Color.fromARGB(178, 1, 28, 58)),
-          Center(
-            child: Padding(
+          SafeArea(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(40.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                           MediaQuery.of(context).padding.top - 
+                           MediaQuery.of(context).padding.bottom,
+                ),
+                child: IntrinsicHeight(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                     Image.asset('assets/images/aaabe.png', scale: 0.8),
                     SizedBox(height: 30), // Espaço padronizado
                     Text('Registrar-se', style: TextStyle(fontSize: 24)),
@@ -240,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    Spacer(), // Empurra os elementos restantes para baixo
+                    SizedBox(height: 50),
                     isLoading
                         ? CircularProgressIndicator(
                             color: Theme.of(context).colorScheme.secondary,
@@ -257,7 +266,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(color: AppColors.white),
                       ),
                     ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

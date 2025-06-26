@@ -122,26 +122,35 @@ class LoginScreenState extends State<LoginScreen> {
       body: Stack(
         children: [
           Container(color: const Color.fromARGB(255, 30, 30, 30)),
-          Opacity(
-            opacity: 0.5,
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/brasao.png'),
-                  fit: BoxFit.contain,
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/brasao.png'),
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
           ),
           Container(color: const Color.fromARGB(178, 1, 28, 58)),
-          Center(
-            child: Padding(
+          SafeArea(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(40.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                           MediaQuery.of(context).padding.top - 
+                           MediaQuery.of(context).padding.bottom,
+                ),
+                child: IntrinsicHeight(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                     Image.asset('assets/images/aaabe.png', scale: 0.8),
                     SizedBox(height: 30), // Espaço padronizado
                     Text('Login', style: TextStyle(fontSize: 24)),
@@ -247,7 +256,7 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    Spacer(), // Empurra os elementos restantes para baixo
+                    SizedBox(height: 50),
                     if (_isLoading)
                       CircularProgressIndicator()
                     else ...[
@@ -280,7 +289,9 @@ class LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: AppColors.white),
                       ),
                     ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

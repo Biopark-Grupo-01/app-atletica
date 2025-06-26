@@ -88,9 +88,12 @@ class AuthWrapper extends StatelessWidget {
         
         if (userProvider.isLoading) {
           print('AuthWrapper showing loading');
-          return const Scaffold(
+          return Scaffold(
+            backgroundColor: AppColors.blue,
             body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: AppColors.yellow,
+              ),
             ),
           );
         }

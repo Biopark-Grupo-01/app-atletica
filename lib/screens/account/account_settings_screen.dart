@@ -80,7 +80,6 @@ class AccountSettingsScreen extends StatelessWidget {
                                                 Text(
                                                   user.name,
                                                   maxLines: 3,
-                                                  // overflow: TextOverflow.ellipsis,
                                                   style: const TextStyle(
                                                     fontSize: 26,
                                                     fontWeight: FontWeight.bold,
@@ -92,8 +91,9 @@ class AccountSettingsScreen extends StatelessWidget {
                                                   user.cpf ??
                                                       'CPF não disponível',
                                                   style: const TextStyle(
-                                                    fontSize: 18,
+                                                    fontSize: 16,
                                                     color: Colors.white70,
+                                                    fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
                                               ],
@@ -127,18 +127,12 @@ class AccountSettingsScreen extends StatelessWidget {
                               Navigator.of(context).pop();
                             }
                             
-                            // APENAS para web: navega para login forçadamente
-                            if (kIsWeb) {
-                              // No web, força navegação para login e limpa stack
+                            if (context.mounted) {
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/',
                                 (route) => false,
                               );
-                              return;
                             }
-                            
-                            // No mobile: deixa o AuthWrapper gerenciar automaticamente
-                            // Não faz navegação manual
                             
                           } catch (e) {
                             // Remove o dialog se houver erro
@@ -214,7 +208,7 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => TicketsScreen(user: user),
+                                        (context) => const TicketsScreen(),
                                   ),
                                 );
                               },
@@ -228,24 +222,26 @@ class AccountSettingsScreen extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder:
-                                        (context) => TicketsScreen(user: user),
+                                        (context) => const TicketsScreen(),
                                   ),
                                 );
                               },
                             ),
-                            MenuCard(
-                              icon: Icons.badge,
-                              title: "Carteirinha",
-                              subtitle: "Sua carteirinha de associação",
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => MembershipCardScreen(),
-                                  ),
-                                );
-                              },
-                            ),
+                            if (userProvider.isAssociate) ...[
+                              MenuCard(
+                                icon: Icons.badge,
+                                title: "Carteirinha",
+                                subtitle: "Sua carteirinha de associação",
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => MembershipCardScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                             if (!userProvider.isAdmin) ...[
                               MenuCard(
                                 icon: Icons.support_agent,
@@ -316,7 +312,7 @@ Widget buildClubeCheersCard({
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
