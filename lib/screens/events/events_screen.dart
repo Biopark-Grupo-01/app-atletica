@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/services/events_news_service.dart';
@@ -18,6 +16,7 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
+  final EventsNewsService _service = EventsNewsService();
   List<Map<String, String>> news = [];
   List<Map<String, String>> events = [];
   bool isLoading = true;
@@ -27,19 +26,18 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadEventsFromService(); // Carrega eventos do serviço por padrão
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadNewsFromService() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
     try {
-      final service = EventsNewsService();
-      final data = await service.loadData(context);
-      final newsList = (data['news'] ?? []).map<Map<String, String>>((e) => Map<String, String>.from(e)).toList();
-      final eventsList = (data['events'] ?? []).map<Map<String, String>>((e) => Map<String, String>.from(e)).toList();
-
+      final newsList = await _service.getNewsFromBackend();
       setState(() {
         news = newsList;
-        events = eventsList;
         isLoading = false;
       });
     } catch (e) {
@@ -50,37 +48,17 @@ class _EventsScreenState extends State<EventsScreen> {
     }
   }
 
-  Future<void> _loadNewsFromBackend() async {
+  Future<void> _loadEventsFromService() async {
     setState(() {
       isLoading = true;
       error = null;
     });
     try {
-      final response = await http.get(Uri.parse('http://192.168.1.2:3001/api/news'));
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final List<dynamic> data = json['data'] ?? [];
-        final List<Map<String, String>> newsList = data.map<Map<String, String>>((item) {
-          return {
-            'id': item['id'] ?? '',
-            'title': item['title'] ?? '',
-            'description': item['description'] ?? '',
-            'date': item['date'] ?? '', // MANTÉM formato ISO
-            'author': item['author'] ?? '',
-            'imageUrl': '', // Adapte se houver imagem
-            'location': '', // Adapte se houver local
-          };
-        }).toList();
-        setState(() {
-          news = newsList;
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          error = 'Erro ao buscar notícias: ${response.statusCode}';
-          isLoading = false;
-        });
-      }
+      final eventsList = await _service.getEventsFromBackend();
+      setState(() {
+        events = eventsList;
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         error = e.toString();
@@ -149,38 +127,31 @@ class _EventsScreenState extends State<EventsScreen> {
                               final isLast = index == sortedList.length - 1;
                               return Column(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (_selectedTabIndex == 1) {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => NewsDetailScreen(news: item),
-                                          ),
-                                        );
-                                      } else {
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/trainingDetail',
-                                          arguments: item,
-                                        );
-                                      }
-                                    },
-                                    child: _selectedTabIndex == 0
-                                        ? EventItem(
-                                            imageUrl: item['imageUrl'] ?? '',
-                                            date: item['date'] ?? '',
-                                            location: item['location'] ?? '',
-                                            title: item['title'] ?? '',
-                                            description: item['description'] ?? '',
-                                          )
-                                        : NewsItem(
+                                  _selectedTabIndex == 0
+                                      ? EventItem(
+                                          imageUrl: item['imageUrl'] ?? '',
+                                          date: item['date'] ?? '',
+                                          location: item['location'] ?? '',
+                                          title: item['title'] ?? '',
+                                          description: item['description'] ?? '',
+                                          price: item['price'] ?? '0,00',
+                                        )
+                                      : GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => NewsDetailScreen(news: item),
+                                              ),
+                                            );
+                                          },
+                                          child: NewsItem(
                                             imageUrl: item['imageUrl'] ?? '',
                                             date: item['date'] ?? '',
                                             title: item['title'] ?? '',
                                             description: item['description'] ?? '',
                                           ),
-                                  ),
+                                        ),
                                   if (_selectedTabIndex == 1 && !isLast)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -218,7 +189,9 @@ class _EventsScreenState extends State<EventsScreen> {
             _selectedTabIndex = index;
           });
           if (index == 1) {
-            await _loadNewsFromBackend();
+            await _loadNewsFromService();
+          } else if (index == 0) {
+            await _loadEventsFromService();
           }
         },
         child: Container(

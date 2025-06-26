@@ -222,6 +222,7 @@ class EventsNewsService {
         location: 'Toledo',
         title: 'Confraternização Semana Acadêmica',
         description: 'Ocorrerá uma festa para o fim da semana acadêmica',
+        price: '25,00',
       ),
       EventModel(
         id: '2',
@@ -230,6 +231,7 @@ class EventsNewsService {
         location: 'Toledo',
         title: 'Evento da API',
         description: 'Evento vindo do back-end.',
+        price: '50,00',
       ),
       EventModel(
         id: '3',
@@ -238,6 +240,7 @@ class EventsNewsService {
         location: 'Toledo',
         title: 'Festa Junina da Atlética',
         description: 'Tradicional festa com comidas típicas, música e muita diversão.',
+        price: '35,00',
       ),
     ];
   }
@@ -344,6 +347,65 @@ class EventsNewsService {
     } catch (e) {
       print('Erro ao criar notícia: $e');
       return false;
+    }
+  }
+
+  // Método para buscar eventos do backend
+  Future<List<Map<String, String>>> getEventsFromBackend() async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.get(Uri.parse('$baseUrl/events'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> data = json['data'] ?? [];
+        return data.map<Map<String, String>>((item) {
+          return {
+            'id': item['id'] ?? '',
+            'title': item['title'] ?? '',
+            'description': item['description'] ?? '',
+            'date': item['date'] ?? '', // MANTÉM formato ISO
+            'location': item['location'] ?? '',
+            'price': item['price'] ?? '',
+            'type': item['type'] ?? '',
+            'imageUrl': '', // Adapte se houver imagem no futuro
+          };
+        }).toList();
+      } else {
+        print('Erro ao buscar eventos: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erro ao buscar eventos: $e');
+      return [];
+    }
+  }
+
+  // Método para buscar notícias do backend
+  Future<List<Map<String, String>>> getNewsFromBackend() async {
+    try {
+      final baseUrl = ApiService.baseUrl;
+      final response = await http.get(Uri.parse('$baseUrl/news'));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> data = json['data'] ?? [];
+        return data.map<Map<String, String>>((item) {
+          return {
+            'id': item['id'] ?? '',
+            'title': item['title'] ?? '',
+            'description': item['description'] ?? '',
+            'date': item['date'] ?? '', // MANTÉM formato ISO
+            'author': item['author'] ?? '',
+            'imageUrl': '', // Adapte se houver imagem
+            'location': '', // Adapte se houver local
+          };
+        }).toList();
+      } else {
+        print('Erro ao buscar notícias: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erro ao buscar notícias: $e');
+      return [];
     }
   }
 }

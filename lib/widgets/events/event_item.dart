@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app_atletica/theme/app_colors.dart';
+import 'package:intl/intl.dart';
 
 class EventItem extends StatelessWidget {
   final String imageUrl;
@@ -7,6 +8,7 @@ class EventItem extends StatelessWidget {
   final String location;
   final String title;
   final String description;
+  final String price;
 
   const EventItem({
     super.key,
@@ -15,13 +17,39 @@ class EventItem extends StatelessWidget {
     required this.location,
     required this.title,
     required this.description,
+    required this.price,
   });
+
+  String _formatDate(String dateStr) {
+    try {
+      // Tenta fazer parse da data ISO 8601 do backend
+      final dateTime = DateTime.parse(dateStr);
+      return DateFormat('dd/MM/yyyy').format(dateTime);
+    } catch (e) {
+      // Se falhar, retorna a string original
+      return dateStr;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          '/trainingDetail',
+          arguments: {
+            'title': title,
+            'date': date,
+            'location': location,
+            'description': description,
+            'price': price,
+          },
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         // Retângulo com imagem
         Container(
           decoration: BoxDecoration(
@@ -56,7 +84,7 @@ class EventItem extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    date,
+                    _formatDate(date),
                     style: const TextStyle(
                       color: AppColors.white,
                       fontSize: 16,
@@ -69,11 +97,14 @@ class EventItem extends StatelessWidget {
                     color: AppColors.lightGrey,
                   ),
                   const SizedBox(width: 2),
-                  Text(
-                    location,
-                    style: const TextStyle(
-                      color: AppColors.lightGrey,
-                      fontSize: 16,
+                  Expanded(
+                    child: Text(
+                      location,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: AppColors.lightGrey,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
@@ -90,12 +121,15 @@ class EventItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
               ),
             ],
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 }

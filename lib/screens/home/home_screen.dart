@@ -162,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     location: item['location'] ?? '',
                     title: item['title'] ?? '',
                     description: item['description'] ?? '',
+                    price: item['price'] ?? '',
                   ),
                 )
               : _buildEmptySection('Nenhum evento disponível no momento'),
