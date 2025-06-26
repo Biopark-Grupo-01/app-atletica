@@ -36,7 +36,7 @@ class CustomTitle extends StatelessWidget {
             child: Divider(color: AppColors.yellow, thickness: 1),
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 15),
       ],
     );
   }

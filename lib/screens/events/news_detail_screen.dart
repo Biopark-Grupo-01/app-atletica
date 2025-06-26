@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/services/events_news_service.dart';
 
 class NewsDetailScreen extends StatelessWidget {
   final Map<String, String> news;
@@ -82,19 +83,62 @@ class NewsDetailScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              // Imagem da notícia (padrão se não houver)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  (news['imageUrl'] ?? '').isNotEmpty
-                      ? news['imageUrl']!
-                      : 'https://cdn-icons-png.flaticon.com/512/2965/2965879.png', // imagem padrão
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
+              // Imagem da notícia
+              if ((news['imageUrl'] ?? '').isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    EventsNewsService().getFullImageUrl(news['imageUrl']!),
+                    width: double.infinity,
+                    height: 200,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      }
+                      return Container(
+                        height: 200,
+                        color: AppColors.lightGrey.withValues(alpha: 0.3),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.yellow,
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      print('❌ Erro ao carregar imagem na tela de detalhes: $error');
+                      return Container(
+                        height: 200,
+                        color: AppColors.lightGrey.withValues(alpha: 0.3),
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 50,
+                                color: AppColors.lightGrey,
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Imagem não encontrada',
+                                style: TextStyle(
+                                  color: AppColors.lightGrey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
+              if ((news['imageUrl'] ?? '').isNotEmpty) const SizedBox(height: 24),
               Text(
                 news['description'] ?? '',
                 style: const TextStyle(color: AppColors.white, fontSize: 18),

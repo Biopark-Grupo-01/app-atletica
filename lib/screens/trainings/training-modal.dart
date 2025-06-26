@@ -75,6 +75,41 @@ class _TrainingModalState extends State<TrainingModal> {
     }
   }
 
+  String getModalityImage(String modality) {
+    // Normaliza a modalidade para uppercase e remove espaços
+    final normalizedModality = modality.toUpperCase().trim();
+    
+    // Mapeia as modalidades para as imagens correspondentes
+    switch (normalizedModality) {
+      case 'FUTEBOL':
+      case 'FUTSAL':
+        return 'assets/images/FUTEBOL.jpg';
+      case 'BASQUETE':
+      case 'BASQUETEBOL':
+        return 'assets/images/BASQUETE.jpg';
+      case 'VOLEI':
+      case 'VÔLEI':
+      case 'VOLLEYBALL':
+        return 'assets/images/VOLEI.jpg';
+      case 'HANDEBOL':
+        return 'assets/images/HANDEBOL.jpg';
+      case 'NATACAO':
+      case 'NATAÇÃO':
+      case 'SWIMMING':
+        return 'assets/images/NATACAO.jpg';
+      case 'TENIS':
+      case 'TÊNIS':
+      case 'TENNIS':
+        return 'assets/images/TENIS.jpg';
+      case 'GOLF':
+      case 'GOLFE':
+        return 'assets/images/GOLF.jpg';
+      default:
+        // Imagem padrão caso a modalidade não seja encontrada
+        return 'assets/images/cartao.png';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isTraining = widget.training != null;
@@ -115,10 +150,19 @@ class _TrainingModalState extends State<TrainingModal> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.asset(
-                              "assets/images/cartao.png",
+                              getModalityImage(isTraining ? widget.training!.modality : widget.match!.modality),
                               height: 180,
                               width: double.infinity,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback para imagem padrão em caso de erro
+                                return Image.asset(
+                                  "assets/images/cartao.png",
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                );
+                              },
                             ),
                           ),
                           Padding(

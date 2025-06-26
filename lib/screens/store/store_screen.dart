@@ -67,7 +67,6 @@ class _StoreScreenState extends State<StoreScreen> {
 
     try {
       final products = await _productService.getProducts();
-      // print('Produtos carregados: ${products}');
       setState(() {
         _products = products;
         _isLoading = false;
@@ -78,6 +77,111 @@ class _StoreScreenState extends State<StoreScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  // ========== MÉTODOS DE IMAGEM ==========
+  
+  bool _hasValidProductImage(String imageUrl) {
+    return imageUrl.isNotEmpty && 
+           imageUrl != 'null' && 
+           !imageUrl.contains('placeholder') && 
+           !imageUrl.contains('via.placeholder');
+  }
+
+  String _getProductImageUrl(String imageUrl) {
+    // Se já é uma URL completa, usa diretamente
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // Se é um caminho relativo, constrói a URL completa
+    return StoreService.getFullImageUrl(imageUrl);
+  }
+
+  Widget _buildProductImage(String imageUrl) {
+    return SizedBox(
+      height: 120,
+      child: _hasValidProductImage(imageUrl) 
+          ? _buildImageWidget(_getProductImageUrl(imageUrl))
+          : Image.asset(
+              'assets/images/brasao.png', // Imagem mockada como fallback
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: AppColors.lightGrey,
+                  child: const Center(
+                    child: Icon(
+                      Icons.image_not_supported, 
+                      size: 30,
+                      color: AppColors.darkGrey,
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  // Widget helper para construir a imagem correta (asset ou network)
+  Widget _buildImageWidget(String imageUrl) {
+    // Se for um asset local, usa Image.asset
+    if (imageUrl.startsWith('assets/')) {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          print('Erro ao carregar asset: $error');
+          return Container(
+            color: AppColors.lightGrey,
+            child: const Center(
+              child: Icon(
+                Icons.image_not_supported, 
+                size: 30,
+                color: AppColors.darkGrey,
+              ),
+            ),
+          );
+        },
+      );
+    }
+    
+    // Se for uma URL do servidor, usa Image.network
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: AppColors.lightGrey,
+          child: const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.yellow),
+              strokeWidth: 2,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        print('Erro ao carregar imagem do produto: $error');
+        // Se falhar carregamento da rede, usa imagem mockada
+        return Image.asset(
+          'assets/images/brasao.png',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: AppColors.lightGrey,
+              child: const Center(
+                child: Icon(
+                  Icons.image_not_supported, 
+                  size: 30,
+                  color: AppColors.darkGrey,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -264,7 +368,7 @@ class _StoreScreenState extends State<StoreScreen> {
                             child: _buildHorizontalProductCard(
                               product['name'] ?? '',
                               product['price'] ?? '',
-                              product['image'] ?? '',
+                              product['imageUrl'] ?? '',
                               MediaQuery.of(context).size.width - 32,
                             ),
                           ),
@@ -349,28 +453,7 @@ class _StoreScreenState extends State<StoreScreen> {
             flex: 3,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child:
-                  imageUrl.startsWith('http')
-                      ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        height: 120,
-                        errorBuilder:
-                            (context, error, stackTrace) => const Icon(
-                              Icons.broken_image,
-                              color: Colors.white,
-                            ),
-                      )
-                      : Image.asset(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        height: 120,
-                        errorBuilder:
-                            (context, error, stackTrace) => const Icon(
-                              Icons.broken_image,
-                              color: Colors.white,
-                            ),
-                      ),
+              child: _buildProductImage(imageUrl),
             ),
           ),
           const SizedBox(width: 12),
@@ -425,7 +508,7 @@ class _StoreScreenState extends State<StoreScreen> {
     );
   }
 
-  Future<void> _showContextMenu(BuildContext context, Map<String, dynamic> product) async {
+  void _showContextMenu(BuildContext context, Map<String, dynamic> product) async {
     await showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF091B40),
@@ -500,7 +583,7 @@ class _StoreScreenState extends State<StoreScreen> {
         description: product['description']?.toString(),
         price: priceValue,
         stock: int.tryParse(product['stock']?.toString() ?? '0') ?? 0,
-        image: product['image']?.toString(),
+        imageUrl: product['imageUrl']?.toString(),
         categoryId: product['category_id']?.toString() ?? '',
       );
       

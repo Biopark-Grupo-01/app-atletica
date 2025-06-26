@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 // Configurações do ambiente da aplicação
 class AppConfig {
   // URLs de API
-  static String get _host => kIsWeb ? 'localhost' : '10.0.2.2';
+  static String get _host => kIsWeb ? 'localhost' : '192.168.1.2';
   static String get devApiUrl => 'http://$_host:3001/api';
   static const String prodApiUrl = 'api.atletica.com/api';
   

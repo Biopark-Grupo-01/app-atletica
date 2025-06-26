@@ -28,7 +28,11 @@ dependencies:
   firebase_auth: ^5.6.0
   share_plus: ^11.0.0
   firebase_messaging: ^15.1.4
-
+  cached_network_image: ^3.3.0
+  mime: ^1.0.4
+  sqflite: ^2.3.0
+  flutter_image_compress: ^2.3.0
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -64,6 +68,13 @@ flutter:
     - assets/images/chaveiro.jpeg
     - assets/images/tatuagens_temporarias.jpeg
     - assets/images/selfieCarteirinha.png
+    - assets/images/FUTEBOL.jpg
+    - assets/images/BASQUETE.jpg
+    - assets/images/VOLEI.jpg
+    - assets/images/HANDEBOL.jpg
+    - assets/images/NATACAO.jpg
+    - assets/images/TENIS.jpg
+    - assets/images/GOLF.jpg
   fonts:
     - family: Oswald
       fonts:
