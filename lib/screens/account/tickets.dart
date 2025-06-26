@@ -4,12 +4,9 @@ import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:app_atletica/widgets/custom_bottom_nav_bar.dart';
 import 'package:app_atletica/widgets/search_bar.dart';
 import 'package:app_atletica/widgets/tickets/ticket_card.dart';
-import 'package:app_atletica/models/user_model.dart';
 
 class TicketsScreen extends StatefulWidget {
-  final UserModel? user;
-
-  const TicketsScreen({super.key, this.user});
+  const TicketsScreen({super.key});
 
   @override
   State<TicketsScreen> createState() => _TicketsScreenState();

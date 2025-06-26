@@ -189,7 +189,7 @@ Poderia me ajudar com a compra? 😊
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -545,7 +545,7 @@ Poderia me ajudar com a compra? 😊
                   const SizedBox(height: 16),
                   const Text(
                     'Proibido menores de 18',
-                    style: TextStyle(color: subTextColor),
+                    style: TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 24),
 
@@ -554,7 +554,7 @@ Poderia me ajudar com a compra? 😊
                   const SizedBox(height: 16),
                   const Text(
                     '• Documento Oficial com foto',
-                    style: TextStyle(color: subTextColor),
+                    style: TextStyle(color: Colors.white70),
                   ),
                   const SizedBox(height: 24),
 
@@ -564,7 +564,7 @@ Poderia me ajudar com a compra? 😊
                   const Text(
                     'A solicitação de cancelamento pode ser feita em até 7 dias corridos após a compra, '
                     'desde que seja feita antes de 48 horas do início do evento.',
-                    style: TextStyle(color: subTextColor),
+                    style: TextStyle(color: Colors.white70),
                   ),
                 ],
               ),

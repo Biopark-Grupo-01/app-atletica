@@ -70,13 +70,15 @@ class _RegisterAccountScreenState extends State<RegisterAccountScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const Center(child: CustomTitleForms(title: 'CADASTRO')),
-              Expanded(
-                child: SingleChildScrollView(child: _buildMenuCards(context)),
+          child: Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const Center(child: CustomTitleForms(title: 'CADASTRO')),
+                  _buildMenuCards(context),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

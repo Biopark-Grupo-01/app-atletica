@@ -68,23 +68,13 @@ class _ProfileRegistrationFormState extends State<ProfileRegistrationForm> {
                                 shape: BoxShape.circle,
                               ),
                               clipBehavior: Clip.antiAlias,
-                              child: Image.network(
-                                _imageUrl != null
-                                    ? _imageUrl!.path
-                                    : 'https://via.placeholder.com/350x150',
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: AppColors.lightGrey,
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                      ),
+                              child: _imageUrl != null
+                                  ? Image.file(_imageUrl!, fit: BoxFit.cover)
+                                  : const Icon(
+                                      Icons.person_add_alt,
+                                      size: 50,
+                                      color: AppColors.blue,
                                     ),
-                                  );
-                                },
-                              ),
                             ),
                           ),
                         ),

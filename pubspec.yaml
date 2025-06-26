@@ -22,8 +22,12 @@ dependencies:
   provider: ^6.1.2
   flutter_localizations:
     sdk: flutter
+  firebase_core: ^3.14.0
+  google_sign_in: ^6.3.0
+  firebase_crashlytics: ^4.0.1
+  firebase_auth: ^5.6.0
   share_plus: ^11.0.0
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -46,6 +50,7 @@ flutter:
     - assets/images/cartao_branco.png
     - assets/images/cartao.png
     - assets/images/emblema.png
+    - assets/images/google_icon.png
     - assets/images/caneca.png
     - assets/images/roupa1.png
     - assets/images/roupa2.png

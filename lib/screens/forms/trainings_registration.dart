@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:app_atletica/widgets/forms/custom_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:app_atletica/widgets/custom_app_bar.dart';
@@ -292,7 +291,7 @@ class _TrainingsRegistrationFormState extends State<TrainingsRegistrationForm> {
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(color: AppColors.yellow, width: 2),
                               ),
-                              fillColor: _selectedType == 'Treinos' ? Colors.transparent : Colors.grey.withOpacity(0.15),
+                              fillColor: _selectedType == 'Treinos' ? Colors.transparent : Colors.grey.withValues(alpha: 0.15),
                               filled: true,
                             ),
                             style: TextStyle(color: _selectedType == 'Treinos' ? AppColors.white : Colors.grey),

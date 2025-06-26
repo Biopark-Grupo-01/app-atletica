@@ -369,13 +369,13 @@ class _TrainingsScreenState extends State<TrainingsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isSubscribed ? const Color(0xFF1E88E5).withOpacity(0.2) : Colors.white.withOpacity(0.1),
+        color: isSubscribed ? const Color(0xFF1E88E5).withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: isSubscribed ? Border.all(color: const Color(0xFF42A5F5), width: 2) : null,
         boxShadow: isSubscribed
             ? [
                 BoxShadow(
-                  color: const Color(0xFF42A5F5).withOpacity(0.5),
+                  color: const Color(0xFF42A5F5).withValues(alpha: 0.5),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
@@ -453,7 +453,7 @@ void showTrainingModal(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     builder: (_) => TrainingModal(
       training: training,
       isSubscribed: _subscribedIds.contains(training.id),
@@ -475,7 +475,7 @@ void showMatchModal(BuildContext context, Match match) async {
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withOpacity(0.5),
+    barrierColor: Colors.black.withValues(alpha: 0.5),
     builder: (_) => TrainingModal(match: match),
   );
 }

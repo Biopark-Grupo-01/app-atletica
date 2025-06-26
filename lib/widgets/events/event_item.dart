@@ -117,6 +117,8 @@ class EventItem extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
               Text(
@@ -124,6 +126,8 @@ class EventItem extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.white, fontSize: 16),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

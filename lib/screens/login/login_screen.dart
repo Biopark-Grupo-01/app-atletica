@@ -1,8 +1,10 @@
+import 'package:app_atletica/services/firebase_auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:app_atletica/widgets/custom_button.dart';
 import 'package:app_atletica/theme/app_colors.dart';
 import 'package:provider/provider.dart';
-import 'package:app_atletica/providers/user_provider.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -15,6 +17,7 @@ class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
   bool isChecked = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -22,38 +25,95 @@ class LoginScreenState extends State<LoginScreen> {
     
     // Para testes: preenche os campos com credenciais de teste
     if (emailController.text.isEmpty) {
-      emailController.text = 'admin@atletica.com';
-      passwordController.text = 'admin123';
+      // emailController.text = 'admin@atletica.com';
+      // passwordController.text = 'admin123';
     }
   }
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // Acessa o provider para fazer login
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      
-      final success = await userProvider.login(
-        emailController.text.trim(), 
-        passwordController.text.trim()
-      );
-
-      if (success) {
-        // Login bem-sucedido, mostra snackbar e navega para a tela principal
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login realizado com sucesso!'))
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        final firebaseAuthService =
+            Provider.of<FirebaseAuthService>(context, listen: false);
+        final user = await firebaseAuthService.signInWithEmailAndPassword(
+          emailController.text.trim(),
+          passwordController.text.trim(),
         );
         
-        Navigator.pushReplacementNamed(context, '/home');
-      } else {
-        // Falha no login, mostra erro
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(userProvider.errorMessage ?? 'Falha ao fazer login. Tente novamente.'),
-            backgroundColor: Colors.red,
-          )
-        );
+        if (user != null) {
+          print('Login por email bem-sucedido: ${user.email}');
+          // A navegação será tratada pelo stream de estado de autenticação em main.dart
+        }
+      } on FirebaseAuthException catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message ?? 'Falha ao fazer login.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ocorreu um erro. Tente novamente.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+    try {
+      final firebaseAuthService =
+          Provider.of<FirebaseAuthService>(context, listen: false);
+      print('Iniciando login com Google...');
+      final user = await firebaseAuthService.signInWithGoogle();
+      
+      if (user != null) {
+        print('Login com Google bem-sucedido: ${user.email}');
+        // A navegação será tratada pelo stream de estado de autenticação em main.dart
+      } else {
+        print('Login com Google cancelado pelo usuário');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      // ignore: avoid_print
+      print('Google Sign-In Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Falha ao fazer login com o Google: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+    // Não definimos _isLoading = false aqui no finally porque pode interferir com a navegação automática
   }
 
   @override
@@ -62,26 +122,35 @@ class LoginScreenState extends State<LoginScreen> {
       body: Stack(
         children: [
           Container(color: const Color.fromARGB(255, 30, 30, 30)),
-          Opacity(
-            opacity: 0.5,
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/brasao.png'),
-                  fit: BoxFit.contain,
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.5,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/brasao.png'),
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
           ),
           Container(color: const Color.fromARGB(178, 1, 28, 58)),
-          Center(
-            child: Padding(
+          SafeArea(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(40.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                           MediaQuery.of(context).padding.top - 
+                           MediaQuery.of(context).padding.bottom,
+                ),
+                child: IntrinsicHeight(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                     Image.asset('assets/images/aaabe.png', scale: 0.8),
                     SizedBox(height: 30), // Espaço padronizado
                     Text('Login', style: TextStyle(fontSize: 24)),
@@ -186,26 +255,43 @@ class LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ],
-                    ),                    Spacer(), // Empurra os elementos restantes para baixo
-                    Consumer<UserProvider>(
-                      builder: (context, userProvider, child) {
-                        return userProvider.isLoading
-                          ? CircularProgressIndicator(
-                              color: Theme.of(context).colorScheme.secondary,
-                            )
-                          : CustomButton(text: 'Login', onPressed: _login);
-                      },
                     ),
+                    SizedBox(height: 50),
+                    if (_isLoading)
+                      CircularProgressIndicator()
+                    else ...[
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              text: 'Login',
+                              onPressed: _login,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          IconButton(
+                            icon: Image.asset(
+                              'assets/images/google_icon.png', // Certifique-se que este caminho está correto
+                              height: 24.0,
+                            ),
+                            onPressed: _signInWithGoogle,
+                            tooltip: 'Login com Google',
+                          ),
+                        ],
+                      ),
+                    ],
                     SizedBox(height: 20), // Espaço padronizado
                     TextButton(
-                      onPressed:
-                          () => Navigator.pushNamed(context, '/register'),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/register'),
                       child: Text(
                         'Registrar-se',
                         style: TextStyle(color: AppColors.white),
                       ),
                     ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

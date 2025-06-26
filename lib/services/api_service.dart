@@ -59,7 +59,8 @@ class ApiService {
     }
     
     // Se não temos cache ou precisamos atualizar, fazemos a requisição
-    Uri url = Uri.http(baseUrl, endpoint, queryParams);
+    final fullUrl = baseUrl + endpoint;
+    final Uri url = Uri.parse(fullUrl).replace(queryParameters: queryParams);
     final headers = await _getHeaders();
 
     try {
@@ -101,7 +102,8 @@ class ApiService {
     dynamic body,
     Map<String, dynamic>? queryParams,
   }) async {
-    Uri url = Uri.http(baseUrl, endpoint, queryParams);
+    final fullUrl = baseUrl + endpoint;
+    final Uri url = Uri.parse(fullUrl).replace(queryParameters: queryParams);
     final headers = await _getHeaders();
 
     try {
@@ -123,7 +125,8 @@ class ApiService {
     dynamic body,
     Map<String, dynamic>? queryParams,
   }) async {
-    Uri url = Uri.http(baseUrl, endpoint, queryParams);
+    final fullUrl = baseUrl + endpoint;
+    final Uri url = Uri.parse(fullUrl).replace(queryParameters: queryParams);
     final headers = await _getHeaders();
 
     try {
@@ -145,7 +148,8 @@ class ApiService {
     dynamic body,
     Map<String, dynamic>? queryParams,
   }) async {
-    Uri url = Uri.http(baseUrl, endpoint, queryParams);
+    final fullUrl = baseUrl + endpoint;
+    final Uri url = Uri.parse(fullUrl).replace(queryParameters: queryParams);
     final headers = await _getHeaders();
 
     try {
