@@ -24,7 +24,7 @@ class _StoreScreenState extends State<StoreScreen> {
   bool _isLoadingCategories = true;
   String? _categoriesError;
 
-  List<String> _selectedCategories = [];
+  final List<String> _selectedCategories = [];
   final TextEditingController _searchController = TextEditingController();
   bool _initialized = false;
 
@@ -50,7 +50,7 @@ class _StoreScreenState extends State<StoreScreen> {
         _categories = categories;
         _isLoadingCategories = false;
       });
-      print('Categorias carregadas: ${_categories}');
+      print('Categorias carregadas: $_categories');
     } catch (e) {
       setState(() {
         _categoriesError = 'Não foi possível carregar as categorias: $e';
@@ -270,7 +270,7 @@ class _StoreScreenState extends State<StoreScreen> {
                       controller: _searchController,
                     ),
                     const SizedBox(height: 16),
-
+                    if (_categories.isNotEmpty)
                     // Categories horizontal list
                     if (_isLoadingCategories)
                       const Center(
@@ -393,6 +393,10 @@ class _StoreScreenState extends State<StoreScreen> {
         return Icons.emoji_objects;
       case 'ac_unit':
         return Icons.ac_unit;
+      case 'key':
+        return Icons.key;
+      case 'brush':
+        return Icons.brush;
       default:
         return Icons.category;
     }

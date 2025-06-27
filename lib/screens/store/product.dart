@@ -1,3 +1,5 @@
+import 'package:app_atletica/theme/app_colors.dart';
+import 'package:app_atletica/widgets/custom_app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -149,19 +151,7 @@ class _ProductScreenState extends State<ProductScreen> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF091B40),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF091B40),
-        title: const Text(
-          'Produto',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: CustomAppBar(showBackButton: true),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
@@ -186,7 +176,7 @@ class _ProductScreenState extends State<ProductScreen> {
             Text(
               product['name'],
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -194,23 +184,24 @@ class _ProductScreenState extends State<ProductScreen> {
             const SizedBox(height: 4),
 
             // Link clicável
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/store',
-                  arguments: product['category_id'],
-                );
-              },
-              child: Text(
-                'Categoria: ${product['category'].toString().toUpperCase()}',
-                style: TextStyle(
-                  color: Color.fromARGB(230, 255, 255, 255),
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.bold,
-                ),
+            if (product['category_id'].isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/store',
+                    arguments: product['category_id'],
+                  );
+                },
+                child: Text(
+                        'CATEGORIA: ${product['category'].toString().toUpperCase()}',
+                        style: TextStyle(
+                          color: AppColors.lightGrey,
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
-            ),
 
             const SizedBox(height: 24),
 
@@ -218,7 +209,7 @@ class _ProductScreenState extends State<ProductScreen> {
             const Text(
               'A partir de',
               style: TextStyle(
-                color: Color.fromARGB(255, 255, 255, 255),
+                color: AppColors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -226,7 +217,7 @@ class _ProductScreenState extends State<ProductScreen> {
             Text(
               'R\$ ${product['price']}',
               style: GoogleFonts.archivoBlack(
-                textStyle: const TextStyle(color: Colors.white, fontSize: 28),
+                textStyle: const TextStyle(color: AppColors.white, fontSize: 28),
               ),
             ),
 
@@ -240,7 +231,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   const Text(
                     'Modelo',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: AppColors.lightGrey,
                       fontSize: 12,
                       fontWeight: FontWeight.w300,
                     ),
@@ -250,19 +241,19 @@ class _ProductScreenState extends State<ProductScreen> {
 
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(128, 52, 90, 167),
+                      color: AppColors.lightBlue,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: const Color(0xff3e6cc9)),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: DropdownButton<String>(
-                      dropdownColor: const Color.fromARGB(255, 52, 90, 167),
+                      dropdownColor: AppColors.lightBlue,
                       value: selectedModel,
                       isExpanded: true,
                       underline: const SizedBox(),
                       icon: const Icon(
                         Icons.arrow_drop_down,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                       items:
                           ['PP', 'P', 'M', 'G', 'GG']
@@ -271,7 +262,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                   value: size,
                                   child: Text(
                                     '$size (R\$${product['price']})',
-                                    style: const TextStyle(color: Colors.white),
+                                    style: const TextStyle(
+                                      color: AppColors.white,
+                                    ),
                                   ),
                                 ),
                               )
@@ -295,7 +288,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 const Text(
                   'Quantidade',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: AppColors.lightGrey,
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
                   ),
@@ -317,7 +310,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     underline: const SizedBox(),
                     icon: const Icon(
                       Icons.arrow_drop_down,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                     items:
                         List.generate(10, (index) => index + 1)
@@ -326,7 +319,9 @@ class _ProductScreenState extends State<ProductScreen> {
                                 value: qty,
                                 child: Text(
                                   '$qty',
-                                  style: const TextStyle(color: Colors.white),
+                                  style: const TextStyle(
+                                    color: AppColors.white,
+                                  ),
                                 ),
                               ),
                             )
@@ -358,7 +353,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 onPressed: () async {
                   final String phoneNumber = '5544999719743';
                   final String productName = product['name'];
-                  final String category = product['category'];
+                  final String category = product['category'] ?? 'Sem categoria';
                   final String price = product['price'];
                   final String model = selectedModel;
                   final int quantity = selectedQuantity;
@@ -389,7 +384,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 child: const Text(
                   'Comprar agora',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -414,12 +409,12 @@ class _ProductScreenState extends State<ProductScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: const [
-                      Icon(Icons.info_outline, color: Colors.white, size: 20),
+                      Icon(Icons.info_outline, color: AppColors.white, size: 20),
                       SizedBox(width: 6),
                       Text(
                         'Retirada',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
@@ -429,7 +424,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   const SizedBox(height: 4),
                   const Text(
                     'A retirada dos produtos deverá ser alinhada com o resposável por essa seção da atlética.',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppColors.white),
                   ),
                 ],
               ),
@@ -441,7 +436,7 @@ class _ProductScreenState extends State<ProductScreen> {
             const Text(
               'Descrição',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -449,7 +444,7 @@ class _ProductScreenState extends State<ProductScreen> {
             const SizedBox(height: 16),
             Text(
               product['description'] ?? 'Sem descrição disponível.',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.white),
             ),
 
             // Mais produtos
@@ -457,7 +452,7 @@ class _ProductScreenState extends State<ProductScreen> {
             Text(
               'Mais produtos disponíveis na loja',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -512,28 +507,37 @@ class _ProductScreenState extends State<ProductScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: image.startsWith('http')
-                  ? Image.network(
-                      image,
-                      width: 140,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
-                    )
-                  : Image.asset(
-                      image,
-                      width: 140,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: Colors.white),
-                    ),
+              child:
+                  image.startsWith('http')
+                      ? Image.network(
+                        image,
+                        width: 140,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              color: AppColors.white,
+                            ),
+                      )
+                      : Image.asset(
+                        image,
+                        width: 140,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (context, error, stackTrace) => const Icon(
+                              Icons.broken_image,
+                              color: AppColors.white,
+                            ),
+                      ),
             ),
             const SizedBox(height: 8),
             Text(
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: AppColors.white),
             ),
           ],
         ),

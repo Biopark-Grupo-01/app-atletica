@@ -64,7 +64,7 @@ class ProductService {
         price: 50.0,
         stock: 10,
         category: 'ROUPAS',
-        imageUrl: 'assets/images/camisetaa_masculina.png',
+        imageUrl: 'camisetaa_masculina.png',
       ),
       ProductModel(
         id: '2',
@@ -73,7 +73,16 @@ class ProductService {
         price: 25.0,
         stock: 15,
         category: 'CANECAS',
-        imageUrl: 'assets/images/caneca_personalizada.jpeg',
+        imageUrl: 'caneca_personalizada.jpeg',
+      ),
+      ProductModel(
+        id: '3',
+        name: 'Chaveiro',
+        description: 'Chaveiro da Atlética Biopark',
+        price: 15.0,
+        stock: 30,
+        category: 'CHAVEIROS',
+        imageUrl: 'chaveiro.jpeg',
       ),
     ];
   }
